@@ -1,0 +1,283 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{1D78F73C-369E-4037-9EE1-D6E7D3932F52}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Client</RootNamespace>
+    <AssemblyName>Client</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <FileAlignment>512</FileAlignment>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="SharpDX, Version=2.2.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\SharpDX.2.2.0\lib\net20\SharpDX.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.Diagnostics, Version=2.0.4.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\SharpDX.Diagnostics.2.0.4\lib\net20\SharpDX.Diagnostics.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.Direct3D9, Version=2.2.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\SharpDX.Direct3D9.2.2.0\lib\net20\SharpDX.Direct3D9.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Extensions\ViewportExtensions.cs" />
+    <Compile Include="Graphics\BoundingFrustum.cs" />
+    <Compile Include="Graphics\Buffer.cs" />
+    <Compile Include="Graphics\Cameras\Camera3D.cs" />
+    <Compile Include="Graphics\Color.cs" />
+    <Compile Include="Graphics\Cameras\ElementCamera.cs" />
+    <Compile Include="Graphics\CullMode.cs" />
+    <Compile Include="Graphics\DrawScreenTarget.cs" />
+    <Compile Include="Graphics\DrawTarget.cs" />
+    <Compile Include="Graphics\Elements\Element.cs" />
+    <Compile Include="Graphics\Elements\ElementRect.cs" />
+    <Compile Include="Graphics\Elements\ElementScaling.cs" />
+    <Compile Include="Graphics\Elements\HorizontalAlignment.cs" />
+    <Compile Include="Components\Gumps\IGumpManager.cs" />
+    <Compile Include="Components\Gumps\GumpManager.cs" />
+    <Compile Include="Graphics\Elements\TexturedElement.cs" />
+    <Compile Include="Graphics\Elements\VerticalAlignment.cs" />
+    <Compile Include="Graphics\FrustrumCull.cs" />
+    <Compile Include="Graphics\Interfaces\ICullPrimitive.cs" />
+    <Compile Include="Graphics\Interfaces\IDeviceIndexBuffer.cs" />
+    <Compile Include="Graphics\Interfaces\IDeviceVertexBuffer.cs" />
+    <Compile Include="Graphics\Interfaces\IIndices.cs" />
+    <Compile Include="Graphics\IndexBufferProcessor.cs" />
+    <Compile Include="Graphics\Indices.cs" />
+    <Compile Include="Graphics\Interfaces\ISemantic.cs" />
+    <Compile Include="Graphics\Interfaces\IVertices.cs" />
+    <Compile Include="Graphics\MatrixCalc.cs" />
+    <Compile Include="Graphics\Projection.cs" />
+    <Compile Include="Graphics\RenderTarget2D.cs" />
+    <Compile Include="Graphics\Resource.cs" />
+    <Compile Include="Graphics\Shader\Defined\CombineShader.cs" />
+    <Compile Include="Graphics\Shader\Defined\SimpleTextureEffect.cs" />
+    <Compile Include="Graphics\Shader\ShaderParameter.cs" />
+    <Compile Include="Graphics\Shader\ShaderPass.cs" />
+    <Compile Include="Graphics\Shader\ShaderTechnique.cs" />
+    <Compile Include="Graphics\TextureSamplerState.cs" />
+    <Compile Include="Graphics\VertexDeclarationBuilder.cs" />
+    <Compile Include="Graphics\VertexElementAttribute.cs" />
+    <Compile Include="Graphics\Vertices.cs" />
+    <Compile Include="Patterns\Chaining\UIRenderChain.cs" />
+    <Compile Include="Patterns\Chaining\WorldRenderChain.cs" />
+    <Compile Include="Patterns\Chaining\IUIRenderChain.cs" />
+    <Compile Include="Patterns\Chaining\IWorldRenderChain.cs" />
+    <Compile Include="Patterns\Chaining\Steps\UpdateDelegateChainStep.cs" />
+    <Compile Include="Patterns\Chaining\Steps\DelegateChainStep.cs" />
+    <Compile Include="Components\Gumps\Console\ConsoleLine.cs" />
+    <Compile Include="Configuration\ConfigKeys.cs" />
+    <Compile Include="Configuration\ConfigSections.cs" />
+    <Compile Include="Configuration\ConfigurationManager.cs" />
+    <Compile Include="Configuration\IConfiguration.cs" />
+    <Compile Include="Diagnostics\Tracer\GameConsoleTracer.cs" />
+    <Compile Include="EngineTimers.cs" />
+    <Compile Include="Graphics\RenderState\AlphaBlendState.cs" />
+    <Compile Include="Graphics\RenderState\AlphaTestState.cs" />
+    <Compile Include="Graphics\BitWiseTypeValidator.cs" />
+    <Compile Include="Graphics\BoundingRectangle.cs" />
+    <Compile Include="Graphics\Cameras\Camera2D.cs" />
+    <Compile Include="Components\Gumps\Console\Console.cs" />
+    <Compile Include="Components\Gumps\Console\IConsole.cs" />
+    <Compile Include="Graphics\MatrixSource.cs" />
+    <Compile Include="Graphics\RenderState\DeviceRenderStateContainer.cs" />
+    <Compile Include="Graphics\Shader\ShaderTechniqueCollection.cs" />
+    <Compile Include="Graphics\Shader\ShaderPassCollection.cs" />
+    <Compile Include="Graphics\Shader\ShaderElementCollection.cs" />
+    <Compile Include="Graphics\Shader\Shader.cs" />
+    <Compile Include="Graphics\Shader\ShaderParameterCollection.cs" />
+    <Compile Include="Graphics\StateFlag.cs" />
+    <Compile Include="Graphics\RenderState\DepthColourCullState.cs" />
+    <Compile Include="Graphics\Interfaces\ICamera.cs" />
+    <Compile Include="Graphics\Interfaces\IShaderManager.cs" />
+    <Compile Include="Graphics\ShaderManager.cs" />
+    <Compile Include="Patterns\Chaining\RenderChainBase.cs" />
+    <Compile Include="Graphics\RenderState\DeviceRenderState.cs" />
+    <Compile Include="Graphics\RenderState\StencilTestState.cs" />
+    <Compile Include="Graphics\ViewProjectionProvider.cs" />
+    <Compile Include="Graphics\WorldStackProvider.cs" />
+    <Compile Include="IAttach.cs" />
+    <Compile Include="Graphics\VertexDefinitions\VertexPosition.cs" />
+    <Compile Include="Graphics\Interfaces\ICullable.cs" />
+    <Compile Include="Graphics\Interfaces\ICuller.cs" />
+    <Compile Include="Graphics\Texture2D.cs" />
+    <Compile Include="LifetimeCounters.cs" />
+    <Compile Include="Graphics\DeviceCounters.cs" />
+    <Compile Include="Diagnostics\HighResoltionTimer.cs" />
+    <Compile Include="Diagnostics\PerformanceMonitor.cs" />
+    <Compile Include="Diagnostics\PerfTime.cs" />
+    <Compile Include="IUpdate.cs" />
+    <Compile Include="MathHelper.cs" />
+    <Compile Include="NativeMethods.cs" />
+    <Compile Include="Network\INetwork.cs" />
+    <Compile Include="Network\NetworkManager.cs" />
+    <Compile Include="Graphics\TextureBase.cs" />
+    <Compile Include="Graphics\DeviceTimers.cs" />
+    <Compile Include="Diagnostics\PerfTimeSpan.cs" />
+    <Compile Include="Engine.cs" />
+    <Compile Include="EngineModule.cs" />
+    <Compile Include="GameTime.cs" />
+    <Compile Include="Graphics\DeviceContext.cs" />
+    <Compile Include="Graphics\DeviceContextManager.cs" />
+    <Compile Include="Graphics\Interfaces\IDeviceContextService.cs" />
+    <Compile Include="Graphics\Interfaces\IDraw.cs" />
+    <Compile Include="Graphics\Interfaces\IRenderer.cs" />
+    <Compile Include="Graphics\DeviceResource.cs" />
+    <Compile Include="Graphics\DrawState.cs" />
+    <Compile Include="Graphics\VertexDefinitions\VertexPositionColor.cs" />
+    <Compile Include="Graphics\VertexDefinitions\VertexPositionColorTexture.cs" />
+    <Compile Include="Graphics\VertexDefinitions\VertexPositionNormalTexture.cs" />
+    <Compile Include="Graphics\VertexDefinitions\VertexPositionTexture.cs" />
+    <Compile Include="Input\HandledKeyEventArgs.cs" />
+    <Compile Include="Input\IInput.cs" />
+    <Compile Include="Input\InputBinding.cs" />
+    <Compile Include="Input\InputManager.cs" />
+    <Compile Include="ModuleBase.cs" />
+    <Compile Include="Patterns\Chaining\Steps\EngineChainBase.cs" />
+    <Compile Include="Patterns\Chaining\Steps\RenderDelegateChainStep.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="EngineBootstrapper.cs" />
+    <Compile Include="Resources1.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="State.cs" />
+    <Compile Include="Testing\TestRendering.cs" />
+    <Compile Include="Ultima\Facet.cs" />
+    <Compile Include="Ultima\MapCache.cs" />
+    <Compile Include="Ultima\Mobile.cs" />
+    <Compile Include="Ultima\World.cs" />
+    <Compile Include="UpdateChain.cs" />
+    <Compile Include="UpdateState.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Client.licenseheader" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\OpenUO.Core\OpenUO.Core.csproj">
+      <Project>{25B50E34-555E-497E-901E-628494B0C954}</Project>
+      <Name>OpenUO.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\OpenUO.Ultima.SharpDX\OpenUO.Ultima.SharpDX.csproj">
+      <Project>{A183E88C-FCE1-4B3C-8ADD-B36DBA6DFCF3}</Project>
+      <Name>OpenUO.Ultima.SharpDX</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\OpenUO.Ultima.Network\OpenUO.Ultima.Network.csproj">
+      <Project>{99579163-9065-4F01-9CEE-9D956288669A}</Project>
+      <Name>OpenUO.Ultima.Network</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\OpenUO.Ultima\OpenUO.Ultima.csproj">
+      <Project>{911C0A0F-1A08-4DA0-B103-EB24D9E19402}</Project>
+      <Name>OpenUO.Ultima</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.0,Profile=Client">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4 Client Profile %28x86 and x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 3.1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\CombineEffect.fx" />
+    <None Include="Resources\SimpleTextureEffect.fx" />
+    <None Include="Resources\openuo.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources1.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Services\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

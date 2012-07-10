@@ -1,0 +1,178 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{911C0A0F-1A08-4DA0-B103-EB24D9E19402}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>OpenUO.Ultima</RootNamespace>
+    <AssemblyName>OpenUO.Ultima</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="PresentationCore" />
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Adapters\AnimationDataStorageAdapter.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Adapters\Interfaces\IAnimationDataStorageAdapter.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Adapters\Interfaces\IAnimationStorageAdapter.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Adapters\Interfaces\IASCIIFontStorageAdapter.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Adapters\Interfaces\IGumpStorageAdapter.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Adapters\Interfaces\ISkillStorageAdapter.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Adapters\Interfaces\ISoundStorageAdapter.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Adapters\Interfaces\ITexmapStorageAdapter.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Adapters\Interfaces\IUnicodeFontStorageAdapter.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Adapters\SkillStorageAdapter.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Adapters\SoundStorageAdapter.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Animations\AnimationData.cs" />
+    <Compile Include="Factories\AnimationDataFactory.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Factories\AnimationFactory.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Factories\ASCIIFontFactory.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Factories\GumpFactory.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Factories\SkillsFactory.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Factories\SoundFactory.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Factories\TexmapFactory.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Factories\UnicodeFontFactory.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="UltimaSDKCoreModule.cs" />
+    <Compile Include="UopIndexEntry.cs" />
+    <Compile Include="Fonts\ASCIIChar.cs" />
+    <Compile Include="Fonts\ASCIIFont.cs" />
+    <Compile Include="Animations\BodyConverter.cs" />
+    <Compile Include="Animations\BodyTable.cs" />
+    <Compile Include="Animations\BodyTableEntry.cs" />
+    <Compile Include="ClientUtility.cs" />
+    <Compile Include="ColorConverter.cs" />
+    <Compile Include="Factories\ArtworkFactory.cs" />
+    <Compile Include="Factories\AdapterFactoryBase.cs" />
+    <Compile Include="FileIndexEntry.cs" />
+    <Compile Include="FileIndex.cs" />
+    <Compile Include="Adapters\Interfaces\IArtworkStorageAdapter.cs" />
+    <Compile Include="Adapters\Interfaces\IStorageAdapter.cs" />
+    <Compile Include="Animations\Frame.cs" />
+    <Compile Include="Hues\Hue.cs" />
+    <Compile Include="Map\HuedTile.cs" />
+    <Compile Include="Map\HuedTileList.cs" />
+    <Compile Include="Hues\Hues.cs" />
+    <Compile Include="InstallationLocator.cs" />
+    <Compile Include="InstallLocation.cs" />
+    <Compile Include="Map\ItemData.cs" />
+    <Compile Include="Map\LandData.cs" />
+    <Compile Include="Map\Map.cs" />
+    <Compile Include="Map\Maps.cs" />
+    <Compile Include="Map\RadarColors.cs" />
+    <Compile Include="NativeMethods.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Adapters\StorageAdapterBase.cs" />
+    <Compile Include="Skills\Skill.cs" />
+    <Compile Include="Skills\SkillCategory.cs" />
+    <Compile Include="Skills\SkillCategoryData.cs" />
+    <Compile Include="Skills\SkillData.cs" />
+    <Compile Include="Sound.cs" />
+    <Compile Include="Map\StaticTile.cs" />
+    <Compile Include="Map\Tile.cs" />
+    <Compile Include="TileData\TileData.cs" />
+    <Compile Include="TileData\TileFlag.cs" />
+    <Compile Include="Map\TileList.cs" />
+    <Compile Include="Map\TileMatrix.cs" />
+    <Compile Include="Map\TileMatrixPatch.cs" />
+    <Compile Include="Transactions\Interfaces\ITransaction.cs" />
+    <Compile Include="Transactions\Interfaces\IIndexedWriteTransaction.cs" />
+    <Compile Include="Transactions\Transaction.cs" />
+    <Compile Include="Transactions\FileIndexWriteTransaction.cs" />
+    <Compile Include="UltimaException.cs" />
+    <Compile Include="Fonts\UnicodeChar.cs" />
+    <Compile Include="Fonts\UnicodeFont.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="TODO.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Client.licenseheader" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\OpenUO.Core\OpenUO.Core.csproj">
+      <Project>{25B50E34-555E-497E-901E-628494B0C954}</Project>
+      <Name>OpenUO.Core</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

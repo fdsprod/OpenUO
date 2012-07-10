@@ -1,0 +1,187 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>DbExecutor</name>
+    </assembly>
+    <members>
+        <member name="T:Codeplex.Data.DbExecutor">
+            <summary>Simple and Lightweight Database Executor.</summary>
+        </member>
+        <member name="M:Codeplex.Data.DbExecutor.ExecuteReader(System.Data.IDbConnection,System.String,System.Object,System.Data.CommandType,System.Data.CommandBehavior)">
+            <summary>Executes and returns the data records, when done dispose connection.<para>When done dispose connection.</para></summary>
+            <param name="connection">Database connection.</param>
+            <param name="query">SQL code.</param>
+            <param name="parameter">PropertyName parameterized to PropertyName. if null then no use parameter.</param>
+            <param name="commandType">Command Type.</param>
+            <param name="commandBehavior">Command Behavior.</param>
+            <returns>Query results.</returns>
+        </member>
+        <member name="M:Codeplex.Data.DbExecutor.ExecuteReaderDynamic(System.Data.IDbConnection,System.String,System.Object,System.Data.CommandType,System.Data.CommandBehavior)">
+            <summary>Executes and returns the data records enclosing DynamicDataRecord.<para>When done dispose connection.</para></summary>
+            <param name="connection">Database connection.</param>
+            <param name="query">SQL code.</param>
+            <param name="parameter">PropertyName parameterized to PropertyName. if null then no use parameter.</param>
+            <param name="commandType">Command Type.</param>
+            <param name="commandBehavior">Command Behavior.</param>
+            <returns>Query results. Result type is DynamicDataRecord.</returns>
+        </member>
+        <member name="M:Codeplex.Data.DbExecutor.ExecuteNonQuery(System.Data.IDbConnection,System.String,System.Object,System.Data.CommandType)">
+            <summary>Executes and returns the number of rows affected.<para>When done dispose connection.</para></summary>
+            <param name="connection">Database connection.</param>
+            <param name="query">SQL code.</param>
+            <param name="parameter">PropertyName parameterized to PropertyName. if null then no use parameter.</param>
+            <param name="commandType">Command Type.</param>
+            <returns>Rows affected.</returns>
+        </member>
+        <member name="M:Codeplex.Data.DbExecutor.ExecuteScalar``1(System.Data.IDbConnection,System.String,System.Object,System.Data.CommandType)">
+            <summary>Executes and returns the first column, first row.<para>When done dispose connection.</para></summary>
+            <param name="connection">Database connection.</param>
+            <typeparam name="T">Result type.</typeparam>
+            <param name="query">SQL code.</param>
+            <param name="parameter">PropertyName parameterized to PropertyName. if null then no use parameter.</param>
+            <param name="commandType">Command Type.</param>
+            <returns>Query results of first column, first row.</returns>
+        </member>
+        <member name="M:Codeplex.Data.DbExecutor.Select``1(System.Data.IDbConnection,System.String,System.Object,System.Data.CommandType)">
+            <summary>Executes and mapping objects by ColumnName - PropertyName.<para>When done dispose connection.</para></summary>
+            <typeparam name="T">Mapping target Class.</typeparam>
+            <param name="connection">Database connection.</param>
+            <param name="query">SQL code.</param>
+            <param name="parameter">PropertyName parameterized to PropertyName. if null then no use parameter.</param>
+            <param name="commandType">Command Type.</param>
+            <returns>Mapped instances.</returns>
+        </member>
+        <member name="M:Codeplex.Data.DbExecutor.SelectDynamic(System.Data.IDbConnection,System.String,System.Object,System.Data.CommandType)">
+            <summary>Executes and mapping objects to ExpandoObject. Object is dynamic accessable by ColumnName.<para>When done dispose connection.</para></summary>
+            <param name="connection">Database connection.</param>
+            <param name="query">SQL code.</param>
+            <param name="parameter">PropertyName parameterized to PropertyName. if null then no use parameter.</param>
+            <param name="commandType">Command Type.</param>
+            <returns>Mapped results(dynamic type is ExpandoObject).</returns>
+        </member>
+        <member name="M:Codeplex.Data.DbExecutor.Insert(System.Data.IDbConnection,System.String,System.Object,System.Char)">
+            <summary>Insert by object's PropertyName.<para>When done dispose connection.</para></summary>
+            <param name="connection">Database connection.</param>
+            <param name="tableName">Target database's table.</param>
+            <param name="insertItem">Table's column name extracted from PropertyName.</param>
+            <param name="parameterSymbol">Command parameter symbol. SqlServer = '@', MySql = '?', Oracle = ':'</param>
+            <returns>Rows affected.</returns>
+        </member>
+        <member name="M:Codeplex.Data.DbExecutor.Update(System.Data.IDbConnection,System.String,System.Object,System.Object,System.Char)">
+            <summary>Update by object's PropertyName.<para>When done dispose connection.</para></summary>
+            <param name="connection">Database connection.</param>
+            <param name="tableName">Target database's table.</param>
+            <param name="updateItem">Table's column name extracted from PropertyName.</param>
+            <param name="whereCondition">Where condition extracted from PropertyName.</param>
+            <param name="parameterSymbol">Command parameter symbol. SqlServer = '@', MySql = '?', Oracle = ':'</param>
+            <returns>Rows affected.</returns>
+        </member>
+        <member name="M:Codeplex.Data.DbExecutor.Delete(System.Data.IDbConnection,System.String,System.Object,System.Char)">
+            <summary>Delete by object's PropertyName.<para>When done dispose connection.</para></summary>
+            <param name="connection">Database connection.</param>
+            <param name="tableName">Target database's table.</param>
+            <param name="whereCondition">Where condition extracted from PropertyName.</param>
+            <param name="parameterSymbol">Command parameter symbol. SqlServer = '@', MySql = '?', Oracle = ':'</param>
+            <returns>Rows affected.</returns>
+        </member>
+        <member name="M:Codeplex.Data.DbExecutor.#ctor(System.Data.IDbConnection,System.Char)">
+            <summary>Create standard executor.</summary>
+            <param name="connection">Database connection.</param>
+            <param name="parameterSymbol">Command parameter symbol. SqlServer = '@', MySql = '?', Oracle = ':'</param>
+        </member>
+        <member name="M:Codeplex.Data.DbExecutor.#ctor(System.Data.IDbConnection,System.Data.IsolationLevel,System.Char)">
+            <summary>Use transaction.</summary>
+            <param name="connection">Database connection.</param>
+            <param name="isolationLevel">Transaction IsolationLevel.</param>
+            <param name="parameterSymbol">Command parameter symbol. SqlServer = '@', MySql = '?', Oracle = ':'</param>
+        </member>
+        <member name="M:Codeplex.Data.DbExecutor.PrepareExecute(System.String,System.Data.CommandType,System.Object,System.Object)">
+            <summary>If connection is not open then open and create command.</summary>
+            <param name="query">SQL code.</param>
+            <param name="commandType">Command Type.</param>
+            <param name="parameter">PropertyName parameterized to PropertyName. if null then no use parameter.</param>
+            <param name="extraParameter">CommandName set to __extra__PropertyName.</param>
+            <returns>Setuped IDbCommand.</returns>
+        </member>
+        <member name="M:Codeplex.Data.DbExecutor.ExecuteReader(System.String,System.Object,System.Data.CommandType,System.Data.CommandBehavior)">
+            <summary>Executes and returns the data records.</summary>
+            <param name="query">SQL code.</param>
+            <param name="parameter">PropertyName parameterized to PropertyName. if null then no use parameter.</param>
+            <param name="commandType">Command Type.</param>
+            <param name="commandBehavior">Command Behavior.</param>
+            <returns>Query results.</returns>
+        </member>
+        <member name="M:Codeplex.Data.DbExecutor.ExecuteReaderDynamic(System.String,System.Object,System.Data.CommandType,System.Data.CommandBehavior)">
+            <summary>Executes and returns the data records enclosing DynamicDataRecord.</summary>
+            <param name="query">SQL code.</param>
+            <param name="parameter">PropertyName parameterized to PropertyName. if null then no use parameter.</param>
+            <param name="commandType">Command Type.</param>
+            <param name="commandBehavior">Command Behavior.</param>
+            <returns>Query results. Result type is DynamicDataRecord.</returns>
+        </member>
+        <member name="M:Codeplex.Data.DbExecutor.ExecuteNonQuery(System.String,System.Object,System.Data.CommandType)">
+            <summary>Executes and returns the number of rows affected.</summary>
+            <param name="query">SQL code.</param>
+            <param name="parameter">PropertyName parameterized to PropertyName. if null then no use parameter.</param>
+            <param name="commandType">Command Type.</param>
+            <returns>Rows affected.</returns>
+        </member>
+        <member name="M:Codeplex.Data.DbExecutor.ExecuteScalar``1(System.String,System.Object,System.Data.CommandType)">
+            <summary>Executes and returns the first column, first row.</summary>
+            <typeparam name="T">Result type.</typeparam>
+            <param name="query">SQL code.</param>
+            <param name="parameter">PropertyName parameterized to PropertyName. if null then no use parameter.</param>
+            <param name="commandType">Command Type.</param>
+            <returns>Query results of first column, first row.</returns>
+        </member>
+        <member name="M:Codeplex.Data.DbExecutor.Select``1(System.String,System.Object,System.Data.CommandType)">
+            <summary>Executes and mapping objects by ColumnName - PropertyName.</summary>
+            <typeparam name="T">Mapping target Class.</typeparam>
+            <param name="query">SQL code.</param>
+            <param name="parameter">PropertyName parameterized to PropertyName. if null then no use parameter.</param>
+            <param name="commandType">Command Type.</param>
+            <returns>Mapped instances.</returns>
+        </member>
+        <member name="M:Codeplex.Data.DbExecutor.SelectDynamic(System.String,System.Object,System.Data.CommandType)">
+            <summary>Executes and mapping objects to ExpandoObject. Object is dynamic accessable by ColumnName.</summary>
+            <param name="query">SQL code.</param>
+            <param name="parameter">PropertyName parameterized to PropertyName. if null then no use parameter.</param>
+            <param name="commandType">Command Type.</param>
+            <returns>Mapped results(dynamic type is ExpandoObject).</returns>
+        </member>
+        <member name="M:Codeplex.Data.DbExecutor.Insert(System.String,System.Object)">
+            <summary>Insert by object's PropertyName.</summary>
+            <param name="tableName">Target database's table.</param>
+            <param name="insertItem">Table's column name extracted from PropertyName.</param>
+            <returns>Rows affected.</returns>
+        </member>
+        <member name="M:Codeplex.Data.DbExecutor.Update(System.String,System.Object,System.Object)">
+            <summary>Update by object's PropertyName.</summary>
+            <param name="tableName">Target database's table.</param>
+            <param name="updateItem">Table's column name extracted from PropertyName.</param>
+            <param name="whereCondition">Where condition extracted from PropertyName.</param>
+            <returns>Rows affected.</returns>
+        </member>
+        <member name="M:Codeplex.Data.DbExecutor.Delete(System.String,System.Object)">
+            <summary>Delete by object's PropertyName.</summary>
+            <param name="tableName">Target database's table.</param>
+            <param name="whereCondition">Where condition extracted from PropertyName.</param>
+            <returns>Rows affected.</returns>
+        </member>
+        <member name="M:Codeplex.Data.DbExecutor.TransactionComplete">
+            <summary>Commit transaction.</summary>
+        </member>
+        <member name="M:Codeplex.Data.DbExecutor.Dispose">
+            <summary>Dispose inner connection.</summary>
+        </member>
+        <member name="T:Codeplex.Data.Internal.ExpressionAccessor">
+            <summary>Delegate accessor created from expression tree.</summary>
+        </member>
+        <member name="T:Codeplex.Data.Internal.ReflectionAccessor">
+            <summary>Reflection(PropertyInfo/MemberInfo) accessor.</summary>
+        </member>
+        <member name="T:Codeplex.Data.DynamicDataRecord">
+            <summary>Dynamic IDataRecord Accessor. Can access dot syntax by column name or indexer(No or Name).</summary>
+        </member>
+    </members>
+</doc>

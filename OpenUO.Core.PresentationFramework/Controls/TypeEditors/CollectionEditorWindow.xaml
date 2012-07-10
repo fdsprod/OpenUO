@@ -1,0 +1,42 @@
+﻿<Window x:Class="OpenUO.Core.PresentationFramework.TypeEditors.CollectionEditorWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:OpenUO.Core.PresentationFramework="clr-namespace:OpenUO.Core.PresentationFramework" Title="CollectionEditor" Height="400" Width="600" WindowStyle="ToolWindow" Padding="10" WindowStartupLocation="CenterOwner" Name="collEdt">
+    <Window.Template>
+        <ControlTemplate TargetType="Window">
+            <Border Background="White" Padding="{TemplateBinding Padding}">
+                <ContentPresenter />
+            </Border>
+        </ControlTemplate>
+    </Window.Template>
+    
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="50*" />
+            <ColumnDefinition Width="50*" />
+            <ColumnDefinition Width="100" />
+        </Grid.ColumnDefinitions>
+        
+        <DockPanel Grid.Column="0" LastChildFill="True">
+            <Grid DockPanel.Dock="Bottom">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition></ColumnDefinition>
+                    <ColumnDefinition></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <Button Height="25" Width="60" HorizontalAlignment="Left" Name="cmdAdd" Click="cmdAdd_Click">Add</Button>
+                <Button Grid.Column="1" Height="25" Width="60" HorizontalAlignment="Right" Margin="0,0,10,0" Name="cmdRemove" Click="cmdRemove_Click">Remove</Button>
+            </Grid>
+            
+            <ListBox DockPanel.Dock="Top" HorizontalAlignment="Stretch" Margin="10" Name="myLst" SelectionChanged="myLst_SelectionChanged"></ListBox>
+            
+        </DockPanel>
+                
+        <GridSplitter Width="3"></GridSplitter>
+        
+        <OpenUO.Core.PresentationFramework:PropertyGrid Grid.Column="1" Margin="10" AutomaticlyExpandObjects="False" Foreground="White" Instance="{Binding ElementName=myButton}" x:Name="myGrid" ShowDescription="False" ShowPreview="False" DataContext="{Binding}" />
+        <StackPanel Grid.Column="2">
+            <Button Name="cmdOk" Click="cmdOk_Click">Ok</Button>
+            <Button Margin="0,10,0,0" Click="Button_Click">Cancel</Button>
+        </StackPanel>
+
+    </Grid>
+</Window>
