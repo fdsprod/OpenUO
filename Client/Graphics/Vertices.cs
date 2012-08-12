@@ -417,7 +417,7 @@ namespace Client.Graphics
 #endif
         }
 
-        public void Dispose()
+		protected override void Dispose(bool disposing)
         {
             if (_buffer != null)
             {
