@@ -22,7 +22,18 @@ namespace OpenUO.Ultima.Windows.Forms.Adapters
 {
     internal class ArtworkBitmapAdapter : StorageAdapterBase, IArtworkStorageAdapter<Bitmap>
     {
-        private FileIndex _fileIndex;
+        private FileIndexBase _fileIndex;
+
+        public override int Length
+        {
+            get
+            {
+                if (!IsInitialized)
+                    Initialize();
+
+                return _fileIndex.Length;
+            }
+        }
         
         public override void Initialize()
         {
@@ -32,7 +43,7 @@ namespace OpenUO.Ultima.Windows.Forms.Adapters
 
             _fileIndex =
                 install.IsUOPFormat
-                    ? install.CreateFileIndex("artLegacyMUL.uop")
+                    ? install.CreateFileIndex("artLegacyMUL.uop", 0x10000, false, ".tga")
                     : install.CreateFileIndex("artidx.mul", "art.mul");
         }
 
@@ -56,13 +67,6 @@ namespace OpenUO.Ultima.Windows.Forms.Adapters
             Bitmap bmp = new Bitmap(44, 44, PixelFormat.Format16bppArgb1555);
             BitmapData bd = bmp.LockBits(new Rectangle(0, 0, 44, 44), ImageLockMode.WriteOnly, PixelFormat.Format16bppArgb1555);
             BinaryReader bin = new BinaryReader(stream);
-
-            if (_fileIndex.IsUopFormat)
-            {
-                bin.ReadInt32(); // Unknown
-                bin.ReadInt32(); // Unknown
-                bin.ReadInt32(); // Unknown
-            }
 
             int xOffset = 21;
             int xRun = 2;
@@ -98,23 +102,15 @@ namespace OpenUO.Ultima.Windows.Forms.Adapters
 
         public unsafe Bitmap GetStatic(int index)
         {
-            if(_fileIndex.IsUopFormat)
-                index += 2855;
-            else
-                index += 0x4000;
-
-            index &= 0xFFFF;
+            index += 0x4000;
 
             int length, extra;
             Stream stream = _fileIndex.Seek(index, out length, out extra);
-            BinaryReader bin = new BinaryReader(stream);
 
-            if (_fileIndex.IsUopFormat)
-            {
-                bin.ReadInt32(); // Unknown
-                bin.ReadInt32(); // Unknown
-                bin.ReadInt32(); // Unknown
-            }
+            if (stream == null)
+                return null;
+
+            BinaryReader bin = new BinaryReader(stream);
 
             bin.ReadInt32(); // Unknown
 

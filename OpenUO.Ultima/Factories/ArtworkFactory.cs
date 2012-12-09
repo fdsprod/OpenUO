@@ -22,6 +22,16 @@ namespace OpenUO.Ultima
         public ArtworkFactory(InstallLocation install, IoCContainer container)
             : base(install, container) { }
 
+        public int GetLandTileCount<T>()
+        {
+            return 0x4000;
+        }
+
+        public int GetStaticTileCount<T>()
+        {
+            return GetAdapter<IArtworkStorageAdapter<T>>().Length - 0x4000;
+        }
+
         public T GetLand<T>(int index)
         {
             return GetAdapter<IArtworkStorageAdapter<T>>().GetLand(index);

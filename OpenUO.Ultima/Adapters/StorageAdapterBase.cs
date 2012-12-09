@@ -23,7 +23,11 @@ namespace OpenUO.Ultima.Adapters
             set;
         }
 
-        public virtual void Initialize() { }
+        public bool IsInitialized { get; private set; }
+
+        public abstract int Length { get; }
+
+        public virtual void Initialize() { IsInitialized = true;  }
 
         public void Dispose()
         {

@@ -55,7 +55,7 @@ namespace OpenUO.Ultima.UnitTests
         public void TestTexmapsBitmapAdapter()
         {
             TexmapFactory factory = new TexmapFactory(Install, Container);
-            Bitmap texmap = factory.GetTexmap<Bitmap>(0);
+            Bitmap texmap = factory.GetTexmap<Bitmap>(1);
 
             Guard.AssertIsNotNull(texmap, "Texmap 0 was not found.");
         }

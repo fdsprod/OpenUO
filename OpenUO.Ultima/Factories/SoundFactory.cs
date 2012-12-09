@@ -26,5 +26,10 @@ namespace OpenUO.Ultima
         {
             return GetAdapter<ISoundStorageAdapter<T>>().GetSound(index);
         }
+
+        public int GetLength<T>()
+        {
+            return GetAdapter<ISoundStorageAdapter<T>>().Length;
+        }
     }
 }

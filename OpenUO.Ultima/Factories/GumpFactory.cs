@@ -26,5 +26,10 @@ namespace OpenUO.Ultima
         {
             return GetAdapter<IGumpStorageAdapter<T>>().GetGump(index);
         }
+
+        public int GetLength<T>()
+        {
+            return GetAdapter<IGumpStorageAdapter<T>>().Length;
+        }
     }
 }

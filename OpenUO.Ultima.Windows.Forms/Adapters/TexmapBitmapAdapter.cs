@@ -21,7 +21,18 @@ namespace OpenUO.Ultima.Windows.Forms.Adapters
 {
     internal class TexmapBitmapAdapter : StorageAdapterBase, ITexmapStorageAdapter<Bitmap>
     {
-        private FileIndex _fileIndex;
+        private FileIndexBase _fileIndex;
+
+        public override int Length
+        {
+            get
+            {
+                if (!IsInitialized)
+                    Initialize();
+
+                return _fileIndex.Length;
+            }
+        }
 
         public override void Initialize()
         {

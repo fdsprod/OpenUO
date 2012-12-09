@@ -12,12 +12,13 @@
  ***************************************************************************/
 #endregion
 
-
 using System;
+
 namespace OpenUO.Ultima.Adapters
 {
     public interface IStorageAdapter : IDisposable
     {
+        int Length { get; }
         InstallLocation Install { get; set; }
         void Initialize();
     }

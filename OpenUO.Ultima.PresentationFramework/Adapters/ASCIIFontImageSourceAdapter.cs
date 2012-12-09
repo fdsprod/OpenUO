@@ -24,6 +24,17 @@ namespace OpenUO.Ultima.PresentationFramework.Adapters
     {
         private ASCIIFont[] _fonts;
 
+        public override int Length
+        {
+            get
+            {
+                if (!IsInitialized)
+                    Initialize();
+
+                return _fonts.Length;
+            }
+        }
+
         public override void Initialize()
         {
             base.Initialize();

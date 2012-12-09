@@ -71,11 +71,11 @@ namespace OpenUO.Ultima
             Directory = directory;
         }
 
-        public FileIndex CreateFileIndex(string uopFile)
+        public FileIndexBase CreateFileIndex(string uopFile, int length, bool hasExtra, string extension)
         {
             uopFile = GetPath(uopFile);
 
-            FileIndex fileIndex = new FileIndex(uopFile);
+            FileIndexBase fileIndex = new UopFileIndex(uopFile, length, hasExtra, extension);
 
             if (!fileIndex.FilesExist)
             {
@@ -84,15 +84,17 @@ namespace OpenUO.Ultima
                     Path.GetFileName(uopFile), Directory);
             }
 
+            fileIndex.Open();
+
             return fileIndex;
         }
 
-        public FileIndex CreateFileIndex(string idxFile, string mulFile)
+        public FileIndexBase CreateFileIndex(string idxFile, string mulFile)
         {
             idxFile = GetPath(idxFile);
             mulFile = GetPath(mulFile);
 
-            FileIndex fileIndex = new FileIndex(idxFile, mulFile);
+            FileIndexBase fileIndex = new MulFileIndex(idxFile, mulFile);
 
             if (!fileIndex.FilesExist)
             {
@@ -101,6 +103,8 @@ namespace OpenUO.Ultima
                     Path.GetFileName(idxFile), 
                     Path.GetFileName(mulFile), Directory);
             }
+
+            fileIndex.Open();
 
             return fileIndex;
         }

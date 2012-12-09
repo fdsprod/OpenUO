@@ -23,6 +23,17 @@ namespace OpenUO.Ultima.Adapters
         private Skill[] _skills;
         private SkillCategory[] _categories;
         private int[] _categoryLookup;
+
+        public override int Length
+        {
+            get
+            {
+                if (!IsInitialized)
+                    Initialize();
+
+                return _skills.Length;
+            }
+        }
         
         public override void Initialize()
         {
@@ -95,7 +106,7 @@ namespace OpenUO.Ultima.Adapters
             }
         }
 
-        private Skill ReadSkill(FileIndex fileIndex, int index)
+        private Skill ReadSkill(FileIndexBase fileIndex, int index)
         {
             int length, extra;
             Stream stream = fileIndex.Seek(index, out length, out extra);

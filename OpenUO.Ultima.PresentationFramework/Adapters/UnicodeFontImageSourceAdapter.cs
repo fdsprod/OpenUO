@@ -27,6 +27,17 @@ namespace OpenUO.Ultima.PresentationFramework.Adapters
         private const string FILE_NAME_FORMAT = "unifont{0}.mul";
 
         private UnicodeFont[] _fonts;
+
+        public override int Length
+        {
+            get
+            {
+                if (!IsInitialized)
+                    Initialize();
+
+                return _fonts.Length;
+            }
+        }
                 
         public override void Initialize()
         {

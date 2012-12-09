@@ -22,6 +22,17 @@ namespace OpenUO.Ultima.Adapters
     {
         private AnimationData[] _animationData;
 
+        public override int Length
+        {
+            get
+            {
+                if (!IsInitialized)
+                    Initialize();
+
+                return _animationData.Length;
+            }
+        }
+
         public override void Initialize()
         {
             base.Initialize();

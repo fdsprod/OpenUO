@@ -19,7 +19,18 @@ namespace OpenUO.Ultima.Adapters
 {
     public class SoundStorageAdapter : StorageAdapterBase, ISoundStorageAdapter<Sound>
     {
-        private FileIndex _fileIndex;
+        private FileIndexBase _fileIndex;
+
+        public override int Length
+        {
+            get
+            {
+                if (!IsInitialized)
+                    Initialize();
+
+                return _fileIndex.Length;
+            }
+        }
 
         public override void Initialize()
         {
@@ -29,7 +40,7 @@ namespace OpenUO.Ultima.Adapters
 
             _fileIndex =
                 install.IsUOPFormat
-                    ? install.CreateFileIndex("soundLegacyMUL.uop")
+                    ? install.CreateFileIndex("soundLegacyMUL.uop", 0xFFF, false, ".dat")
                     : install.CreateFileIndex("soundidx.mul", "sound..mul");
         }
 
@@ -40,9 +51,6 @@ namespace OpenUO.Ultima.Adapters
 
             if (stream == null)
                 return null;
-
-            if (_fileIndex.IsUopFormat)
-                stream.Seek(12, SeekOrigin.Current);
 
             int[] waveHeader = CreateWaveHeader(length);
 

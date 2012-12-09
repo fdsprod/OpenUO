@@ -22,7 +22,18 @@ namespace OpenUO.Ultima.PresentationFramework.Adapters
 {
     internal class GumpImageSourceAdapter : StorageAdapterBase, IGumpStorageAdapter<ImageSource>
     {
-        private FileIndex _fileIndex;
+        private FileIndexBase _fileIndex;
+
+        public override int Length
+        {
+            get
+            {
+                if (!IsInitialized)
+                    Initialize();
+
+                return _fileIndex.Length;
+            }
+        }
 
         public override void Initialize()
         {
@@ -32,7 +43,7 @@ namespace OpenUO.Ultima.PresentationFramework.Adapters
 
             _fileIndex =
                 install.IsUOPFormat
-                    ? install.CreateFileIndex("gumpartLegacyMUL.uop")
+                    ? install.CreateFileIndex("gumpartLegacyMUL.uop", 0xFFFF, true, ".tga")
                     : install.CreateFileIndex("gumpidx.mul", "gumpart.mul");
         }
 
@@ -56,16 +67,7 @@ namespace OpenUO.Ultima.PresentationFramework.Adapters
                 return null;
 
             BinaryReader bin = new BinaryReader(stream);
-
-            if (_fileIndex.IsUopFormat)
-            {
-                bin.ReadInt32(); // Unknown
-                bin.ReadInt32(); // Unknown
-                bin.ReadInt32(); // Unknown
-
-                extra = (bin.ReadInt32() << 16) | bin.ReadInt32();
-            }
-
+            
             int width = (extra >> 16) & 0xFFFF;
             int height = extra & 0xFFFF;
 

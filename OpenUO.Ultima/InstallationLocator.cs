@@ -28,6 +28,7 @@ namespace OpenUO.Ultima
         {
             KnownInstallationRegistryKeys = new List<string>() {
                 @"Electronic Arts\EA Games\Ultima Online Stygian Abyss Classic",     
+                @"Electronic Arts\EA Games\Ultima Online Classic",  
                 @"Origin Worlds Online\Ultima Online\KR Legacy Beta", 
                 @"EA Games\Ultima Online: Mondain's Legacy\1.00.0000", 
                 @"Origin Worlds Online\Ultima Online\1.0", 

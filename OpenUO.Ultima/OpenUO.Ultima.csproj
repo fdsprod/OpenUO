@@ -10,8 +10,9 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>OpenUO.Ultima</RootNamespace>
     <AssemblyName>OpenUO.Ultima</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -22,6 +23,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -31,6 +33,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="PresentationCore" />
@@ -79,6 +82,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Animations\AnimationData.cs" />
+    <Compile Include="UopFileIndex.cs" />
+    <Compile Include="MulFileIndex.cs" />
+    <Compile Include="FileIndexBase.cs" />
     <Compile Include="Factories\AnimationDataFactory.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -104,7 +110,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="UltimaSDKCoreModule.cs" />
-    <Compile Include="UopIndexEntry.cs" />
     <Compile Include="Fonts\ASCIIChar.cs" />
     <Compile Include="Fonts\ASCIIFont.cs" />
     <Compile Include="Animations\BodyConverter.cs" />
@@ -115,7 +120,6 @@
     <Compile Include="Factories\ArtworkFactory.cs" />
     <Compile Include="Factories\AdapterFactoryBase.cs" />
     <Compile Include="FileIndexEntry.cs" />
-    <Compile Include="FileIndex.cs" />
     <Compile Include="Adapters\Interfaces\IArtworkStorageAdapter.cs" />
     <Compile Include="Adapters\Interfaces\IStorageAdapter.cs" />
     <Compile Include="Animations\Frame.cs" />
@@ -145,10 +149,6 @@
     <Compile Include="Map\TileList.cs" />
     <Compile Include="Map\TileMatrix.cs" />
     <Compile Include="Map\TileMatrixPatch.cs" />
-    <Compile Include="Transactions\Interfaces\ITransaction.cs" />
-    <Compile Include="Transactions\Interfaces\IIndexedWriteTransaction.cs" />
-    <Compile Include="Transactions\Transaction.cs" />
-    <Compile Include="Transactions\FileIndexWriteTransaction.cs" />
     <Compile Include="UltimaException.cs" />
     <Compile Include="Fonts\UnicodeChar.cs" />
     <Compile Include="Fonts\UnicodeFont.cs" />

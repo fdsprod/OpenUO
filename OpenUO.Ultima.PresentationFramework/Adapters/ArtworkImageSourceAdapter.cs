@@ -22,7 +22,18 @@ namespace OpenUO.Ultima.PresentationFramework.Adapters
 {
     internal class ArtworkImageSourceAdapter : StorageAdapterBase, IArtworkStorageAdapter<ImageSource>
     {
-        private FileIndex _fileIndex;
+        private FileIndexBase _fileIndex;
+
+        public override int Length
+        {
+            get
+            {
+                if (!IsInitialized)
+                    Initialize();
+
+                return _fileIndex.Length;
+            }
+        }
         
         public override void Initialize()
         {
@@ -32,7 +43,7 @@ namespace OpenUO.Ultima.PresentationFramework.Adapters
 
             _fileIndex =
                 install.IsUOPFormat
-                    ? install.CreateFileIndex("artLegacyMUL.uop")
+                    ? install.CreateFileIndex("artLegacyMUL.uop", 0x10000, false, ".tga")
                     : install.CreateFileIndex("artidx.mul", "art.mul");
         }
 
@@ -53,13 +64,6 @@ namespace OpenUO.Ultima.PresentationFramework.Adapters
             BinaryReader bin = new BinaryReader(stream);
             WriteableBitmap bmp = new WriteableBitmap(44, 44, 96, 96, PixelFormats.Bgr555, null); 
             bmp.Lock();
-
-            if (_fileIndex.IsUopFormat)
-            {
-                bin.ReadInt32(); // Unknown
-                bin.ReadInt32(); // Unknown
-                bin.ReadInt32(); // Unknown
-            }
 
             int xOffset = 21;
             int xRun = 2;
@@ -102,14 +106,7 @@ namespace OpenUO.Ultima.PresentationFramework.Adapters
             int length, extra;
             Stream stream = _fileIndex.Seek(index, out length, out extra);
             BinaryReader bin = new BinaryReader(stream);
-
-            if (_fileIndex.IsUopFormat)
-            {
-                bin.ReadInt32(); // Unknown
-                bin.ReadInt32(); // Unknown
-                bin.ReadInt32(); // Unknown
-            }
-
+            
             bin.ReadInt32(); // Unknown
 
             int width = bin.ReadInt16();

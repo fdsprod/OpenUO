@@ -15,6 +15,8 @@ namespace Ultima.Winforms.Sample
     {
         private IoCContainer _container;
         private ArtworkFactory _artFactory;
+        private GumpFactory _gumpFactory;
+        private SoundFactory _soundFactory;
 
         public SampleForm(IoCContainer container)
         {
@@ -41,10 +43,25 @@ namespace Ultima.Winforms.Sample
                 _artFactory = null;
             }
 
+            if(_gumpFactory != null){
+                _gumpFactory.Dispose();
+                _gumpFactory = null;
+            }
+
+            if (_soundFactory != null)
+            {
+                _soundFactory.Dispose();
+                _soundFactory = null;
+            }
+
+            _gumpFactory = new GumpFactory(uoInstallationComboBox1.SelectedInstallation, _container);
             _artFactory = new ArtworkFactory(uoInstallationComboBox1.SelectedInstallation, _container);
+            _soundFactory = new SoundFactory(uoInstallationComboBox1.SelectedInstallation, _container);
 
             artworkControl1.Factory = _artFactory;
             artworkControl2.Factory = _artFactory;
+            gumpControl.Factory = _gumpFactory;
+            soundControl.Factory = _soundFactory;
         }
         
         private void uoInstallationComboBox1_SelectedInstallationChanged(object sender, EventArgs e)

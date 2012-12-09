@@ -29,12 +29,8 @@ namespace OpenUO.Ultima.Windows.Forms.Controls
         Statics
     }
 
-    public sealed class ArtworkControl : Control
+    public sealed class ArtworkControlOld : Control
     {
-        const int MAX_WIDTH = 48;
-        const int MAX_HEIGHT = 48;
-        const int LAND_TILE_COUNT = 0x4000;
-
         private ArtworkFactory _artworkFactory;
         private ArtworkControlType _artworkControlType;
 
@@ -46,8 +42,6 @@ namespace OpenUO.Ultima.Windows.Forms.Controls
                 if (_artworkControlType != value)
                 {
                     _artworkControlType = value;
-
-                    Recalculate(true);
                     Invalidate();
                 }
             }
@@ -63,111 +57,50 @@ namespace OpenUO.Ultima.Windows.Forms.Controls
                 if (_artworkFactory != value)
                 {
                     _artworkFactory = value;
-                    
-                    Recalculate(true);
                     Invalidate();
                 }
             }
         }
 
-        private VScrollBar _scrollBar;
-        private int _visibleRowsCount;
-        private int _visibleColumnsCount;
-        private Rectangle _cellBounds;
-
-        public ArtworkControl()
+        public ArtworkControlOld()
         {
-            DoubleBuffered = true;
-
-            _cellBounds = new Rectangle(
-                0,
-                0,
-                MAX_WIDTH,
-                MAX_HEIGHT);
-
-            _cellBounds.Inflate(new Size(-2, -2));
-
-            _scrollBar = new VScrollBar();
-            _scrollBar.ValueChanged += OnScrollbarValueChanged;
-
-            Recalculate(true);
-            Controls.Add(_scrollBar);
-        }
-
-        protected override void OnResize(EventArgs e)
-        {
-            Recalculate(false);
-
-            base.OnResize(e);
-        }
-
-        private void Recalculate(bool resetScrollbar)
-        {
-            _scrollBar.Location = new Point(Width - _scrollBar.Width - 2, 1);
-            _scrollBar.Size = new System.Drawing.Size(_scrollBar.Width, Height - 2);
-            _visibleColumnsCount = Math.Max(0, (((Width - _scrollBar.Width) - 1) / MAX_WIDTH));
-            _visibleRowsCount = Math.Max(0, ((Height - 1) / MAX_HEIGHT));
-            
-            if(_visibleColumnsCount == 0) 
-            {
-                _scrollBar.Maximum = 0;
-                return;
-            }
-
-            if (_artworkFactory == null)
-            {
-                return;
-            }
-
-            if (_artworkControlType == Forms.Controls.ArtworkControlType.Land)
-            {
-                var count = _artworkFactory.GetLandTileCount<Bitmap>() / _visibleColumnsCount;
-
-                if(_artworkFactory.GetStaticTileCount<Bitmap>() % _visibleColumnsCount > 0)
-                    count++;
-
-                _scrollBar.Maximum = count;
-            }
-            else
-            {
-                var count = _artworkFactory.GetStaticTileCount<Bitmap>() / _visibleColumnsCount;
-
-                if(_artworkFactory.GetStaticTileCount<Bitmap>() % _visibleColumnsCount > 0)
-                    count++;
-
-                _scrollBar.Maximum = count;
-            }
-            
-            if(resetScrollbar)
-            {
-                _scrollBar.Value = 0;
-            }
-        }
-        
-        private void OnScrollbarValueChanged(object sender, EventArgs e)
-        {
-            Refresh();
+            DoubleBuffered = true;            
         }
 
         protected override void OnPaint(PaintEventArgs e)
         {
             base.OnPaint(e);
 
-            using (Brush backBrush = new LinearGradientBrush(_cellBounds, Color.Gainsboro, Color.White, LinearGradientMode.ForwardDiagonal))
+            const int MAX_WIDTH = 48;
+            const int MAX_HEIGHT = 48;
+                
+            Rectangle itemBounds = new Rectangle(
+                0,
+                0,
+                MAX_WIDTH,
+                MAX_HEIGHT);
+                
+            itemBounds.Inflate(new Size(-2, -2));
+
+            using (Brush backBrush = new LinearGradientBrush(itemBounds, Color.Gainsboro, Color.White, LinearGradientMode.ForwardDiagonal))
             using (Brush borderBrush = new SolidBrush(Color.LightSteelBlue))
             using (Pen borderPen = new Pen(borderBrush))
             {
-                int startingIndex = _scrollBar.Value * _visibleColumnsCount;
+                int columns = Math.Max(0, ((Width - 1) / MAX_WIDTH));
+                int rows = Math.Max(0, ((Height - 1) / MAX_HEIGHT));
 
-                for (int y = 0; y < _visibleRowsCount; y++)
+                int startingIndex = 0;
+
+                for (int y = 0; y < rows; y++)
                 {
                     e.Graphics.TranslateTransform(0, y * MAX_HEIGHT);
 
-                    for (int x = 0; x < _visibleColumnsCount; x++)
+                    for (int x = 0; x < columns; x++)
                     {
-                        int index = startingIndex + ((y * _visibleColumnsCount) + x);
+                        int index = startingIndex + ((y * columns) + x);
 
-                        e.Graphics.FillRectangle(backBrush, _cellBounds);
+                        e.Graphics.FillRectangle(backBrush, itemBounds);
+                        e.Graphics.DrawRectangle(borderPen, itemBounds);
 
                         if (_artworkFactory != null)
                         {
@@ -180,11 +113,10 @@ namespace OpenUO.Ultima.Windows.Forms.Controls
 
                             if (bmp != null)
                             {
-                                e.Graphics.DrawImageUnscaledAndClipped(bmp, _cellBounds);
+                                e.Graphics.DrawImageUnscaledAndClipped(bmp, itemBounds);
                             }
                         }
 
-                        e.Graphics.DrawRectangle(borderPen, _cellBounds);
                         e.Graphics.TranslateTransform(MAX_WIDTH, 0);
                     }
 
@@ -211,12 +143,6 @@ namespace OpenUO.Ultima.Windows.Forms.Controls
                 }
 
                 e.Graphics.TextRenderingHint = textRenderingHint;
-            }
-
-            using (Brush borderBrush = new SolidBrush(Color.LightSteelBlue))
-            using (Pen borderPen = new Pen(borderBrush))
-            {
-                e.Graphics.DrawRectangle(borderPen, new Rectangle(0, 0, Width - 1, Height - 1));
             }
         }
     }

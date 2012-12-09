@@ -22,14 +22,14 @@ namespace OpenUO.Ultima.Transactions
     public sealed class FileIndexWriteTransaction : Transaction, IIndexedWriteTransaction
     {
         private bool _committed;
-        private FileIndex _fileIndex;
+        private FileIndexBase _fileIndex;
         private List<WriteEntry> _transactionWrites;
 
         public event EventHandler WriteBegin;
         public event EventHandler<ProgressEventArgs> WriteProgress;
         public event EventHandler WriteEnd;
 
-        public FileIndexWriteTransaction(FileIndex fileIndex)
+        public FileIndexWriteTransaction(FileIndexBase fileIndex)
         {
             _fileIndex = fileIndex;
             _transactionWrites = new List<WriteEntry>();

@@ -26,11 +26,22 @@ namespace OpenUO.Ultima.PresentationFramework.Adapters
     {
         private const int DoubleXor = (0x200 << 22) | (0x200 << 12);
 
-        private FileIndex[] _fileIndices;
+        private FileIndexBase[] _fileIndices;
         private BodyTable _bodyTable;
         private BodyConverter _bodyConverter;
         private int[] _table;
         private Hues _hues;
+
+        public override int Length
+        {
+            get
+            {
+                if (!IsInitialized)
+                    Initialize();
+
+                return 0;
+            }
+        }
 
         public override void Initialize()
         {
@@ -73,7 +84,7 @@ namespace OpenUO.Ultima.PresentationFramework.Adapters
                 Translate(ref body, ref hue);
 
             int fileType = _bodyConverter.Convert(ref body);
-            FileIndex fileIndex = _fileIndices[fileType - 1];
+            FileIndexBase fileIndex = _fileIndices[fileType - 1];
 
             int index;
 
