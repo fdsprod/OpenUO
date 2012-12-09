@@ -166,7 +166,7 @@ namespace Client.Graphics
             _buffer.AddDirtyRange(startIndex, count, GetType(), false);
         }
 
-        public void Dispose()
+		protected override void Dispose(bool disposing)
         {
             if (_buffer != null)
             {
