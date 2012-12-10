@@ -24,138 +24,173 @@ using OpenUO.Core.Diagnostics;
 
 namespace OpenUO.Ultima
 {
-	public class ClilocTable : IEnumerable<ClilocData>, IDisposable
-	{
-		private Dictionary<int, ClilocData> _Table = new Dictionary<int, ClilocData>();
+    public class ClientLocalizations : IEnumerable<LocalizationEntry>, IDisposable
+    {
+        private Dictionary<int, LocalizationEntry> _table = new Dictionary<int, LocalizationEntry>();
 
-		public virtual ClilocLNG Language { get; protected set; }
-		public virtual FileInfo InputFile { get; protected set; }
+        public virtual ClientLocalizationLanguage Language
+        {
+            get;
+            protected set;
+        }
 
-		public int Count { get { return _Table.Count; } }
+        public virtual FileInfo InputFile
+        {
+            get;
+            protected set;
+        }
 
-		public bool Loaded { get; private set; }
+        public int Count
+        {
+            get { return _table.Count; }
+        }
 
-		public ClilocTable()
-		{ }
+        public bool Loaded
+        {
+            get;
+            private set;
+        }
 
-		public void Clear()
-		{
-			foreach (var d in _Table.Values)
-				d.Clear();
-		}
+        public void Clear()
+        {
+            foreach (var d in _table.Values)
+            {
+                d.Clear();
+            }
+        }
 
-		public void Dispose()
-		{
-			Unload();
-		}
+        public void Dispose()
+        {
+            Unload();
+        }
 
-		public void Unload()
-		{
-			if (!Loaded)
-				return;
+        public void Unload()
+        {
+            if (!Loaded)
+            {
+                return;
+            }
 
-			Language = ClilocLNG.NULL;
-			InputFile = null;
-			_Table.Clear();
+            Language = ClientLocalizationLanguage.NULL;
+            InputFile = null;
 
-			Loaded = false;
-		}
+            _table.Clear();
 
-		public void Load(FileInfo file)
-		{
-			if (Loaded)
-				return;
+            Loaded = false;
+        }
 
-			try
-			{
-				ClilocLNG lng = ClilocLNG.NULL;
+        public void Load(FileInfo file)
+        {
+            if (Loaded)
+                return;
 
-				if (!Enum.TryParse<ClilocLNG>(file.Extension.TrimStart('.'), true, out lng))
-					throw new FileLoadException("Could not detect language for: " + file.FullName);
+            try
+            {
+                ClientLocalizationLanguage lng = ClientLocalizationLanguage.NULL;
 
-				Language = lng;
-				InputFile = file;
+                if (!Enum.TryParse<ClientLocalizationLanguage>(file.Extension.TrimStart('.'), true, out lng))
+                {
+                    throw new FileLoadException("Could not detect language for: " + file.FullName);
+                }
 
-				using (BinaryReader reader = new BinaryReader(InputFile.OpenRead(), Encoding.UTF8))
-				{
-					long size = reader.BaseStream.Seek(0, SeekOrigin.End);
-					reader.BaseStream.Seek(0, SeekOrigin.Begin);
+                Language = lng;
+                InputFile = file;
 
-					reader.ReadInt32();
-					reader.ReadInt16();
+                using (BinaryReader reader = new BinaryReader(InputFile.OpenRead(), Encoding.UTF8))
+                {
+                    long size = reader.BaseStream.Seek(0, SeekOrigin.End);
+                    reader.BaseStream.Seek(0, SeekOrigin.Begin);
 
-					while (reader.BaseStream.Position < size)
-					{
-						int index = reader.ReadInt32();
-						reader.ReadByte();
-						int length = reader.ReadInt16();
-						long offset = reader.BaseStream.Position;
-						reader.BaseStream.Seek(length, SeekOrigin.Current);
+                    reader.ReadInt32();
+                    reader.ReadInt16();
 
-						if (_Table.ContainsKey(index))
-							_Table[index] = new ClilocData(Language, index, offset, length);
-						else
-							_Table.Add(index, new ClilocData(Language, index, offset, length));
-					}
-				}
+                    while (reader.BaseStream.Position < size)
+                    {
+                        int index = reader.ReadInt32();
+                        reader.ReadByte();
+                        int length = reader.ReadInt16();
+                        long offset = reader.BaseStream.Position;
+                        reader.BaseStream.Seek(length, SeekOrigin.Current);
 
-				Loaded = true;
-			}
-			catch (Exception e)
-			{
-				Tracer.Error(e);
-			}
-		}
+                        if (_table.ContainsKey(index))
+                        {
+                            _table[index] = new LocalizationEntry(Language, index, offset, length);
+                        }
+                        else
+                        {
+                            _table.Add(index, new LocalizationEntry(Language, index, offset, length));
+                        }
+                    }
+                }
 
-		public bool Contains(int index)
-		{
-			return _Table.ContainsKey(index);
-		}
+                Loaded = true;
+            }
+            catch (Exception e)
+            {
+                Tracer.Error(e);
+            }
+        }
 
-		public bool IsNullOrEmpty(int index)
-		{
-			if (!Contains(index) || _Table[index] == null)
-				return true;
+        public bool Contains(int index)
+        {
+            return _table.ContainsKey(index);
+        }
 
-			ClilocInfo info = _Table[index].Lookup(InputFile);
+        public bool IsNullOrEmpty(int index)
+        {
+            if (!Contains(index) || _table[index] == null)
+            {
+                return true;
+            }
 
-			if (!String.IsNullOrWhiteSpace(info.Text))
-				return false;
+            ClilocInfo info = _table[index].Lookup(InputFile);
 
-			return true;
-		}
+            if (!String.IsNullOrWhiteSpace(info.Text))
+            {
+                return false;
+            }
 
-		public ClilocInfo Update(int index)
-		{
-			if (!Contains(index) || _Table[index] == null)
-				return null;
+            return true;
+        }
 
-			return _Table[index].Lookup(InputFile, true);
-		}
+        public ClilocInfo Update(int index)
+        {
+            if (!Contains(index) || _table[index] == null)
+            {
+                return null;
+            }
 
-		public ClilocInfo Lookup(int index)
-		{
-			if (!Contains(index) || _Table[index] == null)
-				return null;
+            return _table[index].Lookup(InputFile, true);
+        }
 
-			return _Table[index].Lookup(InputFile);
-		}
+        public ClilocInfo Lookup(int index)
+        {
+            if (!Contains(index) || _table[index] == null)
+            {
+                return null;
+            }
 
-		public ClilocInfo this[int index] { get { return Lookup(index); } }
+            return _table[index].Lookup(InputFile);
+        }
 
-		IEnumerator IEnumerable.GetEnumerator()
-		{
-			return _Table.Values.GetEnumerator();
-		}
+        public ClilocInfo this[int index]
+        {
+            get { return Lookup(index); }
+        }
 
-		public virtual IEnumerator<ClilocData> GetEnumerator()
-		{
-			return _Table.Values.GetEnumerator();
-		}
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return _table.Values.GetEnumerator();
+        }
 
-		public override string ToString()
-		{
-			return ((Language == ClilocLNG.NULL) ? "Not Loaded" : "Cliloc." + Language);
-		}
-	}
+        public virtual IEnumerator<LocalizationEntry> GetEnumerator()
+        {
+            return _table.Values.GetEnumerator();
+        }
+
+        public override string ToString()
+        {
+            return ((Language == ClientLocalizationLanguage.NULL) ? "Not Loaded" : "Cliloc." + Language);
+        }
+    }
 }

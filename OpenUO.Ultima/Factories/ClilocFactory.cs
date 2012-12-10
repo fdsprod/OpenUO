@@ -22,7 +22,7 @@ namespace OpenUO.Ultima
 		public ClilocFactory(InstallLocation install, IoCContainer container)
 			: base(install, container) { }
 
-		public T GetCliloc<T>(ClilocLNG lng, int index)
+		public T GetCliloc<T>(ClientLocalizationLanguage lng, int index)
 		{
 			return GetAdapter<IClilocStorageAdapter<T>>().GetCliloc(lng, index);
 		}

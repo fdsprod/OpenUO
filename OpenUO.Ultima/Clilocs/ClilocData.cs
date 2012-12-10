@@ -24,60 +24,91 @@ using OpenUO.Core.Diagnostics;
 
 namespace OpenUO.Ultima
 {
-	public class ClilocData
-	{
-		public ClilocLNG Language { get; protected set; }
-		public int Index { get; protected set; }
-		public long Offset { get; protected set; }
-		public long Length { get; protected set; }
+    public class LocalizationEntry
+    {
+        public ClientLocalizationLanguage Language
+        {
+            get;
+            protected set;
+        }
 
-		protected ClilocInfo Info { get; set; }
+        public int Index
+        {
+            get;
+            protected set;
+        }
 
-		public ClilocData(ClilocLNG lng, int index, long offset, long length)
-		{
-			Language = lng;
-			Index = index;
-			Offset = offset;
-			Length = length;
-		}
+        public long Offset
+        {
+            get;
+            protected set;
+        }
 
-		public virtual void Clear()
-		{
-			Info = null;
-		}
+        public long Length
+        {
+            get;
+            protected set;
+        }
 
-		public ClilocInfo Lookup(BinaryReader bin)
-		{
-			bin.BaseStream.Seek(Offset, SeekOrigin.Begin);
-			byte[] data = new byte[Length];
+        protected ClilocInfo Info
+        {
+            get;
+            set;
+        }
 
-			for (long i = 0; i < data.Length; i++)
-				data[i] = bin.ReadByte();
+        public LocalizationEntry(ClientLocalizationLanguage lng, int index, long offset, long length)
+        {
+            Language = lng;
+            Index = index;
+            Offset = offset;
+            Length = length;
+        }
 
-			Info = new ClilocInfo(Language, Index, Encoding.UTF8.GetString(data));
-			data = null;
-			return Info;
-		}
+        public virtual void Clear()
+        {
+            Info = null;
+        }
 
-		public ClilocInfo Lookup(FileInfo file, bool forceUpdate = false)
-		{
-			try
-			{
-				if (Info != null)
-				{
-					if (!forceUpdate)
-						return Info;
-				}
+        public ClilocInfo Lookup(BinaryReader bin)
+        {
+            bin.BaseStream.Seek(Offset, SeekOrigin.Begin);
 
-				using (BinaryReader reader = new BinaryReader(file.OpenRead(), Encoding.UTF8))
-					Lookup(reader);
-			}
-			catch (Exception e)
-			{
-				Tracer.Error(e);
-			}
+            byte[] data = new byte[Length];
 
-			return Info;
-		}
-	}
+            for (long i = 0; i < data.Length; i++)
+            {
+                data[i] = bin.ReadByte();
+            }
+
+            Info = new ClilocInfo(Language, Index, Encoding.UTF8.GetString(data));
+            data = null;
+
+            return Info;
+        }
+
+        public ClilocInfo Lookup(FileInfo file, bool forceUpdate = false)
+        {
+            try
+            {
+                if (Info != null)
+                {
+                    if (!forceUpdate)
+                    {
+                        return Info;
+                    }
+                }
+
+                using (BinaryReader reader = new BinaryReader(file.OpenRead(), Encoding.UTF8))
+                {
+                    Lookup(reader);
+                }
+            }
+            catch (Exception e)
+            {
+                Tracer.Error(e);
+            }
+
+            return Info;
+        }
+    }
 }

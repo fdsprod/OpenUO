@@ -22,7 +22,7 @@ using System.Xml;
 
 namespace OpenUO.Ultima
 {
-	public enum ClilocLNG
+	public enum ClientLocalizationLanguage
 	{
 		NULL,
 		ENU,

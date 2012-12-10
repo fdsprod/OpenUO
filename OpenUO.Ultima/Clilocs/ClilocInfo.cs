@@ -26,11 +26,11 @@ namespace OpenUO.Ultima
 	{
 		public static readonly Regex VarPattern = new Regex(@"(~(\d+)_(\w+)~)", RegexOptions.IgnoreCase);
 
-		public ClilocLNG Language { get; protected set; }
+		public ClientLocalizationLanguage Language { get; protected set; }
 		public int Index { get; protected set; }
 		public string Text { get; protected set; }
 
-		public ClilocInfo(ClilocLNG lng, int index, string text)
+		public ClilocInfo(ClientLocalizationLanguage lng, int index, string text)
 		{
 			Language = lng;
 			Index = index;

@@ -218,10 +218,6 @@
       <Project>{25B50E34-555E-497E-901E-628494B0C954}</Project>
       <Name>OpenUO.Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\OpenUO.Ultima.SharpDX\OpenUO.Ultima.SharpDX.csproj">
-      <Project>{A183E88C-FCE1-4B3C-8ADD-B36DBA6DFCF3}</Project>
-      <Name>OpenUO.Ultima.SharpDX</Name>
-    </ProjectReference>
     <ProjectReference Include="..\OpenUO.Ultima.Network\OpenUO.Ultima.Network.csproj">
       <Project>{99579163-9065-4F01-9CEE-9D956288669A}</Project>
       <Name>OpenUO.Ultima.Network</Name>

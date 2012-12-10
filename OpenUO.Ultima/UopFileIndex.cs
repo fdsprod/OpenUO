@@ -24,7 +24,7 @@ namespace OpenUO.Ultima
     //thanks for updating the ultima sdk for others like myself to reference.
     public class UopFileIndex : FileIndexBase
     {
-        const int UOP_MAGIC_NUMBER = 0x50594D;
+        public const int UOP_MAGIC_NUMBER = 0x50594D;
 
         private readonly string _extension;
         private readonly bool _hasExtra;

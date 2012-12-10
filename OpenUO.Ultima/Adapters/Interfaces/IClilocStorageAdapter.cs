@@ -16,6 +16,6 @@ namespace OpenUO.Ultima.Adapters
 {
     public interface IClilocStorageAdapter<T> : IStorageAdapter
     {
-        T GetCliloc(ClilocLNG lng, int index);
+        T GetCliloc(ClientLocalizationLanguage lng, int index);
     }
 }
