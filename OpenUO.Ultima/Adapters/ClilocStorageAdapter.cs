@@ -26,7 +26,7 @@ namespace OpenUO.Ultima.Adapters
 {
 	public class ClilocStorageAdapter : StorageAdapterBase, IClilocStorageAdapter<ClilocInfo>
 	{
-		private Dictionary<ClilocLNG, ClilocTable> _Tables = new Dictionary<ClilocLNG, ClilocTable>
+		private Dictionary<ClilocLNG, ClilocTable> _tables = new Dictionary<ClilocLNG, ClilocTable>
 		{
 			{ ClilocLNG.ENU, new ClilocTable() },
 			{ ClilocLNG.DEU, new ClilocTable() },
@@ -35,41 +35,64 @@ namespace OpenUO.Ultima.Adapters
 			{ ClilocLNG.JPN, new ClilocTable() },
 			{ ClilocLNG.KOR, new ClilocTable() }
 		};
-		public Dictionary<ClilocLNG, ClilocTable> Tables { get { return _Tables; } }
+
+		public Dictionary<ClilocLNG, ClilocTable> Tables { get { return _tables; } }
+
+        public override int Length
+        {
+            get
+            { 
+                if(!IsInitialized)
+                    Initialize();
+                
+                return _tables[0].Count;
+            }
+        }
 
 		public override void Initialize()
 		{
 			base.Initialize();
 
-			List<ClilocTable> tables = new List<ClilocTable>(_Tables.Values);
+			List<ClilocTable> tables = new List<ClilocTable>(_tables.Values);
+            var loaded = tables.TrueForAll(t => t.Loaded);
 
-			if (tables.TrueForAll((ClilocTable t) => { return t.Loaded; }) || (Install == null || String.IsNullOrWhiteSpace(Install.Directory)))
-			{ return; }
+            if (loaded || (Install == null || String.IsNullOrWhiteSpace(Install.Directory)))
+            {
+                return; 
+            }
 
-			foreach (var kvp in _Tables)
+			foreach (var kvp in _tables)
 			{
 				if (kvp.Value.Loaded)
-				{ continue; }
+				{ 
+                    continue; 
+                }
 
 				string stub = Path.Combine(Install.Directory, "/Cliloc." + kvp.Key.ToString().ToLower());
 
 				if (File.Exists(stub))
-				{ kvp.Value.Load(new FileInfo(stub)); }
+				{ 
+                    kvp.Value.Load(new FileInfo(stub)); 
+                }
 			}
 		}
 
 		public unsafe ClilocInfo GetCliloc(ClilocLNG lng, int index)
 		{
-			if (_Tables.ContainsKey(lng) && _Tables[lng] != null)
-			{ return _Tables[lng].Lookup(index); }
+			if (_tables.ContainsKey(lng) && _tables[lng] != null)
+			{ 
+                return _tables[lng].Lookup(index); 
+            }
 
 			return null;
 		}
 
 		public unsafe string GetRawString(ClilocLNG lng, int index)
 		{
-			if (_Tables.ContainsKey(lng) && _Tables[lng] != null && !_Tables[lng].IsNullOrEmpty(index))
-			{ return _Tables[lng][index].Text; }
+			if (_tables.ContainsKey(lng) && _tables[lng] != null && !_tables[lng].IsNullOrEmpty(index))
+			{ 
+                return _tables[lng][index].Text;
+            }
 
 			return String.Empty;
 		}
@@ -79,7 +102,9 @@ namespace OpenUO.Ultima.Adapters
 			ClilocInfo info = GetCliloc(lng, index);
 
 			if (info == null)
-			{ return String.Empty; }
+			{ 
+                return String.Empty; 
+            }
 
 			return info.ToString(args);
 		}
@@ -89,7 +114,9 @@ namespace OpenUO.Ultima.Adapters
 			ClilocInfo info = GetCliloc(lng, index);
 
 			if (info == null)
-			{ return String.Empty; }
+			{ 
+                return String.Empty; 
+            }
 
 			return info.ToString(args);
 		}
