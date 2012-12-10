@@ -41,7 +41,7 @@ namespace OpenUO.Ultima
 
         private readonly TileMatrixPatch _patch;
 
-        private UopMapLookup[] _uopLookups;
+        private UOPIndex _mapIndex;
         private string _hashPattern;
 
         public TileMatrixPatch Patch
@@ -84,20 +84,36 @@ namespace OpenUO.Ultima
 
             if (fileIndex != 0x7F)
             {
-                string mapPath = install.IsUOPFormat ? install.GetPath("map{0}LegacyMUL.uop", fileIndex) : install.GetPath("map{0}.mul", fileIndex);
-                string indexPath = install.GetPath("staidx{0}.mul", fileIndex);
-                string staticsPath = install.GetPath("statics{0}.mul", fileIndex);
- 
-                _map = new FileStream(mapPath, FileMode.Open, FileAccess.Read, FileShare.Read);
-                _fileIndex = new FileStream(indexPath, FileMode.Open, FileAccess.Read, FileShare.Read);
-                _staticsStream = new FileStream(staticsPath, FileMode.Open, FileAccess.Read, FileShare.Read); 
+                string mapPath = install.GetPath("map{0}.mul", fileIndex);
 
-                _reader = new BinaryReader(_fileIndex);
-
-                if (install.IsUOPFormat)
+                if (File.Exists(mapPath))
                 {
-                    _hashPattern = string.Format("map{0}LegacyMUL", fileIndex).ToLowerInvariant();
-                    ReadUopLookups();
+                    _map = new FileStream(mapPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                }
+                else
+                {
+                    mapPath = install.GetPath("map{0}LegacyMUL.uop", fileIndex);
+
+                    if (File.Exists(mapPath))
+                    {
+                        _map = new FileStream(mapPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                        _mapIndex = new UOPIndex(_map);
+                    }
+                }
+
+                string indexPath = install.GetPath("staidx{0}.mul", fileIndex);
+
+                if (File.Exists(indexPath))
+                {
+                    _fileIndex = new FileStream(indexPath, FileMode.Open, FileAccess.Read, FileShare.Read);
+                    _reader = new BinaryReader(_fileIndex);
+                }
+
+                string staticsPath = install.GetPath("statics{0}.mul", fileIndex);
+
+                if (File.Exists(staticsPath))
+                {
+                    _staticsStream = new FileStream(staticsPath, FileMode.Open, FileAccess.Read, FileShare.Read);
                 }
             }
 
@@ -125,81 +141,6 @@ namespace OpenUO.Ultima
                 m_LandTiles[i] = new Tile[m_BlockHeight][];
                 m_StaticTiles[i] = new Tile[m_BlockHeight][][][];
             }*/
-        }
-
-        private void ReadUopLookups()
-        {
-            BinaryReader reader = new BinaryReader(_map);
-
-            reader.BaseStream.Seek(0, SeekOrigin.Begin);
-
-            if (reader.ReadInt32() != UopFileIndex.UOP_MAGIC_NUMBER)
-            {
-                throw new ArgumentException("Invalid UOP format.");
-            }
-            
-            reader.ReadInt64(); // version + sig
-            long nextBlock = reader.ReadInt64();
-            reader.ReadInt32(); // block capacity
-            int count = reader.ReadInt32();
-
-            _uopLookups = new UopMapLookup[count];
-
-            Dictionary<ulong, int> hashes = new Dictionary<ulong, int>();
-
-            for (int i = 0; i < count; i++)
-            {
-                string file = string.Format("build/{0}/{1:D8}.dat", _hashPattern, i);
-                ulong hash = UopFileIndex.CreateHash(file);
-
-                if (!hashes.ContainsKey(hash))
-                {
-                    hashes.Add(hash, i);
-                }
-            }
-
-            reader.BaseStream.Seek(nextBlock, SeekOrigin.Begin);
-
-            do
-            {
-                int filesCount = reader.ReadInt32();
-                nextBlock = reader.ReadInt64();
-
-                for (int i = 0; i < filesCount; i++)
-                {
-                    long offset = reader.ReadInt64();
-                    int headerLength = reader.ReadInt32();
-                    int compressedLength = reader.ReadInt32();
-                    int decompressedLength = reader.ReadInt32();
-                    ulong hash = reader.ReadUInt64();
-                    reader.ReadUInt32(); // Adler32
-                    short flag = reader.ReadInt16();
-
-                    int length = flag == 1 ? compressedLength : decompressedLength;
-
-                    if (offset == 0)
-                    {
-                        continue;
-                    }
-
-                    int index;
-
-                    if (hashes.TryGetValue(hash, out index))
-                    {
-                        if (index < 0 || index > _uopLookups.Length)
-                        {
-                            throw new IndexOutOfRangeException("hashes dictionary and files collection have different count of entries!");
-
-                        }
-                        _uopLookups[index] = new UopMapLookup(offset + headerLength, length);
-                    }
-                    else
-                    {
-                        throw new ArgumentException(string.Format("File with hash 0x{0:X8} was not found in hashes dictionary! EA Mythic changed UOP format!", hash));
-                    }
-                }
-            }
-            while (reader.BaseStream.Seek(nextBlock, SeekOrigin.Begin) != 0);
         }
 
         public void SetStaticBlock(int x, int y, HuedTile[][][] value)
@@ -324,19 +265,11 @@ namespace OpenUO.Ultima
 
         private unsafe Tile[] ReadLandBlock(int x, int y)
         {
-            long offset = ((x * _blockHeight) + y) * 196 + 4;
+            int offset = ((x * _blockHeight) + y) * 196 + 4;
 
-            if (_install.IsUOPFormat)
-            {
-                offset = CalculateOffsetFromUOP(offset);
-            }
-
-            if (_install.IsUOPFormat)
-            {
-                int block = (int)offset / 0xC4000;
-                offset += 0xD88 + (0xD54 * (block / 100)) + (12 * block);
-            }
-
+            if (_mapIndex != null)
+                offset = _mapIndex.Lookup(offset);
+            
             _map.Seek(offset, SeekOrigin.Begin);
 
             Tile[] tiles = new Tile[64];
@@ -347,23 +280,6 @@ namespace OpenUO.Ultima
             }
 
             return tiles;
-        }
-
-        private long CalculateOffsetFromUOP(long offset)
-        {
-            long pos = 0;
-
-            foreach (UopMapLookup lookup in _uopLookups)
-            {
-                long currPos = pos + lookup.Length;
-
-                if (offset < currPos)
-                    return lookup.Offset + (offset - pos);
-
-                pos = currPos;
-            }
-
-            return _map.Length;
         }
 
         public void Dispose()
@@ -378,15 +294,129 @@ namespace OpenUO.Ultima
                 _reader.Close();
         }
 
-        struct UopMapLookup
+        public class UOPIndex
         {
-            public long Offset;
-            public int Length;
-
-            internal UopMapLookup(long offset, int length)
+            private class UOPEntry : IComparable<UOPEntry>
             {
-                Offset = offset;
-                Length = length;
+                public int Offset;
+                public int Length;
+                public int Order;
+
+                public UOPEntry(int offset, int length)
+                {
+                    Offset = offset;
+                    Length = length;
+                    Order = 0;
+                }
+
+                public int CompareTo(UOPEntry other)
+                {
+                    return Order.CompareTo(other.Order);
+                }
+            }
+
+            private class OffsetComparer : IComparer<UOPEntry>
+            {
+                public static readonly IComparer<UOPEntry> Instance = new OffsetComparer();
+
+                public OffsetComparer()
+                {
+                }
+
+                public int Compare(UOPEntry x, UOPEntry y)
+                {
+                    return x.Offset.CompareTo(y.Offset);
+                }
+            }
+
+            private BinaryReader _reader;
+            private int _length;
+            private int _version;
+            private UOPEntry[] _entries;
+
+            public int Version
+            {
+                get { return _version; }
+            }
+
+            public UOPIndex(FileStream stream)
+            {
+                _reader = new BinaryReader(stream);
+                _length = (int)stream.Length;
+
+                if (_reader.ReadInt32() != 0x50594D)
+                    throw new ArgumentException("Invalid UOP file.");
+
+                _version = _reader.ReadInt32();
+                _reader.ReadInt32();
+                int nextTable = _reader.ReadInt32();
+
+                List<UOPEntry> entries = new List<UOPEntry>();
+
+                do
+                {
+                    stream.Seek(nextTable, SeekOrigin.Begin);
+                    int count = _reader.ReadInt32();
+                    nextTable = _reader.ReadInt32();
+                    _reader.ReadInt32();
+
+                    for (int i = 0; i < count; ++i)
+                    {
+                        int offset = _reader.ReadInt32();
+
+                        if (offset == 0)
+                        {
+                            stream.Seek(30, SeekOrigin.Current);
+                            continue;
+                        }
+
+                        _reader.ReadInt64();
+                        int length = _reader.ReadInt32();
+
+                        entries.Add(new UOPEntry(offset, length));
+
+                        stream.Seek(18, SeekOrigin.Current);
+                    }
+                }
+                while (nextTable != 0 && nextTable < _length);
+
+                entries.Sort(OffsetComparer.Instance);
+
+                for (int i = 0; i < entries.Count; ++i)
+                {
+                    stream.Seek(entries[i].Offset + 2, SeekOrigin.Begin);
+
+                    int dataOffset = _reader.ReadInt16();
+                    entries[i].Offset += 4 + dataOffset;
+
+                    stream.Seek(dataOffset, SeekOrigin.Current);
+                    entries[i].Order = _reader.ReadInt32();
+                }
+
+                entries.Sort();
+                _entries = entries.ToArray();
+            }
+
+            public int Lookup(int offset)
+            {
+                int total = 0;
+
+                for (int i = 0; i < _entries.Length; ++i)
+                {
+                    int newTotal = total + _entries[i].Length;
+
+                    if (offset < newTotal)
+                        return _entries[i].Offset + (offset - total);
+
+                    total = newTotal;
+                }
+
+                return _length;
+            }
+
+            public void Close()
+            {
+                _reader.Close();
             }
         }
     }
