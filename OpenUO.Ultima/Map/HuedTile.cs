@@ -37,7 +37,6 @@ namespace OpenUO.Ultima
         {
             get { return _z; }
             set { _z = (sbyte)value; }
-
         }
 
         public HuedTile(short id, short hue, sbyte z)
@@ -47,7 +46,7 @@ namespace OpenUO.Ultima
             _z = z;
         }
 
-        public void Set(short id, short hue, sbyte z)
+        internal void Set(short id, short hue, sbyte z)
         {
             _id = id;
             _hue = hue;

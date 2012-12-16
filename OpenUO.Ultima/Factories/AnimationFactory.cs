@@ -19,7 +19,7 @@ namespace OpenUO.Ultima
 {
     public class AnimationFactory : AdapterFactoryBase
     {
-        public AnimationFactory(InstallLocation install, IoCContainer container)
+        public AnimationFactory(InstallLocation install, Container container)
             : base(install, container) { }
 
         public Frame<T>[] GetAnimation<T>(int body, int action, int direction, int hue, bool preserveHue)

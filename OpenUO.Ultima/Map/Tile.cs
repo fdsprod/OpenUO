@@ -12,11 +12,14 @@
  ***************************************************************************/
  #endregion
 
+using System.Collections;
+using System.Collections.Generic;
+using System.Runtime.InteropServices;
 
 namespace OpenUO.Ultima
 {
-    [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 1)]
-    public struct Tile //: IComparable
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public struct Tile
     {
         internal short _id;
         internal sbyte _z;
@@ -34,10 +37,7 @@ namespace OpenUO.Ultima
 
         public bool Ignored
         {
-            get
-            {
-                return (_id == 2 || _id == 0x1DB || (_id >= 0x1AE && _id <= 0x1B5));
-            }
+            get { return (_id == 2 || _id == 0x1DB || (_id >= 0x1AE && _id <= 0x1B5)); }
         }
 
         public Tile(short id, sbyte z)
@@ -45,42 +45,5 @@ namespace OpenUO.Ultima
             _id = id;
             _z = z;
         }
-
-        public void Set(short id, sbyte z)
-        {
-            _id = id;
-            _z = z;
-        }
-
-        //public int CompareTo(object x)
-        //{
-        //    if (x == null)
-        //        return 1;
-
-        //    if (!(x is Tile))
-        //        throw new ArgumentNullException();
-
-        //    Tile a = (Tile)x;
-
-        //    if (m_Z > a.m_Z)
-        //        return 1;
-        //    else if (a.m_Z > m_Z)
-        //        return -1;
-
-        //    ItemData ourData = TileData.ItemTable[m_ID & 0x3FFF];
-        //    ItemData theirData = TileData.ItemTable[a.m_ID & 0x3FFF];
-
-        //    if (ourData.Height > theirData.Height)
-        //        return 1;
-        //    else if (theirData.Height > ourData.Height)
-        //        return -1;
-
-        //    if (ourData.Background && !theirData.Background)
-        //        return -1;
-        //    else if (theirData.Background && !ourData.Background)
-        //        return 1;
-
-        //    return 0;
-        //}
     }
 }

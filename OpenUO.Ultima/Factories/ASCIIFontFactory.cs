@@ -19,7 +19,7 @@ namespace OpenUO.Ultima
 {
     public class ASCIIFontFactory : AdapterFactoryBase
     {
-        public ASCIIFontFactory(InstallLocation install, IoCContainer container)
+        public ASCIIFontFactory(InstallLocation install, Container container)
             : base(install, container) { }
 
         public T GetText<T>(int fontId, string text, short hueId )

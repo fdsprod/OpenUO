@@ -22,15 +22,15 @@ namespace OpenUO.Ultima.UnitTests
     public class CoreAdapterTests : TestingBase
     {
         private static bool _configuredKernelForTest;
-        private static IoCContainer _container;
+        private static Container _container;
 
-        protected static IoCContainer Container
+        protected static Container Container
         {
             get
             {
                 if (!_configuredKernelForTest)
                 {
-                    _container = new IoCContainer();
+                    _container = new Container();
                     _container.RegisterModule<UltimaSDKCoreModule>();
                     _configuredKernelForTest = true;
                 }

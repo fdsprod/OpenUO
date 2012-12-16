@@ -16,7 +16,7 @@ namespace Ultima.Winforms.Sample
 #if DEBUG
             new DebugTraceListener { TraceLevel = TraceLevels.Verbose };
 #endif
-            IoCContainer container = new IoCContainer();
+            Container container = new Container();
 
             container.RegisterModule<OpenUO.Ultima.UltimaSDKCoreModule>();
             container.RegisterModule<OpenUO.Ultima.Windows.Forms.UltimaSDKBitmapModule>();

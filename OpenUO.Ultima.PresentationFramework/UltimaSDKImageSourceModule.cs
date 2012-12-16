@@ -26,7 +26,7 @@ namespace OpenUO.Ultima.PresentationFramework
             get { return "OpenUO Ultima SDK - ImageSource Module"; }
         }
 
-        public void OnLoad(IoCContainer container)
+        public void OnLoad(Container container)
         {
             container.Register<IArtworkStorageAdapter<ImageSource>, ArtworkImageSourceAdapter>();
             container.Register<IAnimationStorageAdapter<ImageSource>, AnimationImageSourceStorageAdapter>();
@@ -36,7 +36,7 @@ namespace OpenUO.Ultima.PresentationFramework
             container.Register<IUnicodeFontStorageAdapter<ImageSource>, UnicodeFontImageSourceAdapter>();
         }
 
-        public void OnUnload(IoCContainer container)
+        public void OnUnload(Container container)
         {
 
         }

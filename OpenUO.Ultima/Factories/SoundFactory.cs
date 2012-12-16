@@ -19,7 +19,7 @@ namespace OpenUO.Ultima
 {
     public class SoundFactory : AdapterFactoryBase
     {
-        public SoundFactory(InstallLocation install, IoCContainer container)
+        public SoundFactory(InstallLocation install, Container container)
             : base(install, container) { }
 
         public T GetSound<T>(int index)

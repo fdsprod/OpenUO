@@ -38,16 +38,8 @@ namespace OpenUO.Ultima
 
         private readonly int _blockWidth, _blockHeight;
         private readonly int _width, _height;
-
-        private readonly TileMatrixPatch _patch;
-
+        
         private UOPIndex _mapIndex;
-        private string _hashPattern;
-
-        public TileMatrixPatch Patch
-        {
-            get { return _patch; }
-        }
 
         public int BlockWidth
         {
@@ -130,41 +122,14 @@ namespace OpenUO.Ultima
             }
 
             _invalidLandBlock = new Tile[196];
-
-            _landTiles = new Tile[_blockWidth][][];
-            _staticTiles = new HuedTile[_blockWidth][][][][];
-
-            _patch = new TileMatrixPatch(this, install, mapID);
-
-            /*for ( int i = 0; i < m_BlockWidth; ++i )
-            {
-                m_LandTiles[i] = new Tile[m_BlockHeight][];
-                m_StaticTiles[i] = new Tile[m_BlockHeight][][][];
-            }*/
-        }
-
-        public void SetStaticBlock(int x, int y, HuedTile[][][] value)
-        {
-            if (x < 0 || y < 0 || x >= _blockWidth || y >= _blockHeight)
-                return;
-
-            if (_staticTiles[x] == null)
-                _staticTiles[x] = new HuedTile[_blockHeight][][][];
-
-            _staticTiles[x][y] = value;
         }
 
         public HuedTile[][][] GetStaticBlock(int x, int y)
         {
             if (x < 0 || y < 0 || x >= _blockWidth || y >= _blockHeight || _staticsStream == null || _fileIndex == null)
                 return _emptyStaticBlock;
-
-            if (_staticTiles[x] == null)
-                _staticTiles[x] = new HuedTile[_blockHeight][][][];
-
-            HuedTile[][][] tiles = _staticTiles[x][y] ?? (_staticTiles[x][y] = ReadStaticBlock(x, y));
-
-            return tiles;
+                        
+            return ReadStaticBlock(x, y);
         }
 
         public HuedTile[] GetStaticTiles(int x, int y)
@@ -173,28 +138,13 @@ namespace OpenUO.Ultima
 
             return tiles[x & 0x7][y & 0x7];
         }
-
-        public void SetLandBlock(int x, int y, Tile[] value)
-        {
-            if (x < 0 || y < 0 || x >= _blockWidth || y >= _blockHeight)
-                return;
-
-            if (_landTiles[x] == null)
-                _landTiles[x] = new Tile[_blockHeight][];
-
-            _landTiles[x][y] = value;
-        }
-
+        
         public Tile[] GetLandBlock(int x, int y)
         {
-            if (x < 0 || y < 0 || x >= _blockWidth || y >= _blockHeight || _map == null) return _invalidLandBlock;
-
-            if (_landTiles[x] == null)
-                _landTiles[x] = new Tile[_blockHeight][];
-
-            Tile[] tiles = _landTiles[x][y] ?? (_landTiles[x][y] = ReadLandBlock(x, y));
-
-            return tiles;
+            if (x < 0 || y < 0 || x >= _blockWidth || y >= _blockHeight || _map == null) 
+                return _invalidLandBlock;
+            
+            return ReadLandBlock(x, y);
         }
 
         public Tile GetLandTile(int x, int y)
@@ -220,9 +170,9 @@ namespace OpenUO.Ultima
 
             _staticsStream.Seek(lookup, SeekOrigin.Begin);
 
-            StaticTile[] staTiles = new StaticTile[count];
+            StaticTileData[] staTiles = new StaticTileData[count];
 
-            fixed (StaticTile* pTiles = staTiles)
+            fixed (StaticTileData* pTiles = staTiles)
             {
                 NativeMethods._lread(_staticsStream.SafeFileHandle, pTiles, length);
 
@@ -241,7 +191,7 @@ namespace OpenUO.Ultima
 
                 HuedTileList[][] lists = _hueTileLists;
 
-                StaticTile* pCur = pTiles, pEnd = pTiles + count;
+                StaticTileData* pCur = pTiles, pEnd = pTiles + count;
 
                 while (pCur < pEnd)
                 {

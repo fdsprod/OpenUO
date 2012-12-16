@@ -19,7 +19,7 @@ namespace OpenUO.Ultima
 {
     public class SkillsFactory : AdapterFactoryBase
     {
-        public SkillsFactory(InstallLocation install, IoCContainer container)
+        public SkillsFactory(InstallLocation install, Container container)
             : base(install, container) { }
 
         public T GetSkill<T>(int index)

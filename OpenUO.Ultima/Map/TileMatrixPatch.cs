@@ -68,7 +68,7 @@ namespace OpenUO.Ultima
                     fixed (Tile* pTiles = tiles)
                         NativeMethods._lread(fsData.SafeFileHandle, pTiles, 192);
 
-                    matrix.SetLandBlock(x, y, tiles);
+                    //matrix.SetLandBlock(x, y, tiles);
                 }
 
                 return count;
@@ -108,7 +108,7 @@ namespace OpenUO.Ultima
 
                     if (offset < 0 || length <= 0)
                     {
-                        matrix.SetStaticBlock(blockX, blockY, matrix.EmptyStaticBlock);
+                        //matrix.SetStaticBlock(blockX, blockY, matrix.EmptyStaticBlock);
                         continue;
                     }
 
@@ -116,13 +116,13 @@ namespace OpenUO.Ultima
 
                     int tileCount = length / 7;
 
-                    StaticTile[] staTiles = new StaticTile[tileCount];
+                    StaticTileData[] staTiles = new StaticTileData[tileCount];
 
-                    fixed (StaticTile* pTiles = staTiles)
+                    fixed (StaticTileData* pTiles = staTiles)
                     {
                         NativeMethods._lread(fsData.SafeFileHandle, pTiles, length);
 
-                        StaticTile* pCur = pTiles, pEnd = pTiles + tileCount;
+                        StaticTileData* pCur = pTiles, pEnd = pTiles + tileCount;
 
                         while (pCur < pEnd)
                         {
@@ -140,7 +140,7 @@ namespace OpenUO.Ultima
                                 tiles[x][y] = lists[x][y].ToArray();
                         }
 
-                        matrix.SetStaticBlock(blockX, blockY, tiles);
+                        //matrix.SetStaticBlock(blockX, blockY, tiles);
                     }
                 }
 

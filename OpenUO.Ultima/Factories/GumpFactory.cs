@@ -19,7 +19,7 @@ namespace OpenUO.Ultima
 {
     public class GumpFactory : AdapterFactoryBase
     {
-        public GumpFactory(InstallLocation install, IoCContainer container)
+        public GumpFactory(InstallLocation install, Container container)
             : base(install, container) { }
 
         public T GetGump<T>(int index)

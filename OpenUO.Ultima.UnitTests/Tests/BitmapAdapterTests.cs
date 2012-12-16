@@ -24,15 +24,15 @@ namespace OpenUO.Ultima.UnitTests
     public class BitmapAdapterTests : TestingBase
     {
         private static bool _configuredKernelForTest;
-        private static IoCContainer _container;
+        private static Container _container;
 
-        protected static IoCContainer Container
+        protected static Container Container
         {
             get
             {
                 if (!_configuredKernelForTest)
                 {
-                    _container = new IoCContainer();
+                    _container = new Container();
                     _container.RegisterModule<UltimaSDKBitmapModule>();
                     _configuredKernelForTest = true;
                 }

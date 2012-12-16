@@ -19,7 +19,7 @@ namespace OpenUO.Ultima
 {
     public class AnimationDataFactory : AdapterFactoryBase
     {
-        public AnimationDataFactory(InstallLocation install, IoCContainer container)
+        public AnimationDataFactory(InstallLocation install, Container container)
             : base(install, container) { }
 
         public T GetAnimationData<T>(int index)

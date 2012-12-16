@@ -53,6 +53,7 @@ using System.Linq;
 using System.Reflection;
 #if EXPRESSIONS
 using System.Linq.Expressions;
+using OpenUO.Core.Patterns;
 #endif
 
 namespace OpenUO.Core.Patterns
@@ -567,7 +568,7 @@ namespace OpenUO.Core.Patterns
     }
     #endregion
 
-    public sealed partial class IoCContainer : IDisposable
+    public sealed partial class Container : IDisposable, IContainer
     {
         #region "Fluent" API
         /// <summary>
@@ -575,10 +576,10 @@ namespace OpenUO.Core.Patterns
         /// </summary>
         public sealed class RegisterOptions
         {
-            private IoCContainer _Container;
+            private Container _Container;
             private TypeRegistration _Registration;
 
-            public RegisterOptions(IoCContainer container, TypeRegistration registration)
+            public RegisterOptions(Container container, TypeRegistration registration)
             {
                 _Container = container;
                 _Registration = registration;
@@ -751,9 +752,9 @@ namespace OpenUO.Core.Patterns
 
         #region Public API
         #region Child Containers
-        public IoCContainer GetChildContainer()
+        public Container GetChildContainer()
         {
-            return new IoCContainer(this);
+            return new Container(this);
         }
         #endregion
 
@@ -969,7 +970,7 @@ namespace OpenUO.Core.Patterns
         /// <param name="registerType">Type to register</param>
         /// <param name="factory">Factory/lambda that returns an instance of RegisterType</param>
         /// <returns>RegisterOptions for fluent API</returns>
-        public RegisterOptions Register(Type registerType, Func<IoCContainer, NamedParameterOverloads, object> factory)
+        public RegisterOptions Register(Type registerType, Func<Container, NamedParameterOverloads, object> factory)
         {
             return RegisterInternal(registerType, string.Empty, new DelegateFactory(registerType, factory));
         }
@@ -981,7 +982,7 @@ namespace OpenUO.Core.Patterns
         /// <param name="factory">Factory/lambda that returns an instance of RegisterType</param>
         /// <param name="name">Name of registation</param>
         /// <returns>RegisterOptions for fluent API</returns>
-        public RegisterOptions Register(Type registerType, Func<IoCContainer, NamedParameterOverloads, object> factory, string name)
+        public RegisterOptions Register(Type registerType, Func<Container, NamedParameterOverloads, object> factory, string name)
         {
             return RegisterInternal(registerType, name, new DelegateFactory(registerType, factory));
         }
@@ -1096,7 +1097,7 @@ namespace OpenUO.Core.Patterns
         /// <typeparam name="RegisterType">Type to register</typeparam>
         /// <param name="factory">Factory/lambda that returns an instance of RegisterType</param>
         /// <returns>RegisterOptions for fluent API</returns>
-        public RegisterOptions Register<RegisterType>(Func<IoCContainer, NamedParameterOverloads, RegisterType> factory)
+        public RegisterOptions Register<RegisterType>(Func<Container, NamedParameterOverloads, RegisterType> factory)
             where RegisterType : class
         {
             if (factory == null)
@@ -1114,7 +1115,7 @@ namespace OpenUO.Core.Patterns
         /// <param name="factory">Factory/lambda that returns an instance of RegisterType</param>
         /// <param name="name">Name of registation</param>
         /// <returns>RegisterOptions for fluent API</returns>
-        public RegisterOptions Register<RegisterType>(Func<IoCContainer, NamedParameterOverloads, RegisterType> factory, string name)
+        public RegisterOptions Register<RegisterType>(Func<Container, NamedParameterOverloads, RegisterType> factory, string name)
             where RegisterType : class
         {
             if (factory == null)
@@ -2136,7 +2137,7 @@ namespace OpenUO.Core.Patterns
             /// <param name="parameters">Any user parameters passed</param>
             /// <param name="options"></param>
             /// <returns></returns>
-            public abstract object GetObject(Type requestedType, IoCContainer container, NamedParameterOverloads parameters, ResolveOptions options);
+            public abstract object GetObject(Type requestedType, Container container, NamedParameterOverloads parameters, ResolveOptions options);
 
             public virtual ObjectFactoryBase SingletonVariant
             {
@@ -2180,7 +2181,7 @@ namespace OpenUO.Core.Patterns
                 Constructor = constructor;
             }
 
-            public virtual ObjectFactoryBase GetFactoryForChildContainer(Type type, IoCContainer parent, IoCContainer child)
+            public virtual ObjectFactoryBase GetFactoryForChildContainer(Type type, Container parent, Container child)
             {
                 return this;
             }
@@ -2207,7 +2208,7 @@ namespace OpenUO.Core.Patterns
                 this.registerImplementation = registerImplementation;
             }
 
-            public override object GetObject(Type requestedType, IoCContainer container, NamedParameterOverloads parameters, ResolveOptions options)
+            public override object GetObject(Type requestedType, Container container, NamedParameterOverloads parameters, ResolveOptions options)
             {
                 try
                 {
@@ -2248,13 +2249,13 @@ namespace OpenUO.Core.Patterns
         {
             private readonly Type registerType;
 
-            private Func<IoCContainer, NamedParameterOverloads, object> _factory;
+            private Func<Container, NamedParameterOverloads, object> _factory;
 
             public override bool AssumeConstruction { get { return true; } }
 
             public override Type CreatesType { get { return this.registerType; } }
 
-            public override object GetObject(Type requestedType, IoCContainer container, NamedParameterOverloads parameters, ResolveOptions options)
+            public override object GetObject(Type requestedType, Container container, NamedParameterOverloads parameters, ResolveOptions options)
             {
                 try
                 {
@@ -2266,7 +2267,7 @@ namespace OpenUO.Core.Patterns
                 }
             }
 
-            public DelegateFactory(Type registerType, Func<IoCContainer, NamedParameterOverloads, object> factory)
+            public DelegateFactory(Type registerType, Func<Container, NamedParameterOverloads, object> factory)
             {
                 if (factory == null)
                     throw new ArgumentNullException("factory");
@@ -2312,9 +2313,9 @@ namespace OpenUO.Core.Patterns
 
             public override Type CreatesType { get { return this.registerType; } }
 
-            public override object GetObject(Type requestedType, IoCContainer container, NamedParameterOverloads parameters, ResolveOptions options)
+            public override object GetObject(Type requestedType, Container container, NamedParameterOverloads parameters, ResolveOptions options)
             {
-                var factory = _factory.Target as Func<IoCContainer, NamedParameterOverloads, object>;
+                var factory = _factory.Target as Func<Container, NamedParameterOverloads, object>;
 
                 if (factory == null)
                     throw new IoCWeakReferenceException(this.registerType);
@@ -2329,7 +2330,7 @@ namespace OpenUO.Core.Patterns
                 }
             }
 
-            public WeakDelegateFactory(Type registerType, Func<IoCContainer, NamedParameterOverloads, object> factory)
+            public WeakDelegateFactory(Type registerType, Func<Container, NamedParameterOverloads, object> factory)
             {
                 if (factory == null)
                     throw new ArgumentNullException("factory");
@@ -2343,7 +2344,7 @@ namespace OpenUO.Core.Patterns
             {
                 get
                 {
-                    var factory = _factory.Target as Func<IoCContainer, NamedParameterOverloads, object>;
+                    var factory = _factory.Target as Func<Container, NamedParameterOverloads, object>;
 
                     if (factory == null)
                         throw new IoCWeakReferenceException(this.registerType);
@@ -2392,7 +2393,7 @@ namespace OpenUO.Core.Patterns
                 get { return this.registerImplementation; }
             }
 
-            public override object GetObject(Type requestedType, IoCContainer container, NamedParameterOverloads parameters, ResolveOptions options)
+            public override object GetObject(Type requestedType, Container container, NamedParameterOverloads parameters, ResolveOptions options)
             {
                 return _instance;
             }
@@ -2458,7 +2459,7 @@ namespace OpenUO.Core.Patterns
                 get { return this.registerImplementation; }
             }
 
-            public override object GetObject(Type requestedType, IoCContainer container, NamedParameterOverloads parameters, ResolveOptions options)
+            public override object GetObject(Type requestedType, Container container, NamedParameterOverloads parameters, ResolveOptions options)
             {
                 var instance = _instance.Target;
 
@@ -2538,7 +2539,7 @@ namespace OpenUO.Core.Patterns
                 get { return this.registerImplementation; }
             }
 
-            public override object GetObject(Type requestedType, IoCContainer container, NamedParameterOverloads parameters, ResolveOptions options)
+            public override object GetObject(Type requestedType, Container container, NamedParameterOverloads parameters, ResolveOptions options)
             {
                 if (parameters.Count != 0)
                     throw new ArgumentException("Cannot specify parameters for singleton types");
@@ -2571,7 +2572,7 @@ namespace OpenUO.Core.Patterns
                 }
             }
 
-            public override ObjectFactoryBase GetFactoryForChildContainer(Type type, IoCContainer parent, IoCContainer child)
+            public override ObjectFactoryBase GetFactoryForChildContainer(Type type, Container parent, Container child)
             {
                 // We make sure that the singleton is constructed before the child container takes the factory.
                 // Otherwise the results would vary depending on whether or not the parent container had resolved
@@ -2623,7 +2624,7 @@ namespace OpenUO.Core.Patterns
                 get { return this.registerImplementation; }
             }
 
-            public override object GetObject(Type requestedType, IoCContainer container, NamedParameterOverloads parameters, ResolveOptions options)
+            public override object GetObject(Type requestedType, Container container, NamedParameterOverloads parameters, ResolveOptions options)
             {
                 object current;
 
@@ -2664,7 +2665,7 @@ namespace OpenUO.Core.Patterns
                 return new CustomObjectLifetimeFactory(this.registerType, this.registerImplementation, lifetimeProvider, errorString);
             }
 
-            public override ObjectFactoryBase GetFactoryForChildContainer(Type type, IoCContainer parent, IoCContainer child)
+            public override ObjectFactoryBase GetFactoryForChildContainer(Type type, Container parent, Container child)
             {
                 // We make sure that the singleton is constructed before the child container takes the factory.
                 // Otherwise the results would vary depending on whether or not the parent container had resolved
@@ -2681,16 +2682,16 @@ namespace OpenUO.Core.Patterns
         #endregion
 
         #region Singleton Container
-        private static readonly IoCContainer _Current = new IoCContainer();
+        private static readonly Container _Current = new Container();
 
-        static IoCContainer()
+        static Container()
         {
         }
 
         /// <summary>
         /// Lazy created Singleton instance of the container for simple scenarios
         /// </summary>
-        public static IoCContainer Current
+        public static Container Current
         {
             get
             {
@@ -2745,15 +2746,15 @@ namespace OpenUO.Core.Patterns
         #endregion
 
         #region Constructors
-        public IoCContainer()
+        public Container()
         {
             _RegisteredTypes = new SafeDictionary<TypeRegistration, ObjectFactoryBase>();
 
             RegisterDefaultTypes();
         }
 
-        IoCContainer _Parent;
-        private IoCContainer(IoCContainer parent)
+        Container _Parent;
+        private Container(Container parent)
             : this()
         {
             _Parent = parent;
@@ -2761,10 +2762,11 @@ namespace OpenUO.Core.Patterns
         #endregion
 
         #region Internal Methods
-        private readonly object _AutoRegisterLock = new object();
+        private readonly object _autoRegisterLock = new object();
+
         private void AutoRegisterInternal(IEnumerable<Assembly> assemblies, bool ignoreDuplicateImplementations, Func<Type, bool> registrationPredicate)
         {
-            lock (_AutoRegisterLock)
+            lock (_autoRegisterLock)
             {
                 var types = assemblies.SelectMany(a => a.SafeGetTypes()).Where(t => !IsIgnoredType(t, registrationPredicate)).ToList();
 
@@ -2868,7 +2870,7 @@ namespace OpenUO.Core.Patterns
 
         private void RegisterDefaultTypes()
         {
-            Register<IoCContainer>(this);
+            Register<Container>(this);
 
 #if MESSENGER
             // Only register the Messenger singleton if we are the root container
@@ -3140,7 +3142,7 @@ namespace OpenUO.Core.Patterns
             {
                 Type returnType = genericArguments[0];
 
-                MethodInfo resolveMethod = typeof(IoCContainer).GetMethod("Resolve", new Type[] { });
+                MethodInfo resolveMethod = typeof(Container).GetMethod("Resolve", new Type[] { });
                 resolveMethod = resolveMethod.MakeGenericMethod(returnType);
 
                 var resolveCall = Expression.Call(Expression.Constant(this), resolveMethod);
@@ -3155,7 +3157,7 @@ namespace OpenUO.Core.Patterns
             {
                 Type returnType = genericArguments[1];
 
-                MethodInfo resolveMethod = typeof(IoCContainer).GetMethod("Resolve", new Type[] { typeof(String) });
+                MethodInfo resolveMethod = typeof(Container).GetMethod("Resolve", new Type[] { typeof(String) });
                 resolveMethod = resolveMethod.MakeGenericMethod(returnType);
 
                 ParameterExpression[] resolveParameters = new ParameterExpression[] { Expression.Parameter(typeof(String), "name") };
@@ -3174,7 +3176,7 @@ namespace OpenUO.Core.Patterns
                 var name = Expression.Parameter(typeof(string), "name");
                 var parameters = Expression.Parameter(typeof(IDictionary<string, object>), "parameters");
 
-                MethodInfo resolveMethod = typeof(IoCContainer).GetMethod("Resolve", new Type[] { typeof(String), typeof(NamedParameterOverloads) });
+                MethodInfo resolveMethod = typeof(Container).GetMethod("Resolve", new Type[] { typeof(String), typeof(NamedParameterOverloads) });
                 resolveMethod = resolveMethod.MakeGenericMethod(returnType);
 
                 var resolveCall = Expression.Call(Expression.Constant(this), resolveMethod, name, Expression.Call(typeof(NamedParameterOverloads), "FromIDictionary", null, parameters));
@@ -3419,7 +3421,7 @@ namespace OpenUO.Core.Patterns
     public interface IModule
     {
         string Name { get; }
-        void OnLoad(IoCContainer container);
-        void OnUnload(IoCContainer container);
+        void OnLoad(Container container);
+        void OnUnload(Container container);
     }
 }

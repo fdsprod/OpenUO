@@ -22,11 +22,11 @@ namespace OpenUO.Ultima
 {
     public abstract class AdapterFactoryBase : IDisposable
     {
-        private IoCContainer _container;
+        private Container _container;
         private IStorageAdapter _adapter;
         private InstallLocation _install;
 
-        protected AdapterFactoryBase(InstallLocation install, IoCContainer container)
+        protected AdapterFactoryBase(InstallLocation install, Container container)
         {
             Guard.AssertIsNotNull(install, "install");
             Guard.AssertIsNotNull(container, "container");

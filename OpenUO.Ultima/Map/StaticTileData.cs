@@ -12,12 +12,12 @@
  ***************************************************************************/
  #endregion
 
-
 using System.Runtime.InteropServices;
+
 namespace OpenUO.Ultima
 {
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public struct StaticTile
+    internal struct StaticTileData
     {
         public short Id;
         public byte X;

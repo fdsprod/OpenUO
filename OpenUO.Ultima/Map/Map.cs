@@ -49,5 +49,15 @@ namespace OpenUO.Ultima
         {
             get { return m_Height; }
         }
+
+        public int NumberOfSectorsX
+        {
+            get { return m_Width / m_Tiles.BlockWidth; }
+        }
+
+        public int NumberOfSectorsY
+        {
+            get { return m_Height / m_Tiles.BlockHeight; }
+        }
     }
 }

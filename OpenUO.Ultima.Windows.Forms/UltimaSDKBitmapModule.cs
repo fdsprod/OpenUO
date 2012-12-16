@@ -26,7 +26,7 @@ namespace OpenUO.Ultima.Windows.Forms
             get { return "OpenUO Ultima SDK - Bitmap Module"; }
         }
 
-        public void OnLoad(IoCContainer container)
+        public void OnLoad(Container container)
         {
             container.Register<IArtworkStorageAdapter<Bitmap>, ArtworkBitmapAdapter>();
             container.Register<IAnimationStorageAdapter<Bitmap>, AnimationBitmapStorageAdapter>();
@@ -36,7 +36,7 @@ namespace OpenUO.Ultima.Windows.Forms
             container.Register<IUnicodeFontStorageAdapter<Bitmap>, UnicodeFontBitmapAdapter>();
         }
 
-        public void OnUnload(IoCContainer container)
+        public void OnUnload(Container container)
         {
 
         }

@@ -13,12 +13,12 @@ namespace Ultima.Winforms.Sample
 {
     public partial class SampleForm : Form
     {
-        private IoCContainer _container;
+        private Container _container;
         private ArtworkFactory _artFactory;
         private GumpFactory _gumpFactory;
         private SoundFactory _soundFactory;
 
-        public SampleForm(IoCContainer container)
+        public SampleForm(Container container)
         {
             _container = container;
 

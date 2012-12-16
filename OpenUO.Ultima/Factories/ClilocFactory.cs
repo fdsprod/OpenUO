@@ -19,7 +19,7 @@ namespace OpenUO.Ultima
 {
 	public class ClilocFactory : AdapterFactoryBase
 	{
-		public ClilocFactory(InstallLocation install, IoCContainer container)
+		public ClilocFactory(InstallLocation install, Container container)
 			: base(install, container) { }
 
 		public T GetCliloc<T>(ClientLocalizationLanguage lng, int index)

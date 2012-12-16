@@ -84,6 +84,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Animations\AnimationData.cs" />
+    <Compile Include="TileData\TileComparer.cs" />
     <Compile Include="UopFileIndex.cs" />
     <Compile Include="MulFileIndex.cs" />
     <Compile Include="FileIndexBase.cs" />
@@ -149,11 +150,10 @@
     <Compile Include="Skills\SkillCategoryData.cs" />
     <Compile Include="Skills\SkillData.cs" />
     <Compile Include="Sound.cs" />
-    <Compile Include="Map\StaticTile.cs" />
+    <Compile Include="Map\StaticTileData.cs" />
     <Compile Include="Map\Tile.cs" />
     <Compile Include="TileData\TileData.cs" />
     <Compile Include="TileData\TileFlag.cs" />
-    <Compile Include="Map\TileList.cs" />
     <Compile Include="Map\TileMatrix.cs" />
     <Compile Include="Map\TileMatrixPatch.cs" />
     <Compile Include="UltimaException.cs" />

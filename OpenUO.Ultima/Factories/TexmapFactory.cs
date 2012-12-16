@@ -19,7 +19,7 @@ namespace OpenUO.Ultima
 {
     public class TexmapFactory : AdapterFactoryBase
     {
-        public TexmapFactory(InstallLocation install, IoCContainer container)
+        public TexmapFactory(InstallLocation install, Container container)
             : base(install, container) { }
 
         public T GetTexmap<T>(int index)

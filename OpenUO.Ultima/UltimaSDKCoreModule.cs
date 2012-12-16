@@ -24,14 +24,14 @@ namespace OpenUO.Ultima
             get { return "OpenUO Ultima SDK - Core Module"; }
         }
 
-        public void OnLoad(IoCContainer container)
+        public void OnLoad(Container container)
         {
             container.Register<IAnimationDataStorageAdapter<AnimationData>, AnimationDataStorageAdapter>();
             container.Register<ISkillStorageAdapter<Skill>, SkillStorageAdapter>();
             container.Register<ISoundStorageAdapter<Sound>, SoundStorageAdapter>();
         }
 
-        public void OnUnload(IoCContainer container)
+        public void OnUnload(Container container)
         {
             // TODO: Unregister types.
         }

@@ -19,7 +19,7 @@ namespace OpenUO.Ultima
 {
     public class ArtworkFactory : AdapterFactoryBase
     {
-        public ArtworkFactory(InstallLocation install, IoCContainer container)
+        public ArtworkFactory(InstallLocation install, Container container)
             : base(install, container) { }
 
         public int GetLandTileCount<T>()

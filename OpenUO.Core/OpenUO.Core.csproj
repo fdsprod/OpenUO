@@ -101,6 +101,7 @@
     <Compile Include="Reflection\FieldAccessor.cs" />
     <Compile Include="Reflection\MethodInvoker.cs" />
     <Compile Include="Reflection\PropertyAccesor.cs" />
+    <Compile Include="TrackableBase.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Client.licenseheader" />

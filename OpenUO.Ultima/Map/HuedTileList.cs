@@ -15,7 +15,7 @@
 
 namespace OpenUO.Ultima
 {
-    public class HuedTileList
+    internal class HuedTileList
     {
         private HuedTile[] _tiles;
         private int _count;
