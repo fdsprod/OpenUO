@@ -1,74 +1,50 @@
 ﻿#region License Header
-/***************************************************************************
- *   Copyright (c) 2011 OpenUO Software Team.
- *   All Right Reserved.
- *
- *   $Id: $:
- *
- *   This program is free software; you can redistribute it and/or modify
- *   it under the terms of the GNU General Public License as published by
- *   the Free Software Foundation; either version 3 of the License, or
- *   (at your option) any later version.
- ***************************************************************************/
- #endregion
+
+// /***************************************************************************
+//  *   Copyright (c) 2011 OpenUO Software Team.
+//  *   All Right Reserved.
+//  *
+//  *   TileMatrix.cs
+//  *
+//  *   This program is free software; you can redistribute it and/or modify
+//  *   it under the terms of the GNU General Public License as published by
+//  *   the Free Software Foundation; either version 3 of the License, or
+//  *   (at your option) any later version.
+//  ***************************************************************************/
+
+#endregion
+
+#region Usings
 
 using System;
 using System.Collections.Generic;
 using System.IO;
 
+#endregion
+
 namespace OpenUO.Ultima
 {
     public class TileMatrix
     {
-        private static InstallLocation _install;
         private static HuedTileList[][] _hueTileLists;
+        private readonly int _blockHeight;
+        private readonly int _blockWidth;
 
-        private readonly HuedTile[][][][][] _staticTiles;
-        private readonly Tile[][][] _landTiles;
-
-        private readonly Tile[] _invalidLandBlock;
         private readonly HuedTile[][][] _emptyStaticBlock;
 
-        private readonly FileStream _map;
-
         private readonly FileStream _fileIndex;
+        private readonly int _height;
+        private readonly Tile[] _invalidLandBlock;
+        private readonly FileStream _map;
+        private readonly UOPIndex _mapIndex;
         private readonly BinaryReader _reader;
 
         private readonly FileStream _staticsStream;
 
-        private readonly int _blockWidth, _blockHeight;
-        private readonly int _width, _height;
-        
-        private UOPIndex _mapIndex;
-
-        public int BlockWidth
-        {
-            get { return _blockWidth; }
-        }
-
-        public int BlockHeight
-        {
-            get { return _blockHeight; }
-        }
-
-        public int Width
-        {
-            get { return _width; }
-        }
-
-        public int Height
-        {
-            get { return _height; }
-        }
-
-        public HuedTile[][][] EmptyStaticBlock
-        {
-            get { return _emptyStaticBlock; }
-        }
+        private readonly int _width;
 
         public TileMatrix(InstallLocation install, int fileIndex, int mapID, int width, int height)
         {
-            _install = install;
             _width = width;
             _height = height;
             _blockWidth = width >> 3;
@@ -124,11 +100,38 @@ namespace OpenUO.Ultima
             _invalidLandBlock = new Tile[196];
         }
 
+        public int BlockWidth
+        {
+            get { return _blockWidth; }
+        }
+
+        public int BlockHeight
+        {
+            get { return _blockHeight; }
+        }
+
+        public int Width
+        {
+            get { return _width; }
+        }
+
+        public int Height
+        {
+            get { return _height; }
+        }
+
+        public HuedTile[][][] EmptyStaticBlock
+        {
+            get { return _emptyStaticBlock; }
+        }
+
         public HuedTile[][][] GetStaticBlock(int x, int y)
         {
             if (x < 0 || y < 0 || x >= _blockWidth || y >= _blockHeight || _staticsStream == null || _fileIndex == null)
+            {
                 return _emptyStaticBlock;
-                        
+            }
+
             return ReadStaticBlock(x, y);
         }
 
@@ -138,12 +141,14 @@ namespace OpenUO.Ultima
 
             return tiles[x & 0x7][y & 0x7];
         }
-        
+
         public Tile[] GetLandBlock(int x, int y)
         {
-            if (x < 0 || y < 0 || x >= _blockWidth || y >= _blockHeight || _map == null) 
+            if (x < 0 || y < 0 || x >= _blockWidth || y >= _blockHeight || _map == null)
+            {
                 return _invalidLandBlock;
-            
+            }
+
             return ReadLandBlock(x, y);
         }
 
@@ -185,7 +190,9 @@ namespace OpenUO.Ultima
                         _hueTileLists[i] = new HuedTileList[8];
 
                         for (int j = 0; j < 8; ++j)
+                        {
                             _hueTileLists[i][j] = new HuedTileList();
+                        }
                     }
                 }
 
@@ -206,7 +213,9 @@ namespace OpenUO.Ultima
                     tiles[i] = new HuedTile[8][];
 
                     for (int j = 0; j < 8; ++j)
+                    {
                         tiles[i][j] = lists[i][j].ToArray();
+                    }
                 }
 
                 return tiles;
@@ -218,8 +227,10 @@ namespace OpenUO.Ultima
             int offset = ((x * _blockHeight) + y) * 196 + 4;
 
             if (_mapIndex != null)
+            {
                 offset = _mapIndex.Lookup(offset);
-            
+            }
+
             _map.Seek(offset, SeekOrigin.Begin);
 
             Tile[] tiles = new Tile[64];
@@ -235,59 +246,27 @@ namespace OpenUO.Ultima
         public void Dispose()
         {
             if (_map != null)
+            {
                 _map.Close();
+            }
 
             if (_staticsStream != null)
+            {
                 _staticsStream.Close();
+            }
 
             if (_reader != null)
+            {
                 _reader.Close();
+            }
         }
 
         public class UOPIndex
         {
-            private class UOPEntry : IComparable<UOPEntry>
-            {
-                public int Offset;
-                public int Length;
-                public int Order;
-
-                public UOPEntry(int offset, int length)
-                {
-                    Offset = offset;
-                    Length = length;
-                    Order = 0;
-                }
-
-                public int CompareTo(UOPEntry other)
-                {
-                    return Order.CompareTo(other.Order);
-                }
-            }
-
-            private class OffsetComparer : IComparer<UOPEntry>
-            {
-                public static readonly IComparer<UOPEntry> Instance = new OffsetComparer();
-
-                public OffsetComparer()
-                {
-                }
-
-                public int Compare(UOPEntry x, UOPEntry y)
-                {
-                    return x.Offset.CompareTo(y.Offset);
-                }
-            }
-
-            private BinaryReader _reader;
-            private int _length;
-            private int _version;
-            private UOPEntry[] _entries;
-
-            public int Version
-            {
-                get { return _version; }
-            }
+            private readonly UOPEntry[] _entries;
+            private readonly int _length;
+            private readonly BinaryReader _reader;
+            private readonly int _version;
 
             public UOPIndex(FileStream stream)
             {
@@ -295,7 +274,9 @@ namespace OpenUO.Ultima
                 _length = (int)stream.Length;
 
                 if (_reader.ReadInt32() != 0x50594D)
+                {
                     throw new ArgumentException("Invalid UOP file.");
+                }
 
                 _version = _reader.ReadInt32();
                 _reader.ReadInt32();
@@ -347,6 +328,11 @@ namespace OpenUO.Ultima
                 _entries = entries.ToArray();
             }
 
+            public int Version
+            {
+                get { return _version; }
+            }
+
             public int Lookup(int offset)
             {
                 int total = 0;
@@ -356,7 +342,9 @@ namespace OpenUO.Ultima
                     int newTotal = total + _entries[i].Length;
 
                     if (offset < newTotal)
+                    {
                         return _entries[i].Offset + (offset - total);
+                    }
 
                     total = newTotal;
                 }
@@ -367,6 +355,35 @@ namespace OpenUO.Ultima
             public void Close()
             {
                 _reader.Close();
+            }
+
+            private class OffsetComparer : IComparer<UOPEntry>
+            {
+                public static readonly IComparer<UOPEntry> Instance = new OffsetComparer();
+
+                public int Compare(UOPEntry x, UOPEntry y)
+                {
+                    return x.Offset.CompareTo(y.Offset);
+                }
+            }
+
+            private class UOPEntry : IComparable<UOPEntry>
+            {
+                public readonly int Length;
+                public int Offset;
+                public int Order;
+
+                public UOPEntry(int offset, int length)
+                {
+                    Offset = offset;
+                    Length = length;
+                    Order = 0;
+                }
+
+                public int CompareTo(UOPEntry other)
+                {
+                    return Order.CompareTo(other.Order);
+                }
             }
         }
     }

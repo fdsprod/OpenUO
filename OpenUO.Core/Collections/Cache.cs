@@ -1,20 +1,27 @@
 ﻿#region License Header
-/***************************************************************************
- *   Copyright (c) 2011 OpenUO Software Team.
- *   All Right Reserved.
- *
- *   $Id: $:
- *
- *   This program is free software; you can redistribute it and/or modify
- *   it under the terms of the GNU General Public License as published by
- *   the Free Software Foundation; either version 3 of the License, or
- *   (at your option) any later version.
- ***************************************************************************/
- #endregion
+
+// /***************************************************************************
+//  *   Copyright (c) 2011 OpenUO Software Team.
+//  *   All Right Reserved.
+//  *
+//  *   Cache.cs
+//  *
+//  *   This program is free software; you can redistribute it and/or modify
+//  *   it under the terms of the GNU General Public License as published by
+//  *   the Free Software Foundation; either version 3 of the License, or
+//  *   (at your option) any later version.
+//  ***************************************************************************/
+
+#endregion
+
+#region Usings
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+
+#endregion
 
 namespace OpenUO.Core.Collections
 {
@@ -29,36 +36,6 @@ namespace OpenUO.Core.Collections
             InternalCache = new Dictionary<T, CacheItem<U>>(capacity);
         }
 
-        public void Clean()
-        {
-            var keys = InternalCache.Keys.ToArray();
-
-            for (int i = 0; i < keys.Length; i++)
-            {
-                T key = keys[i];
-                var cacheItem = InternalCache[key];
-
-                if (cacheItem.IsExpired)
-                    InternalCache.Remove(key);
-            }
-        }
-
-        public virtual void Dispose()
-        {
-            foreach (var cacheItem in InternalCache.Values)
-            {
-                OnItemDisposing(cacheItem);
-                cacheItem.Dispose();
-            }
-
-            InternalCache.Clear();
-        }
-
-        protected virtual void OnItemDisposing(CacheItem<U> cacheItem)
-        {
-
-        }
-
         public virtual U this[T index]
         {
             get
@@ -67,7 +44,9 @@ namespace OpenUO.Core.Collections
                 CacheItem<U> cacheItem;
 
                 if (InternalCache.TryGetValue(index, out cacheItem))
+                {
                     item = cacheItem.Value;
+                }
 
                 return item;
             }
@@ -85,21 +64,59 @@ namespace OpenUO.Core.Collections
             }
         }
 
+        public virtual void Dispose()
+        {
+            foreach (var cacheItem in InternalCache.Values)
+            {
+                OnItemDisposing(cacheItem);
+                cacheItem.Dispose();
+            }
+
+            InternalCache.Clear();
+        }
+
         public IEnumerator<U> GetEnumerator()
         {
             return InternalCache.Values.Select(ci => ci.Value).GetEnumerator();
         }
 
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+        IEnumerator IEnumerable.GetEnumerator()
         {
             return InternalCache.GetEnumerator();
         }
 
+        public void Clean()
+        {
+            T[] keys = InternalCache.Keys.ToArray();
+
+            for (int i = 0; i < keys.Length; i++)
+            {
+                T key = keys[i];
+                CacheItem<U> cacheItem = InternalCache[key];
+
+                if (cacheItem.IsExpired)
+                {
+                    InternalCache.Remove(key);
+                }
+            }
+        }
+
+        protected virtual void OnItemDisposing(CacheItem<U> cacheItem)
+        {
+        }
+
         protected class CacheItem<TValueType> : IDisposable
         {
-            private TValueType _value;
-            private DateTime _lastAccess;
             private readonly TimeSpan _timeToExpire;
+            private DateTime _lastAccess;
+            private TValueType _value;
+
+            public CacheItem(TValueType value, TimeSpan timeToExpire)
+            {
+                _value = value;
+                _lastAccess = DateTime.Now;
+                _timeToExpire = timeToExpire;
+            }
 
             public TValueType Value
             {
@@ -115,13 +132,6 @@ namespace OpenUO.Core.Collections
                 }
             }
 
-            public CacheItem(TValueType value, TimeSpan timeToExpire)
-            {
-                _value = value;
-                _lastAccess = DateTime.Now;
-                _timeToExpire = timeToExpire;
-            }
-
             public bool IsExpired
             {
                 get { return DateTime.Now >= _lastAccess + _timeToExpire; }
@@ -129,8 +139,11 @@ namespace OpenUO.Core.Collections
 
             public void Dispose()
             {
-                if (_value is IDisposable)
-                    ((IDisposable)_value).Dispose();
+                IDisposable disposable = _value as IDisposable;
+                if (disposable != null)
+                {
+                    disposable.Dispose();
+                }
             }
         }
     }

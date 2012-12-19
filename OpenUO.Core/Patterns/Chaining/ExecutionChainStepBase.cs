@@ -1,27 +1,37 @@
 ﻿#region License Header
-/***************************************************************************
- *   Copyright (c) 2011 OpenUO Software Team.
- *   All Right Reserved.
- *
- *   $Id: $:
- *
- *   This program is free software; you can redistribute it and/or modify
- *   it under the terms of the GNU General Public License as published by
- *   the Free Software Foundation; either version 3 of the License, or
- *   (at your option) any later version.
- ***************************************************************************/
- #endregion
+
+// /***************************************************************************
+//  *   Copyright (c) 2011 OpenUO Software Team.
+//  *   All Right Reserved.
+//  *
+//  *   ExecutionChainStepBase.cs
+//  *
+//  *   This program is free software; you can redistribute it and/or modify
+//  *   it under the terms of the GNU General Public License as published by
+//  *   the Free Software Foundation; either version 3 of the License, or
+//  *   (at your option) any later version.
+//  ***************************************************************************/
+
+#endregion
+
+#region Usings
 
 using System.Collections.Generic;
+
+#endregion
 
 namespace OpenUO.Core.Patterns
 {
     public abstract class ExecutionChainStepBase<T> : IChainStep<T>
         where T : class
     {
-        private List<ChainDependency> _dependencies;
-        private bool _cancelExecution;
+        private readonly List<ChainDependency> _dependencies;
         private IChainStep<T> _successor;
+
+        public ExecutionChainStepBase()
+        {
+            _dependencies = new List<ChainDependency>();
+        }
 
         public virtual string Name
         {
@@ -36,22 +46,24 @@ namespace OpenUO.Core.Patterns
 
         public bool CancelExecution
         {
-            get { return _cancelExecution; }
-            set { _cancelExecution = value; }
+            get;
+            set;
         }
 
         public IChainStep<T> Successor
         {
             get { return _successor; }
-            set 
+            set
             {
                 Guard.AssertIsNotNull(value, "value");
 
                 if (_successor == null)
+                {
                     _successor = value;
+                }
                 else
                 {
-                    var successor = _successor;
+                    IChainStep<T> successor = _successor;
                     _successor = value;
                     value.Successor = successor;
                 }
@@ -63,17 +75,14 @@ namespace OpenUO.Core.Patterns
             get { return _dependencies.ToArray(); }
         }
 
-        public ExecutionChainStepBase()
-        {
-            _dependencies = new List<ChainDependency>();
-        }
-
         public void Execute(T state)
         {
             ExecuteOverride(state);
 
             if (!CancelExecution && _successor != null)
+            {
                 _successor.Execute(state);
+            }
         }
 
         public void AddDepenency(string name, bool mustExist)

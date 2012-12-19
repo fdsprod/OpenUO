@@ -98,7 +98,7 @@
     <Compile Include="Factories\AnimationFactory.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Factories\ASCIIFontFactory.cs">
+    <Compile Include="Factories\AsciiFontFactory.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Factories\ClilocFactory.cs" />
@@ -162,10 +162,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="TODO.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Client.licenseheader" />
-    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\OpenUO.Core\OpenUO.Core.csproj">

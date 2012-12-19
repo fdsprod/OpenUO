@@ -1,31 +1,33 @@
 ﻿#region License Header
-/***************************************************************************
- *   Copyright (c) 2011 OpenUO Software Team.
- *   All Right Reserved.
- *
- *   $Id: $:
- *
- *   This program is free software; you can redistribute it and/or modify
- *   it under the terms of the GNU General Public License as published by
- *   the Free Software Foundation; either version 3 of the License, or
- *   (at your option) any later version.
- ***************************************************************************/
- #endregion
+
+// /***************************************************************************
+//  *   Copyright (c) 2011 OpenUO Software Team.
+//  *   All Right Reserved.
+//  *
+//  *   Hue.cs
+//  *
+//  *   This program is free software; you can redistribute it and/or modify
+//  *   it under the terms of the GNU General Public License as published by
+//  *   the Free Software Foundation; either version 3 of the License, or
+//  *   (at your option) any later version.
+//  ***************************************************************************/
+
+#endregion
+
+#region Usings
 
 using System.IO;
 using System.Text;
+
+#endregion
 
 namespace OpenUO.Ultima
 {
     public class Hue
     {
-        private readonly int _index;
         private readonly ushort[] _colors;
+        private readonly int _index;
         private readonly string _name;
-
-        public int Index { get { return _index; } }
-        public ushort[] Colors { get { return _colors; } }
-        public string Name { get { return _name; } }
 
         public Hue(int index)
         {
@@ -47,7 +49,9 @@ namespace OpenUO.Ultima
             _colors = new ushort[34];
 
             for (int i = 0; i < 34; ++i)
+            {
                 _colors[i] = (ushort)(bin.ReadUInt16() | 0x8000);
+            }
 
             bool nulled = false;
 
@@ -58,12 +62,31 @@ namespace OpenUO.Ultima
                 char c = (char)bin.ReadByte();
 
                 if (c == 0)
+                {
                     nulled = true;
+                }
                 else if (!nulled)
+                {
                     sb.Append(c);
+                }
             }
 
             _name = sb.ToString();
+        }
+
+        public int Index
+        {
+            get { return _index; }
+        }
+
+        public ushort[] Colors
+        {
+            get { return _colors; }
+        }
+
+        public string Name
+        {
+            get { return _name; }
         }
     }
 }

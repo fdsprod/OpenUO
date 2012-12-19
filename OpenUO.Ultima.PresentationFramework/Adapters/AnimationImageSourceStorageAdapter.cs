@@ -1,24 +1,30 @@
 ﻿#region License Header
-/***************************************************************************
- *   Copyright (c) 2011 OpenUO Software Team.
- *   All Right Reserved.
- *
- *   $Id: $:
- *
- *   This program is free software; you can redistribute it and/or modify
- *   it under the terms of the GNU General Public License as published by
- *   the Free Software Foundation; either version 3 of the License, or
- *   (at your option) any later version.
- ***************************************************************************/
- #endregion
+
+// /***************************************************************************
+//  *   Copyright (c) 2011 OpenUO Software Team.
+//  *   All Right Reserved.
+//  *
+//  *   AnimationImageSourceStorageAdapter.cs
+//  *
+//  *   This program is free software; you can redistribute it and/or modify
+//  *   it under the terms of the GNU General Public License as published by
+//  *   the Free Software Foundation; either version 3 of the License, or
+//  *   (at your option) any later version.
+//  ***************************************************************************/
+
+#endregion
+
+#region Usings
 
 using System;
 using System.IO;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using OpenUO.Ultima.Adapters;
 using OpenUO.Core;
+using OpenUO.Ultima.Adapters;
+
+#endregion
 
 namespace OpenUO.Ultima.PresentationFramework.Adapters
 {
@@ -26,18 +32,20 @@ namespace OpenUO.Ultima.PresentationFramework.Adapters
     {
         private const int DoubleXor = (0x200 << 22) | (0x200 << 12);
 
-        private FileIndexBase[] _fileIndices;
-        private BodyTable _bodyTable;
         private BodyConverter _bodyConverter;
-        private int[] _table;
+        private BodyTable _bodyTable;
+        private FileIndexBase[] _fileIndices;
         private Hues _hues;
+        private int[] _table;
 
         public override int Length
         {
             get
             {
                 if (!IsInitialized)
+                {
                     Initialize();
+                }
 
                 return 0;
             }
@@ -47,8 +55,8 @@ namespace OpenUO.Ultima.PresentationFramework.Adapters
         {
             base.Initialize();
 
-            var install = Install;
-            
+            InstallLocation install = Install;
+
             _fileIndices = new[] {
                 install.CreateFileIndex("anim.idx", "anim.mul"),
                 install.CreateFileIndex("anim2.idx", "anim2.mul"),
@@ -59,29 +67,19 @@ namespace OpenUO.Ultima.PresentationFramework.Adapters
 
             _bodyTable = new BodyTable(install.GetPath("body.def"));
             _bodyConverter = new BodyConverter(install.GetPath("bodyconv.def"));
-            _hues = new Hues(install);        
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            base.Dispose(disposing);
-
-            foreach (var fileIndex in _fileIndices)
-                fileIndex.Close();
-
-            _fileIndices = null;
-            _bodyConverter = null;
-            _table = null;
-            _bodyTable = null;
-            _hues = null;
+            _hues = new Hues(install);
         }
 
         public unsafe Frame<ImageSource>[] GetAnimation(int body, int action, int direction, int hue, bool preserveHue)
         {
             if (preserveHue)
+            {
                 Translate(ref body);
+            }
             else
+            {
                 Translate(ref body, ref hue);
+            }
 
             int fileType = _bodyConverter.Convert(ref body);
             FileIndexBase fileIndex = _fileIndices[fileType - 1];
@@ -91,73 +89,107 @@ namespace OpenUO.Ultima.PresentationFramework.Adapters
             switch (fileType)
             {
                 default:
+                {
+                    if (body < 200)
                     {
-                        if (body < 200)
-                            index = body * 110;
-                        else if (body < 400)
-                            index = 22000 + ((body - 200) * 65);
-                        else
-                            index = 35000 + ((body - 400) * 175);
-
-                        break;
+                        index = body * 110;
                     }
+                    else if (body < 400)
+                    {
+                        index = 22000 + ((body - 200) * 65);
+                    }
+                    else
+                    {
+                        index = 35000 + ((body - 400) * 175);
+                    }
+
+                    break;
+                }
                 case 2:
+                {
+                    if (body < 200)
                     {
-                        if (body < 200)
-                            index = body * 110;
-                        else
-                            index = 22000 + ((body - 200) * 65);
-
-                        break;
+                        index = body * 110;
                     }
+                    else
+                    {
+                        index = 22000 + ((body - 200) * 65);
+                    }
+
+                    break;
+                }
                 case 3:
+                {
+                    if (body < 300)
                     {
-                        if (body < 300)
-                            index = body * 65;
-                        else if (body < 400)
-                            index = 33000 + ((body - 300) * 110);
-                        else
-                            index = 35000 + ((body - 400) * 175);
-
-                        break;
+                        index = body * 65;
                     }
+                    else if (body < 400)
+                    {
+                        index = 33000 + ((body - 300) * 110);
+                    }
+                    else
+                    {
+                        index = 35000 + ((body - 400) * 175);
+                    }
+
+                    break;
+                }
                 case 4:
+                {
+                    if (body < 200)
                     {
-                        if (body < 200)
-                            index = body * 110;
-                        else if (body < 400)
-                            index = 22000 + ((body - 200) * 65);
-                        else
-                            index = 35000 + ((body - 400) * 175);
-
-                        break;
+                        index = body * 110;
                     }
+                    else if (body < 400)
+                    {
+                        index = 22000 + ((body - 200) * 65);
+                    }
+                    else
+                    {
+                        index = 35000 + ((body - 400) * 175);
+                    }
+
+                    break;
+                }
                 case 5:
+                {
+                    if (body < 200 && body != 34) // looks strange, though it works.
                     {
-                        if (body < 200 && body != 34) // looks strange, though it works.
-                            index = body * 110;
-                        else
-                            index = 35000 + ((body - 400) * 65);
-
-                        break;
+                        index = body * 110;
                     }
+                    else
+                    {
+                        index = 35000 + ((body - 400) * 65);
+                    }
+
+                    break;
+                }
             }
 
             if ((index + (action * 5)) > int.MaxValue)
+            {
                 throw new ArithmeticException();
+            }
 
             index += action * 5;
 
             if (direction <= 4)
+            {
                 index += direction;
+            }
             else
+            {
                 index += direction - (direction - 4) * 2;
+            }
 
             int length, extra;
             Stream stream = fileIndex.Seek(index, out length, out extra);
 
             if (stream == null)
+            {
                 return null;
+            }
 
             bool flip = (direction > 4);
 
@@ -166,7 +198,9 @@ namespace OpenUO.Ultima.PresentationFramework.Adapters
             ushort[] palette = new ushort[0x100];
 
             for (int i = 0; i < 0x100; ++i)
+            {
                 palette[i] = (ushort)(bin.ReadUInt16() ^ 0x8000);
+            }
 
             int start = (int)bin.BaseStream.Position;
             int frameCount = bin.ReadInt32();
@@ -174,7 +208,9 @@ namespace OpenUO.Ultima.PresentationFramework.Adapters
             int[] lookups = new int[frameCount];
 
             for (int i = 0; i < frameCount; ++i)
+            {
                 lookups[i] = start + bin.ReadInt32();
+            }
 
             bool onlyHueGrayPixels = ((hue & 0x8000) == 0);
 
@@ -183,7 +219,9 @@ namespace OpenUO.Ultima.PresentationFramework.Adapters
             Hue hueObject = null;
 
             if (hue >= 0 && hue < _hues.Table.Length)
+            {
                 hueObject = _hues.Table[hue];
+            }
 
             Frame<ImageSource>[] frames = new Frame<ImageSource>[frameCount];
 
@@ -194,7 +232,7 @@ namespace OpenUO.Ultima.PresentationFramework.Adapters
                 int xCenter = bin.ReadInt16();
                 int yCenter = bin.ReadInt16();
 
-                 int width = bin.ReadUInt16();
+                int width = bin.ReadUInt16();
                 int height = bin.ReadUInt16();
 
                 WriteableBitmap bmp = new WriteableBitmap(width, height, 96, 96, PixelFormats.Bgr555, null);
@@ -202,7 +240,7 @@ namespace OpenUO.Ultima.PresentationFramework.Adapters
 
                 ushort* line = (ushort*)bmp.BackBuffer;
                 int delta = bmp.BackBufferStride >> 1;
-                
+
                 int header;
 
                 int xBase = xCenter - 0x200;
@@ -221,7 +259,9 @@ namespace OpenUO.Ultima.PresentationFramework.Adapters
                         ushort* end = cur + (header & 0xFFF);
 
                         while (cur < end)
+                        {
                             *cur++ = palette[bin.ReadByte()];
+                        }
                     }
                 }
                 else
@@ -237,7 +277,9 @@ namespace OpenUO.Ultima.PresentationFramework.Adapters
                         ushort* end = cur - (header & 0xFFF);
 
                         while (cur > end)
+                        {
                             *cur-- = palette[bin.ReadByte()];
+                        }
                     }
 
                     xCenter = width - xCenter;
@@ -247,12 +289,30 @@ namespace OpenUO.Ultima.PresentationFramework.Adapters
                 bmp.Unlock();
 
                 if (hueObject != null)
+                {
                     ApplyHue(bmp, hueObject, onlyHueGrayPixels);
+                }
 
                 frames[i] = new Frame<ImageSource>(xCenter, yCenter, bmp);
             }
 
             return frames;
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+
+            foreach (FileIndexBase fileIndex in _fileIndices)
+            {
+                fileIndex.Close();
+            }
+
+            _fileIndices = null;
+            _bodyConverter = null;
+            _table = null;
+            _bodyTable = null;
+            _hues = null;
         }
 
         public unsafe void ApplyHue(ImageSource bmp, Hue hue, bool onlyHueGrayPixels)
@@ -277,17 +337,21 @@ namespace OpenUO.Ultima.PresentationFramework.Adapters
 
             fixed (ushort* pOriginal = hueColors)
             {
-                ushort* pSource = (ushort*)pOriginal;
+                ushort* pSource = pOriginal;
                 ushort* pDest = pColors;
                 ushort* pEnd = pDest + 32;
 
                 while (pDest < pEnd)
+                {
                     *pDest++ = 0;
+                }
 
                 pEnd += 32;
 
                 while (pDest < pEnd)
+                {
                     *pDest++ = *pSource++;
+                }
             }
 
             if (onlyHueGrayPixels)
@@ -302,9 +366,13 @@ namespace OpenUO.Ultima.PresentationFramework.Adapters
                         int b = c & 0x1F;
 
                         if (r == g && r == b)
+                        {
                             *pBuffer++ = pColors[c >> 10];
+                        }
                         else
+                        {
                             ++pBuffer;
+                        }
                     }
 
                     pBuffer += delta;
@@ -333,7 +401,9 @@ namespace OpenUO.Ultima.PresentationFramework.Adapters
         public void Translate(ref int body)
         {
             if (_table == null)
+            {
                 InitializeTable();
+            }
 
             if (body <= 0 || body >= _table.Length)
             {
@@ -347,7 +417,9 @@ namespace OpenUO.Ultima.PresentationFramework.Adapters
         public void Translate(ref int body, ref int hue)
         {
             if (_table == null)
+            {
                 InitializeTable();
+            }
 
             if (body <= 0 || body >= _table.Length)
             {

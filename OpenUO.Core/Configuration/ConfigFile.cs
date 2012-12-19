@@ -1,16 +1,20 @@
 ﻿#region License Header
-/***************************************************************************
- *   Copyright (c) 2011 OpenUO Software Team.
- *   All Right Reserved.
- *
- *   $Id: ConfigFile.cs 14 2011-10-31 07:03:12Z fdsprod@gmail.com $:
- *
- *   This program is free software; you can redistribute it and/or modify
- *   it under the terms of the GNU General Public License as published by
- *   the Free Software Foundation; either version 3 of the License, or
- *   (at your option) any later version.
- ***************************************************************************/
- #endregion
+
+// /***************************************************************************
+//  *   Copyright (c) 2011 OpenUO Software Team.
+//  *   All Right Reserved.
+//  *
+//  *   ConfigFile.cs
+//  *
+//  *   This program is free software; you can redistribute it and/or modify
+//  *   it under the terms of the GNU General Public License as published by
+//  *   the Free Software Foundation; either version 3 of the License, or
+//  *   (at your option) any later version.
+//  ***************************************************************************/
+
+#endregion
+
+#region Usings
 
 using System;
 using System.Collections.Generic;
@@ -18,20 +22,19 @@ using System.IO;
 using System.Text;
 using System.Xml;
 using System.Xml.Linq;
-
 using OpenUO.Core.Diagnostics;
 using OpenUO.Core.IO;
+
+#endregion
 
 namespace OpenUO.Core.Configuration
 {
     public class ConfigFile
     {
-        private static object _syncRoot = new object();
+        private static readonly object _syncRoot = new object();
 
         private readonly string _filename;
         private readonly Dictionary<string, Dictionary<string, string>> _sections;
-
-        public bool Exists { get { return File.Exists(_filename); } }
 
         public ConfigFile(string filename)
         {
@@ -39,6 +42,11 @@ namespace OpenUO.Core.Configuration
             _sections = new Dictionary<string, Dictionary<string, string>>();
 
             Reload();
+        }
+
+        public bool Exists
+        {
+            get { return File.Exists(_filename); }
         }
 
         private void LoadSettings()
@@ -52,12 +60,14 @@ namespace OpenUO.Core.Configuration
                 lock (_syncRoot)
                 {
                     if (!File.Exists(_filename))
+                    {
                         return;
+                    }
 
                     using (Stream stream = File.Open(_filename, FileMode.Open))
                     {
                         XDocument document = XDocument.Load(stream);
-
+                        
                         foreach (XElement section in document.Root.Descendants("section"))
                         {
                             try
@@ -69,7 +79,9 @@ namespace OpenUO.Core.Configuration
                                 {
                                     try
                                     {
-                                        sectionTable.Add(element.Attribute("name").Value, element.Attribute("value").Value);
+                                        sectionTable.Add(
+                                            element.Attribute("name").Value,
+                                            element.Attribute("value").Value);
                                     }
                                     catch (Exception e)
                                     {
@@ -95,15 +107,15 @@ namespace OpenUO.Core.Configuration
         {
             try
             {
-                XmlWriterSettings settings = new XmlWriterSettings();
+                XmlWriterSettings settings = new XmlWriterSettings {
+                    CheckCharacters = false,
+                    CloseOutput = true,
+                    Encoding = Encoding.UTF8,
+                    Indent = true,
+                    NewLineHandling = NewLineHandling.Entitize
+                };
 
-                settings.CheckCharacters = false;
-                settings.CloseOutput = true;
-                settings.Encoding = Encoding.UTF8;
-                settings.Indent = true;
-                settings.NewLineHandling = NewLineHandling.Entitize;
-
-                XDocument document = new XDocument();
+                XDocument document = new XDocument(settings);
                 document.Add(new XElement("configuration"));
 
                 XElement configuration = document.Element("configuration");
@@ -115,7 +127,8 @@ namespace OpenUO.Core.Configuration
                     foreach (var setting in section.Value)
                     {
                         xSection.Add(
-                            new XElement("setting",
+                            new XElement(
+                                "setting",
                                 new XAttribute("name", setting.Key),
                                 new XAttribute("value", setting.Value)));
                     }
@@ -127,8 +140,10 @@ namespace OpenUO.Core.Configuration
                 {
                     string directory = Path.GetDirectoryName(_filename);
 
-                    if(!string.IsNullOrEmpty(directory))
+                    if (!string.IsNullOrEmpty(directory))
+                    {
                         FileSystemHelper.EnsureDirectoryExists(directory);
+                    }
 
                     using (Stream stream = File.Open(_filename, FileMode.Create))
                         document.Save(stream);
@@ -151,9 +166,13 @@ namespace OpenUO.Core.Configuration
             }
 
             if (sectionTable.ContainsKey(key))
+            {
                 sectionTable[key] = value.ToString();
+            }
             else
+            {
                 sectionTable.Add(key, value.ConvertTo<string>());
+            }
 
             SaveSettings();
         }
@@ -166,7 +185,9 @@ namespace OpenUO.Core.Configuration
         public T GetValue<T>(string section, string key, T defaultValue)
         {
             if (!_sections.ContainsKey(section))
+            {
                 return defaultValue;
+            }
 
             Dictionary<string, string> sectionTable = _sections[section];
 
@@ -176,7 +197,9 @@ namespace OpenUO.Core.Configuration
         public void Reload()
         {
             if (File.Exists(_filename))
+            {
                 LoadSettings();
+            }
         }
     }
 }

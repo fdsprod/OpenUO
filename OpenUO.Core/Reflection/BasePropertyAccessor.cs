@@ -1,20 +1,26 @@
 ﻿#region License Header
-/***************************************************************************
- *   Copyright (c) 2011 OpenUO Software Team.
- *   All Right Reserved.
- *
- *   $Id: $:
- *
- *   This program is free software; you can redistribute it and/or modify
- *   it under the terms of the GNU General Public License as published by
- *   the Free Software Foundation; either version 3 of the License, or
- *   (at your option) any later version.
- ***************************************************************************/
- #endregion
+
+// /***************************************************************************
+//  *   Copyright (c) 2011 OpenUO Software Team.
+//  *   All Right Reserved.
+//  *
+//  *   BasePropertyAccessor.cs
+//  *
+//  *   This program is free software; you can redistribute it and/or modify
+//  *   it under the terms of the GNU General Public License as published by
+//  *   the Free Software Foundation; either version 3 of the License, or
+//  *   (at your option) any later version.
+//  ***************************************************************************/
+
+#endregion
+
+#region Usings
 
 using System;
 using System.Reflection;
 using System.Reflection.Emit;
+
+#endregion
 
 namespace OpenUO.Core.Reflection
 {
@@ -42,8 +48,11 @@ namespace OpenUO.Core.Reflection
 
         private static FastInvokeHandler GetMethodInvoker4Set(MethodInfo methodInfo)
         {
-            DynamicMethod dynamicMethod = new DynamicMethod(string.Empty,
-                typeof(object), new Type[] { typeof(object), typeof(object[]) }, methodInfo.DeclaringType.Module);
+            DynamicMethod dynamicMethod = new DynamicMethod(
+                string.Empty,
+                typeof (object),
+                new[] {typeof (object), typeof (object[])},
+                methodInfo.DeclaringType.Module);
 
             ILGenerator il = dynamicMethod.GetILGenerator();
             ParameterInfo[] ps = methodInfo.GetParameters();
@@ -52,15 +61,21 @@ namespace OpenUO.Core.Reflection
             for (int i = 0; i < paramTypes.Length; i++)
             {
                 if (ps[i].ParameterType.IsByRef)
+                {
                     paramTypes[i] = ps[i].ParameterType.GetElementType();
+                }
                 else
+                {
                     paramTypes[i] = ps[i].ParameterType;
+                }
             }
 
             LocalBuilder[] locals = new LocalBuilder[paramTypes.Length];
 
             for (int i = 0; i < paramTypes.Length; i++)
+            {
                 locals[i] = il.DeclareLocal(paramTypes[i], true);
+            }
 
             for (int i = 0; i < paramTypes.Length; i++)
             {
@@ -72,7 +87,9 @@ namespace OpenUO.Core.Reflection
             }
 
             if (!methodInfo.IsStatic)
+            {
                 il.Emit(OpCodes.Ldarg_0);
+            }
 
             for (int i = 0; i < paramTypes.Length; i++)
             {
@@ -81,10 +98,14 @@ namespace OpenUO.Core.Reflection
 
             il.EmitCall(!methodInfo.IsStatic ? OpCodes.Callvirt : OpCodes.Call, methodInfo, null);
 
-            if (methodInfo.ReturnType == typeof(void))
+            if (methodInfo.ReturnType == typeof (void))
+            {
                 il.Emit(OpCodes.Ldnull);
+            }
             else
+            {
                 EmitBoxIfNeeded(il, methodInfo.ReturnType);
+            }
 
             for (int i = 0; i < paramTypes.Length; i++)
             {
@@ -94,16 +115,17 @@ namespace OpenUO.Core.Reflection
                     EmitFastInt(il, i);
                     il.Emit(OpCodes.Ldloc, locals[i]);
                     if (locals[i].LocalType.IsValueType)
+                    {
                         il.Emit(OpCodes.Box, locals[i].LocalType);
+                    }
                     il.Emit(OpCodes.Stelem_Ref);
                 }
             }
 
             il.Emit(OpCodes.Ret);
-            FastInvokeHandler invoder = (FastInvokeHandler)dynamicMethod.CreateDelegate(typeof(FastInvokeHandler));
+            FastInvokeHandler invoder = (FastInvokeHandler)dynamicMethod.CreateDelegate(typeof (FastInvokeHandler));
             return invoder;
         }
-
 
         private static void EmitCastToReference(ILGenerator il, Type type)
         {

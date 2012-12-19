@@ -1,20 +1,25 @@
 #region License Header
-/***************************************************************************
- *   Copyright (c) 2011 OpenUO Software Team.
- *   All Right Reserved.
- *
- *   $Id: $:
- *
- *   This program is free software; you can redistribute it and/or modify
- *   it under the terms of the GNU General Public License as published by
- *   the Free Software Foundation; either version 3 of the License, or
- *   (at your option) any later version.
- ***************************************************************************/
- #endregion
+
+// /***************************************************************************
+//  *   Copyright (c) 2011 OpenUO Software Team.
+//  *   All Right Reserved.
+//  *
+//  *   MulFileIndex.cs
+//  *
+//  *   This program is free software; you can redistribute it and/or modify
+//  *   it under the terms of the GNU General Public License as published by
+//  *   the Free Software Foundation; either version 3 of the License, or
+//  *   (at your option) any later version.
+//  ***************************************************************************/
+
+#endregion
+
+#region Usings
 
 using System.Collections.Generic;
 using System.IO;
-using OpenUO.Core.Diagnostics;
+
+#endregion
 
 namespace OpenUO.Ultima
 {
@@ -22,15 +27,15 @@ namespace OpenUO.Ultima
     {
         private readonly string _indexPath;
 
-        public override bool FilesExist
-        {
-            get { return File.Exists(_indexPath) && base.FilesExist; }
-        }
-
         public MulFileIndex(string idxFile, string mulFile)
             : base(mulFile)
         {
             _indexPath = idxFile;
+        }
+
+        public override bool FilesExist
+        {
+            get { return File.Exists(_indexPath) && base.FilesExist; }
         }
 
         protected override FileIndexEntry[] ReadEntries()
@@ -47,8 +52,7 @@ namespace OpenUO.Ultima
 
                 for (int i = 0; i < count && i < length; ++i)
                 {
-                    FileIndexEntry entry = new FileIndexEntry()
-                    {
+                    FileIndexEntry entry = new FileIndexEntry {
                         Lookup = bin.ReadInt32(),
                         Length = bin.ReadInt32(),
                         Extra = bin.ReadInt32(),
@@ -59,8 +63,7 @@ namespace OpenUO.Ultima
 
                 for (int i = count; i < length; ++i)
                 {
-                    FileIndexEntry entry = new FileIndexEntry()
-                    {
+                    FileIndexEntry entry = new FileIndexEntry {
                         Lookup = -1,
                         Length = -1,
                         Extra = -1,

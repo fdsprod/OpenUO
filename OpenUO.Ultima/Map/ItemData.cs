@@ -1,30 +1,31 @@
 ﻿#region License Header
-/***************************************************************************
- *   Copyright (c) 2011 OpenUO Software Team.
- *   All Right Reserved.
- *
- *   $Id: $:
- *
- *   This program is free software; you can redistribute it and/or modify
- *   it under the terms of the GNU General Public License as published by
- *   the Free Software Foundation; either version 3 of the License, or
- *   (at your option) any later version.
- ***************************************************************************/
- #endregion
 
+// /***************************************************************************
+//  *   Copyright (c) 2011 OpenUO Software Team.
+//  *   All Right Reserved.
+//  *
+//  *   ItemData.cs
+//  *
+//  *   This program is free software; you can redistribute it and/or modify
+//  *   it under the terms of the GNU General Public License as published by
+//  *   the Free Software Foundation; either version 3 of the License, or
+//  *   (at your option) any later version.
+//  ***************************************************************************/
+
+#endregion
 
 namespace OpenUO.Ultima
 {
     public struct ItemData
     {
-        internal string _name;
+        internal short _animation;
         internal TileFlag _flags;
-        internal byte _weight;
+        internal byte _height;
+        internal string _name;
         internal byte _quality;
         internal byte _quantity;
         internal byte _value;
-        internal byte _height;
-        internal short _animation;
+        internal byte _weight;
 
         public ItemData(string name, TileFlag flags, int weight, int quality, int quantity, int value, int height, int anim)
         {
@@ -39,7 +40,7 @@ namespace OpenUO.Ultima
         }
 
         /// <summary>
-        /// Gets the name of this item.
+        ///     Gets the name of this item.
         /// </summary>
         public string Name
         {
@@ -47,8 +48,8 @@ namespace OpenUO.Ultima
         }
 
         /// <summary>
-        /// Gets the animation body index of this item.
-        /// <seealso cref="Animations" />
+        ///     Gets the animation body index of this item.
+        ///     <seealso cref="Animations" />
         /// </summary>
         public int Animation
         {
@@ -56,8 +57,8 @@ namespace OpenUO.Ultima
         }
 
         /// <summary>
-        /// Gets a bitfield representing the 32 individual flags of this item.
-        /// <seealso cref="TileFlag" />
+        ///     Gets a bitfield representing the 32 individual flags of this item.
+        ///     <seealso cref="TileFlag" />
         /// </summary>
         public TileFlag Flags
         {
@@ -65,8 +66,8 @@ namespace OpenUO.Ultima
         }
 
         /// <summary>
-        /// Whether or not this item is flagged as '<see cref="TileFlag.Background" />'.
-        /// <seealso cref="TileFlag" />
+        ///     Whether or not this item is flagged as '<see cref="TileFlag.Background" />'.
+        ///     <seealso cref="TileFlag" />
         /// </summary>
         public bool Background
         {
@@ -74,8 +75,8 @@ namespace OpenUO.Ultima
         }
 
         /// <summary>
-        /// Whether or not this item is flagged as '<see cref="TileFlag.Bridge" />'.
-        /// <seealso cref="TileFlag" />
+        ///     Whether or not this item is flagged as '<see cref="TileFlag.Bridge" />'.
+        ///     <seealso cref="TileFlag" />
         /// </summary>
         public bool Bridge
         {
@@ -83,8 +84,8 @@ namespace OpenUO.Ultima
         }
 
         /// <summary>
-        /// Whether or not this item is flagged as '<see cref="TileFlag.Impassable" />'.
-        /// <seealso cref="TileFlag" />
+        ///     Whether or not this item is flagged as '<see cref="TileFlag.Impassable" />'.
+        ///     <seealso cref="TileFlag" />
         /// </summary>
         public bool Impassable
         {
@@ -92,8 +93,8 @@ namespace OpenUO.Ultima
         }
 
         /// <summary>
-        /// Whether or not this item is flagged as '<see cref="TileFlag.Surface" />'.
-        /// <seealso cref="TileFlag" />
+        ///     Whether or not this item is flagged as '<see cref="TileFlag.Surface" />'.
+        ///     <seealso cref="TileFlag" />
         /// </summary>
         public bool Surface
         {
@@ -101,7 +102,7 @@ namespace OpenUO.Ultima
         }
 
         /// <summary>
-        /// Gets the weight of this item.
+        ///     Gets the weight of this item.
         /// </summary>
         public int Weight
         {
@@ -109,7 +110,7 @@ namespace OpenUO.Ultima
         }
 
         /// <summary>
-        /// Gets the 'quality' of this item. For wearable items, this will be the layer.
+        ///     Gets the 'quality' of this item. For wearable items, this will be the layer.
         /// </summary>
         public int Quality
         {
@@ -117,7 +118,7 @@ namespace OpenUO.Ultima
         }
 
         /// <summary>
-        /// Gets the 'quantity' of this item.
+        ///     Gets the 'quantity' of this item.
         /// </summary>
         public int Quantity
         {
@@ -125,7 +126,7 @@ namespace OpenUO.Ultima
         }
 
         /// <summary>
-        /// Gets the 'value' of this item.
+        ///     Gets the 'value' of this item.
         /// </summary>
         public int Value
         {
@@ -133,7 +134,7 @@ namespace OpenUO.Ultima
         }
 
         /// <summary>
-        /// Gets the height of this item.
+        ///     Gets the height of this item.
         /// </summary>
         public int Height
         {
@@ -141,14 +142,20 @@ namespace OpenUO.Ultima
         }
 
         /// <summary>
-        /// Gets the 'calculated height' of this item. For <see cref="Bridge">bridges</see>, this will be: <c>(<see cref="Height" /> / 2)</c>.
+        ///     Gets the 'calculated height' of this item. For <see cref="Bridge">bridges</see>, this will be:
+        ///     <c>
+        ///         (<see cref="Height" /> / 2)
+        ///     </c>
+        ///     .
         /// </summary>
         public int CalcHeight
         {
             get
             {
                 if ((_flags & TileFlag.Bridge) != 0)
+                {
                     return _height / 2;
+                }
 
                 return _height;
             }

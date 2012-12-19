@@ -1,32 +1,35 @@
 ﻿#region License Header
-/***************************************************************************
- *   Copyright (c) 2011 OpenUO Software Team.
- *   All Right Reserved.
- *
- *   $Id: $:
- *
- *   This program is free software; you can redistribute it and/or modify
- *   it under the terms of the GNU General Public License as published by
- *   the Free Software Foundation; either version 3 of the License, or
- *   (at your option) any later version.
- ***************************************************************************/
+
+// /***************************************************************************
+//  *   Copyright (c) 2011 OpenUO Software Team.
+//  *   All Right Reserved.
+//  *
+//  *   ClilocTable.cs
+//  *
+//  *   This program is free software; you can redistribute it and/or modify
+//  *   it under the terms of the GNU General Public License as published by
+//  *   the Free Software Foundation; either version 3 of the License, or
+//  *   (at your option) any later version.
+//  ***************************************************************************/
+
 #endregion
+
+#region Usings
 
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using System.Text.RegularExpressions;
-using System.Xml;
-
 using OpenUO.Core.Diagnostics;
+
+#endregion
 
 namespace OpenUO.Ultima
 {
     public class ClientLocalizations : IEnumerable<LocalizationEntry>, IDisposable
     {
-        private Dictionary<int, LocalizationEntry> _table = new Dictionary<int, LocalizationEntry>();
+        private readonly Dictionary<int, LocalizationEntry> _table = new Dictionary<int, LocalizationEntry>();
 
         public virtual ClientLocalizationLanguage Language
         {
@@ -51,17 +54,32 @@ namespace OpenUO.Ultima
             private set;
         }
 
-        public void Clear()
+        public ClilocInfo this[int index]
         {
-            foreach (var d in _table.Values)
-            {
-                d.Clear();
-            }
+            get { return Lookup(index); }
         }
 
         public void Dispose()
         {
             Unload();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return _table.Values.GetEnumerator();
+        }
+
+        public virtual IEnumerator<LocalizationEntry> GetEnumerator()
+        {
+            return _table.Values.GetEnumerator();
+        }
+
+        public void Clear()
+        {
+            foreach (LocalizationEntry d in _table.Values)
+            {
+                d.Clear();
+            }
         }
 
         public void Unload()
@@ -82,13 +100,15 @@ namespace OpenUO.Ultima
         public void Load(FileInfo file)
         {
             if (Loaded)
+            {
                 return;
+            }
 
             try
             {
                 ClientLocalizationLanguage lng = ClientLocalizationLanguage.NULL;
 
-                if (!Enum.TryParse<ClientLocalizationLanguage>(file.Extension.TrimStart('.'), true, out lng))
+                if (!Enum.TryParse(file.Extension.TrimStart('.'), true, out lng))
                 {
                     throw new FileLoadException("Could not detect language for: " + file.FullName);
                 }
@@ -171,21 +191,6 @@ namespace OpenUO.Ultima
             }
 
             return _table[index].Lookup(InputFile);
-        }
-
-        public ClilocInfo this[int index]
-        {
-            get { return Lookup(index); }
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return _table.Values.GetEnumerator();
-        }
-
-        public virtual IEnumerator<LocalizationEntry> GetEnumerator()
-        {
-            return _table.Values.GetEnumerator();
         }
 
         public override string ToString()

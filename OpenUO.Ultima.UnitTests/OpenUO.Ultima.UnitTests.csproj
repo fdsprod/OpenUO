@@ -70,10 +70,6 @@
     <Compile Include="Tests\TestingBase.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Client.licenseheader" />
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="SelectInstallForm.resx">
       <DependentUpon>SelectInstallForm.cs</DependentUpon>
     </EmbeddedResource>

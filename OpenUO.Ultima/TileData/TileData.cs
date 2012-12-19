@@ -1,64 +1,34 @@
 ﻿#region License Header
-/***************************************************************************
- *   Copyright (c) 2011 OpenUO Software Team.
- *   All Right Reserved.
- *
- *   $Id: $:
- *
- *   This program is free software; you can redistribute it and/or modify
- *   it under the terms of the GNU General Public License as published by
- *   the Free Software Foundation; either version 3 of the License, or
- *   (at your option) any later version.
- ***************************************************************************/
- #endregion
+
+// /***************************************************************************
+//  *   Copyright (c) 2011 OpenUO Software Team.
+//  *   All Right Reserved.
+//  *
+//  *   TileData.cs
+//  *
+//  *   This program is free software; you can redistribute it and/or modify
+//  *   it under the terms of the GNU General Public License as published by
+//  *   the Free Software Foundation; either version 3 of the License, or
+//  *   (at your option) any later version.
+//  ***************************************************************************/
+
+#endregion
+
+#region Usings
 
 using System.IO;
 using System.Text;
+
+#endregion
 
 namespace OpenUO.Ultima
 {
     public class TileData
     {
-        private readonly LandData[] m_LandData;
-        private readonly ItemData[] m_ItemData;
         private readonly int[] m_HeightTable;
-
-        /// <summary>
-        /// Gets the list of <see cref="LandData">land tile data</see>.
-        /// </summary>
-        public LandData[] LandTable
-        {
-            get { return m_LandData; }
-        }
-
-        /// <summary>
-        /// Gets the list of <see cref="ItemData">item tile data</see>.
-        /// </summary>
-        public ItemData[] ItemTable
-        {
-            get { return m_ItemData; }
-        }
-
-        public int[] HeightTable
-        {
-            get { return m_HeightTable; }
-        }
-
+        private readonly ItemData[] m_ItemData;
+        private readonly LandData[] m_LandData;
         private readonly byte[] m_StringBuffer = new byte[20];
-
-        private string ReadNameString(BinaryReader bin)
-        {
-            bin.Read(m_StringBuffer, 0, 20);
-
-            int count;
-
-            // This is very hackish... 
-            for (count = 0; count < 20 && m_StringBuffer[count] != 0; ++count)
-            {
-            }
-
-            return Encoding.ASCII.GetString(m_StringBuffer, 0, count);
-        }
 
         public TileData(InstallLocation install)
         {
@@ -91,7 +61,9 @@ namespace OpenUO.Ultima
                     for (int i = 0; i < 0x4000; ++i)
                     {
                         if ((i & 0x1F) == 0)
+                        {
                             bin.ReadInt32(); // header
+                        }
 
                         TileFlag flags = (TileFlag)bin.ReadInt32();
                         int weight = bin.ReadByte();
@@ -114,6 +86,41 @@ namespace OpenUO.Ultima
             {
                 throw new FileNotFoundException();
             }
+        }
+
+        /// <summary>
+        ///     Gets the list of <see cref="LandData">land tile data</see>.
+        /// </summary>
+        public LandData[] LandTable
+        {
+            get { return m_LandData; }
+        }
+
+        /// <summary>
+        ///     Gets the list of <see cref="ItemData">item tile data</see>.
+        /// </summary>
+        public ItemData[] ItemTable
+        {
+            get { return m_ItemData; }
+        }
+
+        public int[] HeightTable
+        {
+            get { return m_HeightTable; }
+        }
+
+        private string ReadNameString(BinaryReader bin)
+        {
+            bin.Read(m_StringBuffer, 0, 20);
+
+            int count;
+
+            // This is very hackish... 
+            for (count = 0; count < 20 && m_StringBuffer[count] != 0; ++count)
+            {
+            }
+
+            return Encoding.ASCII.GetString(m_StringBuffer, 0, count);
         }
     }
 }

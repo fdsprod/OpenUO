@@ -1,18 +1,24 @@
 ﻿#region License Header
-/***************************************************************************
- *   Copyright (c) 2011 OpenUO Software Team.
- *   All Right Reserved.
- *
- *   $Id: $:
- *
- *   This program is free software; you can redistribute it and/or modify
- *   it under the terms of the GNU General Public License as published by
- *   the Free Software Foundation; either version 3 of the License, or
- *   (at your option) any later version.
- ***************************************************************************/
- #endregion
+
+// /***************************************************************************
+//  *   Copyright (c) 2011 OpenUO Software Team.
+//  *   All Right Reserved.
+//  *
+//  *   ObjectExtensions.cs
+//  *
+//  *   This program is free software; you can redistribute it and/or modify
+//  *   it under the terms of the GNU General Public License as published by
+//  *   the Free Software Foundation; either version 3 of the License, or
+//  *   (at your option) any later version.
+//  ***************************************************************************/
+
+#endregion
+
+#region Usings
 
 using System;
+
+#endregion
 
 namespace OpenUO.Core
 {
@@ -23,7 +29,9 @@ namespace OpenUO.Core
             if (obj == null || obj == DBNull.Value)
             {
                 if (convertTo.IsNullableType() || convertTo.IsClass)
+                {
                     return null;
+                }
 
                 throw new InvalidCastException(string.Format("Unable to cast null to {1}'.", obj.GetType(), convertTo));
             }
@@ -60,13 +68,13 @@ namespace OpenUO.Core
 
         public static T ConvertTo<T>(this object obj)
         {
-            return (T)ConvertTo(obj, typeof(T));
+            return (T)ConvertTo(obj, typeof (T));
         }
 
         public static bool TryConvertTo<T>(this object obj, out T outValue)
         {
             object o;
-            bool success = TryConvertTo(obj, typeof(T), out o);
+            bool success = TryConvertTo(obj, typeof (T), out o);
             outValue = (T)o;
 
             return success;

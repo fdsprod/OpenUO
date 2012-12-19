@@ -1,19 +1,25 @@
 ﻿#region License Header
-/***************************************************************************
- *   Copyright (c) 2011 OpenUO Software Team.
- *   All Right Reserved.
- *
- *   $Id: $:
- *
- *   This program is free software; you can redistribute it and/or modify
- *   it under the terms of the GNU General Public License as published by
- *   the Free Software Foundation; either version 3 of the License, or
- *   (at your option) any later version.
- ***************************************************************************/
- #endregion
+
+// /***************************************************************************
+//  *   Copyright (c) 2011 OpenUO Software Team.
+//  *   All Right Reserved.
+//  *
+//  *   ZlibCompression.cs
+//  *
+//  *   This program is free software; you can redistribute it and/or modify
+//  *   it under the terms of the GNU General Public License as published by
+//  *   the Free Software Foundation; either version 3 of the License, or
+//  *   (at your option) any later version.
+//  ***************************************************************************/
+
+#endregion
+
+#region Usings
 
 using System;
 using System.Runtime.InteropServices;
+
+#endregion
 
 namespace OpenUO.Core.IO
 {
@@ -24,9 +30,13 @@ namespace OpenUO.Core.IO
         static ZlibCompression()
         {
             if (IntPtr.Size == 8)
+            {
                 Compressor = new Compressor64();
+            }
             else
+            {
                 Compressor = new Compressor32();
+            }
         }
 
         public static ZLibError Pack(byte[] dest, ref int destLength, byte[] source, int sourceLength)
@@ -47,7 +57,10 @@ namespace OpenUO.Core.IO
 
     public interface ICompressor
     {
-        string Version { get; }
+        string Version
+        {
+            get;
+        }
 
         ZLibError Compress(byte[] dest, ref int destLength, byte[] source, int sourceLength);
         ZLibError Compress(byte[] dest, ref int destLength, byte[] source, int sourceLength, ZLibQuality quality);
@@ -57,18 +70,6 @@ namespace OpenUO.Core.IO
 
     public sealed class Compressor32 : ICompressor
     {
-        [DllImport("zlib32", CallingConvention = CallingConvention.Cdecl)]
-        private static extern string zlibVersion();
-
-        [DllImport("zlib32", CallingConvention = CallingConvention.Cdecl)]
-        private static extern ZLibError compress(byte[] dest, ref int destLength, byte[] source, int sourceLength);
-
-        [DllImport("zlib32", CallingConvention = CallingConvention.Cdecl)]
-        private static extern ZLibError compress2(byte[] dest, ref int destLength, byte[] source, int sourceLength, ZLibQuality quality);
-
-        [DllImport("zlib32", CallingConvention = CallingConvention.Cdecl)]
-        private static extern ZLibError uncompress(byte[] dest, ref int destLen, byte[] source, int sourceLen);
-        
         public string Version
         {
             get { return zlibVersion(); }
@@ -88,22 +89,22 @@ namespace OpenUO.Core.IO
         {
             return uncompress(dest, ref destLength, source, sourceLength);
         }
+
+        [DllImport("zlib32", CallingConvention = CallingConvention.Cdecl)]
+        private static extern string zlibVersion();
+
+        [DllImport("zlib32", CallingConvention = CallingConvention.Cdecl)]
+        private static extern ZLibError compress(byte[] dest, ref int destLength, byte[] source, int sourceLength);
+
+        [DllImport("zlib32", CallingConvention = CallingConvention.Cdecl)]
+        private static extern ZLibError compress2(byte[] dest, ref int destLength, byte[] source, int sourceLength, ZLibQuality quality);
+
+        [DllImport("zlib32", CallingConvention = CallingConvention.Cdecl)]
+        private static extern ZLibError uncompress(byte[] dest, ref int destLen, byte[] source, int sourceLen);
     }
 
     public sealed class Compressor64 : ICompressor
     {
-        [DllImport("zlib64", CallingConvention = CallingConvention.StdCall)]
-        private static extern string zlibVersion();
-
-        [DllImport("zlib64", CallingConvention = CallingConvention.StdCall)]
-        private static extern ZLibError compress(byte[] dest, ref int destLength, byte[] source, int sourceLength);
-
-        [DllImport("zlib64", CallingConvention = CallingConvention.StdCall)]
-        private static extern ZLibError compress2(byte[] dest, ref int destLength, byte[] source, int sourceLength, ZLibQuality quality);
-
-        [DllImport("zlib64", CallingConvention = CallingConvention.StdCall)]
-        private static extern ZLibError uncompress(byte[] dest, ref int destLen, byte[] source, int sourceLen);
-        
         public string Version
         {
             get { return zlibVersion(); }
@@ -123,9 +124,21 @@ namespace OpenUO.Core.IO
         {
             return uncompress(dest, ref destLength, source, sourceLength);
         }
+
+        [DllImport("zlib64", CallingConvention = CallingConvention.StdCall)]
+        private static extern string zlibVersion();
+
+        [DllImport("zlib64", CallingConvention = CallingConvention.StdCall)]
+        private static extern ZLibError compress(byte[] dest, ref int destLength, byte[] source, int sourceLength);
+
+        [DllImport("zlib64", CallingConvention = CallingConvention.StdCall)]
+        private static extern ZLibError compress2(byte[] dest, ref int destLength, byte[] source, int sourceLength, ZLibQuality quality);
+
+        [DllImport("zlib64", CallingConvention = CallingConvention.StdCall)]
+        private static extern ZLibError uncompress(byte[] dest, ref int destLen, byte[] source, int sourceLen);
     }
 
-    public enum ZLibError : int
+    public enum ZLibError
     {
         VersionError = -6,
         BufferError = -5,
@@ -138,7 +151,7 @@ namespace OpenUO.Core.IO
         NeedDictionary = 2
     }
 
-    public enum ZLibQuality : int
+    public enum ZLibQuality
     {
         Default = -1,
         None = 0,

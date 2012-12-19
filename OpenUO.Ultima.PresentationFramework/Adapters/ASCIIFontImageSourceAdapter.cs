@@ -1,22 +1,28 @@
 ﻿#region License Header
-/***************************************************************************
- *   Copyright (c) 2011 OpenUO Software Team.
- *   All Right Reserved.
- *
- *   $Id: $:
- *
- *   This program is free software; you can redistribute it and/or modify
- *   it under the terms of the GNU General Public License as published by
- *   the Free Software Foundation; either version 3 of the License, or
- *   (at your option) any later version.
- ***************************************************************************/
- #endregion
+
+// /***************************************************************************
+//  *   Copyright (c) 2011 OpenUO Software Team.
+//  *   All Right Reserved.
+//  *
+//  *   ASCIIFontImageSourceAdapter.cs
+//  *
+//  *   This program is free software; you can redistribute it and/or modify
+//  *   it under the terms of the GNU General Public License as published by
+//  *   the Free Software Foundation; either version 3 of the License, or
+//  *   (at your option) any later version.
+//  ***************************************************************************/
+
+#endregion
+
+#region Usings
 
 using System.IO;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using OpenUO.Ultima.Adapters;
+
+#endregion
 
 namespace OpenUO.Ultima.PresentationFramework.Adapters
 {
@@ -29,7 +35,9 @@ namespace OpenUO.Ultima.PresentationFramework.Adapters
             get
             {
                 if (!IsInitialized)
+                {
                     Initialize();
+                }
 
                 return _fonts.Length;
             }
@@ -39,7 +47,7 @@ namespace OpenUO.Ultima.PresentationFramework.Adapters
         {
             base.Initialize();
 
-            var install = Install;
+            InstallLocation install = Install;
 
             _fonts = new ASCIIFont[10];
 
@@ -62,16 +70,21 @@ namespace OpenUO.Ultima.PresentationFramework.Adapters
                         if (width > 0 && height > 0)
                         {
                             if (height > fontHeight && k < 96)
+                            {
                                 fontHeight = height;
+                            }
 
                             ushort[] pixels = new ushort[width * height];
 
                             for (int y = 0; y < height; ++y)
-                                for (int x = 0; x < width; ++x)
-                                    pixels[y * width + x] = (ushort)(reader.ReadByte() | (reader.ReadByte() << 8));
-
-                            chars[k] = new ASCIIChar
                             {
+                                for (int x = 0; x < width; ++x)
+                                {
+                                    pixels[y * width + x] = (ushort)(reader.ReadByte() | (reader.ReadByte() << 8));
+                                }
+                            }
+
+                            chars[k] = new ASCIIChar {
                                 Pixels = pixels,
                                 Width = width,
                                 Height = height
@@ -82,13 +95,6 @@ namespace OpenUO.Ultima.PresentationFramework.Adapters
                     _fonts[i] = new ASCIIFont(fontHeight, chars);
                 }
             }
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            base.Dispose(disposing);
-
-            _fonts = null;
         }
 
         public unsafe ImageSource GetText(int fontId, string text, short hueId)
@@ -123,7 +129,8 @@ namespace OpenUO.Ultima.PresentationFramework.Adapters
                     for (int k = 0; k < charWidth; ++k)
                     {
                         ushort pixel = pixels[charWidth * dy + k];
-                        *dest++ = (pixel == 0 ? (byte)0 : (byte)255 << 24) | ((byte)((pixel & 0x7C00) >> 7) << 16) | ((byte)((pixel & 0x3E0) >> 2) << 8) | (byte)((pixel & 0x1F) << 3);
+                        *dest++ = (pixel == 0 ? 0 : 255 << 24) | ((byte)((pixel & 0x7C00) >> 7) << 16) | ((byte)((pixel & 0x3E0) >> 2) << 8) |
+                                  (byte)((pixel & 0x1F) << 3);
                     }
                 }
 
@@ -134,6 +141,13 @@ namespace OpenUO.Ultima.PresentationFramework.Adapters
             bmp.Unlock();
 
             return bmp;
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+
+            _fonts = null;
         }
     }
 }

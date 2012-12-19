@@ -1,16 +1,20 @@
 ﻿#region License Header
-/***************************************************************************
- *   Copyright (c) 2011 OpenUO Software Team.
- *   All Right Reserved.
- *
- *   $Id: $:
- *
- *   This program is free software; you can redistribute it and/or modify
- *   it under the terms of the GNU General Public License as published by
- *   the Free Software Foundation; either version 3 of the License, or
- *   (at your option) any later version.
- ***************************************************************************/
- #endregion
+
+// /***************************************************************************
+//  *   Copyright (c) 2011 OpenUO Software Team.
+//  *   All Right Reserved.
+//  *
+//  *   UnicodeFontBitmapAdapter.cs
+//  *
+//  *   This program is free software; you can redistribute it and/or modify
+//  *   it under the terms of the GNU General Public License as published by
+//  *   the Free Software Foundation; either version 3 of the License, or
+//  *   (at your option) any later version.
+//  ***************************************************************************/
+
+#endregion
+
+#region Usings
 
 using System;
 using System.Collections.Generic;
@@ -18,6 +22,8 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using OpenUO.Ultima.Adapters;
+
+#endregion
 
 namespace OpenUO.Ultima.Windows.Forms.Adapters
 {
@@ -32,17 +38,19 @@ namespace OpenUO.Ultima.Windows.Forms.Adapters
             get
             {
                 if (!IsInitialized)
+                {
                     Initialize();
+                }
 
                 return _fonts.Length;
             }
         }
-                
+
         public override void Initialize()
         {
             base.Initialize();
 
-            var install = Install;
+            InstallLocation install = Install;
 
             List<UnicodeFont> fonts = new List<UnicodeFont>();
 
@@ -51,7 +59,7 @@ namespace OpenUO.Ultima.Windows.Forms.Adapters
 
             while (File.Exists(path))
             {
-                var font = new UnicodeFont();
+                UnicodeFont font = new UnicodeFont();
 
                 int maxHeight = 0;
 
@@ -69,14 +77,16 @@ namespace OpenUO.Ultima.Windows.Forms.Adapters
                             for (int c = 0; c < 0x10000; ++c)
                             {
                                 font.Chars[c] = new UnicodeChar();
-                                stream.Seek((long)((c) * 4), SeekOrigin.Begin);
+                                stream.Seek(((c) * 4), SeekOrigin.Begin);
 
                                 int index = bin.ReadInt32();
 
                                 if ((index >= fs.Length) || (index <= 0))
+                                {
                                     continue;
+                                }
 
-                                stream.Seek((long)index, SeekOrigin.Begin);
+                                stream.Seek(index, SeekOrigin.Begin);
 
                                 sbyte xOffset = bin.ReadSByte();
                                 sbyte yOffset = bin.ReadSByte();
@@ -92,7 +102,9 @@ namespace OpenUO.Ultima.Windows.Forms.Adapters
                                 font.Chars[c].Height = height;
 
                                 if (!((width == 0) || (height == 0)))
+                                {
                                     font.Chars[c].Bytes = bin.ReadBytes(height * (((width - 1) / 8) + 1));
+                                }
                             }
                         }
                     }
@@ -101,19 +113,11 @@ namespace OpenUO.Ultima.Windows.Forms.Adapters
                 font.Height = maxHeight;
                 fonts.Add(font);
                 path = install.GetPath(FILE_NAME_FORMAT, ++i);
-
             }
 
             _fonts = fonts.ToArray();
         }
 
-        protected override void Dispose(bool disposing)
-        {
-            base.Dispose(disposing);
-                           
-            _fonts = null;
-        }
-        
         public unsafe Bitmap GetText(int fontId, string text, short hueId)
         {
             UnicodeFont font = _fonts[fontId];
@@ -128,10 +132,10 @@ namespace OpenUO.Ultima.Windows.Forms.Adapters
             int delta = bd.Stride >> 1;
 
             int dx = 2;
-            
+
             for (int i = 0; i < text.Length; ++i)
             {
-                int c = (int)text[i] % 0x10000;
+                int c = text[i] % 0x10000;
                 UnicodeChar ch = font.Chars[c];
 
                 int charWidth = ch.Width;
@@ -158,18 +162,24 @@ namespace OpenUO.Ultima.Windows.Forms.Adapters
                         int offset = k / 8 + dy * ((charWidth + 7) / 8);
 
                         if (offset > data.Length)
+                        {
                             continue;
+                        }
 
                         if ((data[offset] & (1 << (7 - (k % 8)))) != 0)
+                        {
                             *dest++ = 0x8000;
+                        }
                         else
+                        {
                             *dest++ = 0x0000;
+                        }
                     }
                 }
 
                 dx += ch.Width;
             }
-            
+
             bmp.UnlockBits(bd);
 
             return bmp;
@@ -178,6 +188,13 @@ namespace OpenUO.Ultima.Windows.Forms.Adapters
         public int GetFontHeight(int fontId)
         {
             return _fonts[fontId].Height;
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+
+            _fonts = null;
         }
     }
 }

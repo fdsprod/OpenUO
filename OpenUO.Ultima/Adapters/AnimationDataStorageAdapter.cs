@@ -1,20 +1,26 @@
 ﻿#region License Header
-/***************************************************************************
- *   Copyright (c) 2011 OpenUO Software Team.
- *   All Right Reserved.
- *
- *   $Id: $:
- *
- *   This program is free software; you can redistribute it and/or modify
- *   it under the terms of the GNU General Public License as published by
- *   the Free Software Foundation; either version 3 of the License, or
- *   (at your option) any later version.
- ***************************************************************************/
- #endregion
+
+// /***************************************************************************
+//  *   Copyright (c) 2011 OpenUO Software Team.
+//  *   All Right Reserved.
+//  *
+//  *   AnimationDataStorageAdapter.cs
+//  *
+//  *   This program is free software; you can redistribute it and/or modify
+//  *   it under the terms of the GNU General Public License as published by
+//  *   the Free Software Foundation; either version 3 of the License, or
+//  *   (at your option) any later version.
+//  ***************************************************************************/
+
+#endregion
+
+#region Usings
 
 using System;
 using System.Collections.Generic;
 using System.IO;
+
+#endregion
 
 namespace OpenUO.Ultima.Adapters
 {
@@ -27,7 +33,9 @@ namespace OpenUO.Ultima.Adapters
             get
             {
                 if (!IsInitialized)
+                {
                     Initialize();
+                }
 
                 return _animationData.Length;
             }
@@ -37,7 +45,7 @@ namespace OpenUO.Ultima.Adapters
         {
             base.Initialize();
 
-            var install = Install;
+            InstallLocation install = Install;
 
             List<AnimationData> animationData = new List<AnimationData>();
 
@@ -51,8 +59,7 @@ namespace OpenUO.Ultima.Adapters
                     int header = reader.ReadInt32();
                     byte[] frameData = reader.ReadBytes(64);
 
-                    AnimationData animData = new AnimationData
-                    {
+                    AnimationData animData = new AnimationData {
                         FrameData = new sbyte[64],
                         Unknown = reader.ReadByte(),
                         FrameCount = reader.ReadByte(),
@@ -67,11 +74,13 @@ namespace OpenUO.Ultima.Adapters
 
             _animationData = animationData.ToArray();
         }
-        
+
         public AnimationData GetAnimationData(int index)
         {
             if (index < _animationData.Length)
+            {
                 return _animationData[index];
+            }
 
             return AnimationData.Empty;
         }

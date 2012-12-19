@@ -1,19 +1,25 @@
 ﻿#region License Header
-/***************************************************************************
- *   Copyright (c) 2011 OpenUO Software Team.
- *   All Right Reserved.
- *
- *   $Id: $:
- *
- *   This program is free software; you can redistribute it and/or modify
- *   it under the terms of the GNU General Public License as published by
- *   the Free Software Foundation; either version 3 of the License, or
- *   (at your option) any later version.
- ***************************************************************************/
- #endregion
+
+// /***************************************************************************
+//  *   Copyright (c) 2011 OpenUO Software Team.
+//  *   All Right Reserved.
+//  *
+//  *   ObjectConverterter.cs
+//  *
+//  *   This program is free software; you can redistribute it and/or modify
+//  *   it under the terms of the GNU General Public License as published by
+//  *   the Free Software Foundation; either version 3 of the License, or
+//  *   (at your option) any later version.
+//  ***************************************************************************/
+
+#endregion
+
+#region Usings
 
 using System;
 using System.ComponentModel;
+
+#endregion
 
 namespace OpenUO.Core
 {
@@ -22,7 +28,7 @@ namespace OpenUO.Core
         public static bool TryConvert<TConvertFrom, UConvertTo>(TConvertFrom convertFrom, out UConvertTo convertTo)
         {
             object to;
-            bool converted = TryConvert(typeof(TConvertFrom), convertFrom, typeof(UConvertTo), out to);
+            bool converted = TryConvert(typeof (TConvertFrom), convertFrom, typeof (UConvertTo), out to);
 
             convertTo = (UConvertTo)to;
 
@@ -34,7 +40,7 @@ namespace OpenUO.Core
             to = null;
             bool converted = false;
 
-            if(convertFrom == convertTo)
+            if (convertFrom == convertTo)
             {
                 to = from;
                 return true;

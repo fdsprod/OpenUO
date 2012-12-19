@@ -1,34 +1,49 @@
 #region License Header
-/***************************************************************************
- *   Copyright (c) 2011 OpenUO Software Team.
- *   All Right Reserved.
- *
- *   $Id: $:
- *
- *   This program is free software; you can redistribute it and/or modify
- *   it under the terms of the GNU General Public License as published by
- *   the Free Software Foundation; either version 3 of the License, or
- *   (at your option) any later version.
- ***************************************************************************/
- #endregion
 
-using System.Collections.Generic;
+// /***************************************************************************
+//  *   Copyright (c) 2011 OpenUO Software Team.
+//  *   All Right Reserved.
+//  *
+//  *   FileIndexBase.cs
+//  *
+//  *   This program is free software; you can redistribute it and/or modify
+//  *   it under the terms of the GNU General Public License as published by
+//  *   the Free Software Foundation; either version 3 of the License, or
+//  *   (at your option) any later version.
+//  ***************************************************************************/
+
+#endregion
+
+#region Usings
+
 using System.IO;
-using OpenUO.Core.Diagnostics;
+
+#endregion
 
 namespace OpenUO.Ultima
 {
     public abstract class FileIndexBase
     {
-        private string _dataPath;
-        private int _length;
+        private readonly string _dataPath;
         private FileIndexEntry[] _entries;
+        private int _length;
         private Stream _stream;
+
+        protected FileIndexBase(string dataPath)
+        {
+            _dataPath = dataPath;
+        }
+
+        protected FileIndexBase(string dataPath, int length)
+        {
+            _length = length;
+            _dataPath = dataPath;
+        }
 
         public int Length
         {
             get { return _length; }
-        } 
+        }
 
         public bool IsOpen
         {
@@ -52,18 +67,7 @@ namespace OpenUO.Ultima
 
         public virtual bool FilesExist
         {
-            get{ return File.Exists(_dataPath); }
-        }
-
-        protected FileIndexBase(string dataPath)
-        {
-            _dataPath = dataPath;
-        }
-
-        protected FileIndexBase(string dataPath, int length)
-        {
-            _length = length;
-            _dataPath = dataPath;
+            get { return File.Exists(_dataPath); }
         }
 
         public Stream Seek(int index, out int length, out int extra)
@@ -100,11 +104,13 @@ namespace OpenUO.Ultima
 
             return _stream;
         }
-        
+
         public void Close()
         {
             if (_stream == null)
+            {
                 return;
+            }
 
             _stream.Close();
             _stream = null;
@@ -113,10 +119,14 @@ namespace OpenUO.Ultima
         public void Open()
         {
             if (_stream != null)
+            {
                 return;
+            }
 
             if (!FilesExist)
+            {
                 return;
+            }
 
             _entries = ReadEntries();
 

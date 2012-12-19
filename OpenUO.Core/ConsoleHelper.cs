@@ -1,19 +1,25 @@
 ﻿#region License Header
-/***************************************************************************
- *   Copyright (c) 2011 OpenUO Software Team.
- *   All Right Reserved.
- *
- *   $Id: $:
- *
- *   This program is free software; you can redistribute it and/or modify
- *   it under the terms of the GNU General Public License as published by
- *   the Free Software Foundation; either version 3 of the License, or
- *   (at your option) any later version.
- ***************************************************************************/
- #endregion
+
+// /***************************************************************************
+//  *   Copyright (c) 2011 OpenUO Software Team.
+//  *   All Right Reserved.
+//  *
+//  *   ConsoleHelper.cs
+//  *
+//  *   This program is free software; you can redistribute it and/or modify
+//  *   it under the terms of the GNU General Public License as published by
+//  *   the Free Software Foundation; either version 3 of the License, or
+//  *   (at your option) any later version.
+//  ***************************************************************************/
+
+#endregion
+
+#region Usings
 
 using System;
 using System.Collections.Generic;
+
+#endregion
 
 namespace OpenUO.Core
 {
@@ -22,7 +28,7 @@ namespace OpenUO.Core
         private static readonly Stack<ConsoleColor> _consoleColors = new Stack<ConsoleColor>();
 
         /// <summary>
-        /// Pushes the color to the console
+        ///     Pushes the color to the console
         /// </summary>
         public static void PushColor(ConsoleColor color)
         {
@@ -37,7 +43,7 @@ namespace OpenUO.Core
         }
 
         /// <summary>
-        /// Pops the color of the console to the previous value.
+        ///     Pops the color of the console to the previous value.
         /// </summary>
         public static ConsoleColor PopColor()
         {
@@ -47,7 +53,6 @@ namespace OpenUO.Core
             }
             catch
             {
-
             }
 
             return Console.ForegroundColor;

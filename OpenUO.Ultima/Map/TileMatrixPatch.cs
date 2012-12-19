@@ -1,24 +1,50 @@
 ﻿#region License Header
-/***************************************************************************
- *   Copyright (c) 2011 OpenUO Software Team.
- *   All Right Reserved.
- *
- *   $Id: $:
- *
- *   This program is free software; you can redistribute it and/or modify
- *   it under the terms of the GNU General Public License as published by
- *   the Free Software Foundation; either version 3 of the License, or
- *   (at your option) any later version.
- ***************************************************************************/
- #endregion
+
+// /***************************************************************************
+//  *   Copyright (c) 2011 OpenUO Software Team.
+//  *   All Right Reserved.
+//  *
+//  *   TileMatrixPatch.cs
+//  *
+//  *   This program is free software; you can redistribute it and/or modify
+//  *   it under the terms of the GNU General Public License as published by
+//  *   the Free Software Foundation; either version 3 of the License, or
+//  *   (at your option) any later version.
+//  ***************************************************************************/
+
+#endregion
+
+#region Usings
 
 using System.IO;
+
+#endregion
 
 namespace OpenUO.Ultima
 {
     public class TileMatrixPatch
     {
         private readonly int _landBlocks, _staticBlocks;
+
+        public TileMatrixPatch(TileMatrix matrix, InstallLocation install, int index)
+        {
+            string mapDataPath = install.GetPath("mapdif{0}.mul", index);
+            string mapIndexPath = install.GetPath("mapdifl{0}.mul", index);
+
+            if (File.Exists(mapDataPath) && File.Exists(mapIndexPath))
+            {
+                _landBlocks = PatchLand(matrix, mapDataPath, mapIndexPath);
+            }
+
+            string staDataPath = install.GetPath("stadif{0}.mul", index);
+            string staIndexPath = install.GetPath("stadifl{0}.mul", index);
+            string staLookupPath = install.GetPath("stadifi{0}.mul", index);
+
+            if (File.Exists(staDataPath) && File.Exists(staIndexPath) && File.Exists(staLookupPath))
+            {
+                _staticBlocks = PatchStatics(matrix, staDataPath, staIndexPath, staLookupPath);
+            }
+        }
 
         public int LandBlocks
         {
@@ -28,22 +54,6 @@ namespace OpenUO.Ultima
         public int StaticBlocks
         {
             get { return _staticBlocks; }
-        }
-
-        public TileMatrixPatch(TileMatrix matrix, InstallLocation install, int index)
-        {
-            string mapDataPath = install.GetPath("mapdif{0}.mul", index);
-            string mapIndexPath = install.GetPath("mapdifl{0}.mul", index);
-
-            if (File.Exists(mapDataPath) && File.Exists(mapIndexPath))
-                _landBlocks = PatchLand(matrix, mapDataPath, mapIndexPath);
-
-            string staDataPath = install.GetPath("stadif{0}.mul", index);
-            string staIndexPath = install.GetPath("stadifl{0}.mul", index);
-            string staLookupPath = install.GetPath("stadifi{0}.mul", index);
-
-            if (File.Exists(staDataPath) && File.Exists(staIndexPath) && File.Exists(staLookupPath))
-                _staticBlocks = PatchStatics(matrix, staDataPath, staIndexPath, staLookupPath);
         }
 
         private static unsafe int PatchLand(TileMatrix matrix, string dataPath, string indexPath)
@@ -66,7 +76,9 @@ namespace OpenUO.Ultima
                     Tile[] tiles = new Tile[64];
 
                     fixed (Tile* pTiles = tiles)
+                    {
                         NativeMethods._lread(fsData.SafeFileHandle, pTiles, 192);
+                    }
 
                     //matrix.SetLandBlock(x, y, tiles);
                 }
@@ -93,7 +105,9 @@ namespace OpenUO.Ultima
                     lists[x] = new HuedTileList[8];
 
                     for (int y = 0; y < 8; ++y)
+                    {
                         lists[x][y] = new HuedTileList();
+                    }
                 }
 
                 for (int i = 0; i < count; ++i)
@@ -137,7 +151,9 @@ namespace OpenUO.Ultima
                             tiles[x] = new HuedTile[8][];
 
                             for (int y = 0; y < 8; ++y)
+                            {
                                 tiles[x][y] = lists[x][y].ToArray();
+                            }
                         }
 
                         //matrix.SetStaticBlock(blockX, blockY, tiles);

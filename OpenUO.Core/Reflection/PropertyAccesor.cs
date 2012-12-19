@@ -1,5 +1,25 @@
-﻿using System;
+﻿#region License Header
+
+// /***************************************************************************
+//  *   Copyright (c) 2011 OpenUO Software Team.
+//  *   All Right Reserved.
+//  *
+//  *   PropertyAccesor.cs
+//  *
+//  *   This program is free software; you can redistribute it and/or modify
+//  *   it under the terms of the GNU General Public License as published by
+//  *   the Free Software Foundation; either version 3 of the License, or
+//  *   (at your option) any later version.
+//  ***************************************************************************/
+
+#endregion
+
+#region Usings
+
+using System;
 using System.Reflection;
+
+#endregion
 
 namespace OpenUO.Core.Reflection
 {
@@ -10,14 +30,14 @@ namespace OpenUO.Core.Reflection
 
         public PropertyAccessor(string Property)
         {
-            getMethodHandler = BasePropertyAccessor.GetPropertyInvoker(typeof(TargetType), Property);
-            setMethodHandler = BasePropertyAccessor.SetPropertyInvoker(typeof(TargetType), typeof(TargetType).GetProperty(Property));
+            getMethodHandler = BasePropertyAccessor.GetPropertyInvoker(typeof (TargetType), Property);
+            setMethodHandler = BasePropertyAccessor.SetPropertyInvoker(typeof (TargetType), typeof (TargetType).GetProperty(Property));
         }
 
         public PropertyAccessor(PropertyInfo Property)
         {
-            getMethodHandler = BasePropertyAccessor.GetPropertyInvoker(typeof(TargetType), Property.Name);
-            setMethodHandler = BasePropertyAccessor.SetPropertyInvoker(typeof(TargetType), Property);
+            getMethodHandler = BasePropertyAccessor.GetPropertyInvoker(typeof (TargetType), Property.Name);
+            setMethodHandler = BasePropertyAccessor.SetPropertyInvoker(typeof (TargetType), Property);
         }
 
         public PropertyType Get(TargetType TargetObject, params object[] Paramters)
@@ -47,13 +67,11 @@ namespace OpenUO.Core.Reflection
             setMethodHandler = BasePropertyAccessor.SetPropertyInvoker(targetType, targetType.GetProperty(Property));
         }
 
-
         public PropertyAccessor(Type targetType, PropertyInfo Property)
         {
             getMethodHandler = BasePropertyAccessor.GetPropertyInvoker(targetType, Property.Name);
             setMethodHandler = BasePropertyAccessor.SetPropertyInvoker(targetType, Property);
         }
-
 
         public object Get(object target, params object[] Paramters)
         {

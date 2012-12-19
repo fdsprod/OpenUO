@@ -1,31 +1,40 @@
 ﻿#region License Header
-/***************************************************************************
- *   Copyright (c) 2011 OpenUO Software Team.
- *   All Right Reserved.
- *
- *   $Id: $:
- *
- *   This program is free software; you can redistribute it and/or modify
- *   it under the terms of the GNU General Public License as published by
- *   the Free Software Foundation; either version 3 of the License, or
- *   (at your option) any later version.
- ***************************************************************************/
+
+// /***************************************************************************
+//  *   Copyright (c) 2011 OpenUO Software Team.
+//  *   All Right Reserved.
+//  *
+//  *   ClilocData.cs
+//  *
+//  *   This program is free software; you can redistribute it and/or modify
+//  *   it under the terms of the GNU General Public License as published by
+//  *   the Free Software Foundation; either version 3 of the License, or
+//  *   (at your option) any later version.
+//  ***************************************************************************/
+
 #endregion
 
+#region Usings
+
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using System.Text.RegularExpressions;
-using System.Xml;
-
 using OpenUO.Core.Diagnostics;
+
+#endregion
 
 namespace OpenUO.Ultima
 {
     public class LocalizationEntry
     {
+        public LocalizationEntry(ClientLocalizationLanguage lng, int index, long offset, long length)
+        {
+            Language = lng;
+            Index = index;
+            Offset = offset;
+            Length = length;
+        }
+
         public ClientLocalizationLanguage Language
         {
             get;
@@ -54,14 +63,6 @@ namespace OpenUO.Ultima
         {
             get;
             set;
-        }
-
-        public LocalizationEntry(ClientLocalizationLanguage lng, int index, long offset, long length)
-        {
-            Language = lng;
-            Index = index;
-            Offset = offset;
-            Length = length;
         }
 
         public virtual void Clear()

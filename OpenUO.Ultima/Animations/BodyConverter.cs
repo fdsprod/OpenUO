@@ -1,21 +1,27 @@
 ﻿#region License Header
-/***************************************************************************
- *   Copyright (c) 2011 OpenUO Software Team.
- *   All Right Reserved.
- *
- *   $Id: $:
- *
- *   This program is free software; you can redistribute it and/or modify
- *   it under the terms of the GNU General Public License as published by
- *   the Free Software Foundation; either version 3 of the License, or
- *   (at your option) any later version.
- ***************************************************************************/
- #endregion
+
+// /***************************************************************************
+//  *   Copyright (c) 2011 OpenUO Software Team.
+//  *   All Right Reserved.
+//  *
+//  *   BodyConverter.cs
+//  *
+//  *   This program is free software; you can redistribute it and/or modify
+//  *   it under the terms of the GNU General Public License as published by
+//  *   the Free Software Foundation; either version 3 of the License, or
+//  *   (at your option) any later version.
+//  ***************************************************************************/
+
+#endregion
+
+#region Usings
 
 using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
 using OpenUO.Core.Diagnostics;
+
+#endregion
 
 namespace OpenUO.Ultima
 {
@@ -31,7 +37,9 @@ namespace OpenUO.Ultima
             string path = bodyconvPath;
 
             if (path == null)
+            {
                 return;
+            }
 
             List<int> list1 = new List<int>(), list2 = new List<int>(), list3 = new List<int>(), list4 = new List<int>();
             int max1 = 0, max2 = 0, max3 = 0, max4 = 0;
@@ -48,12 +56,16 @@ namespace OpenUO.Ultima
                     lineNumber++;
 
                     if ((line = line.Trim()).Length == 0 || !numericOnly.IsMatch(line[0].ToString()))
+                    {
                         continue;
+                    }
 
                     string[] split = line.Split('\t');
 
                     if (split.Length <= 1)
+                    {
                         continue;
+                    }
 
                     int original;
 
@@ -93,10 +105,14 @@ namespace OpenUO.Ultima
                     if (anim2 != -1)
                     {
                         if (anim2 == 68)
+                        {
                             anim2 = 122;
+                        }
 
                         if (original > max1)
+                        {
                             max1 = original;
+                        }
 
                         list1.Add(original);
                         list1.Add(anim2);
@@ -105,7 +121,9 @@ namespace OpenUO.Ultima
                     if (anim3 != -1)
                     {
                         if (original > max2)
+                        {
                             max2 = original;
+                        }
 
                         list2.Add(original);
                         list2.Add(anim3);
@@ -114,7 +132,9 @@ namespace OpenUO.Ultima
                     if (anim4 != -1)
                     {
                         if (original > max3)
+                        {
                             max3 = original;
+                        }
 
                         list3.Add(original);
                         list3.Add(anim4);
@@ -123,7 +143,9 @@ namespace OpenUO.Ultima
                     if (anim5 != -1)
                     {
                         if (original > max4)
+                        {
                             max4 = original;
+                        }
 
                         list4.Add(original);
                         list4.Add(anim5);
@@ -137,43 +159,67 @@ namespace OpenUO.Ultima
             _table4 = new int[max4 + 1];
 
             for (int i = 0; i < _table1.Length; ++i)
+            {
                 _table1[i] = -1;
+            }
 
             for (int i = 0; i < list1.Count; i += 2)
-                _table1[(int)list1[i]] = (int)list1[i + 1];
+            {
+                _table1[list1[i]] = list1[i + 1];
+            }
 
             for (int i = 0; i < _table2.Length; ++i)
+            {
                 _table2[i] = -1;
+            }
 
             for (int i = 0; i < list2.Count; i += 2)
-                _table2[(int)list2[i]] = (int)list2[i + 1];
+            {
+                _table2[list2[i]] = list2[i + 1];
+            }
 
             for (int i = 0; i < _table3.Length; ++i)
+            {
                 _table3[i] = -1;
+            }
 
             for (int i = 0; i < list3.Count; i += 2)
-                _table3[(int)list3[i]] = (int)list3[i + 1];
+            {
+                _table3[list3[i]] = list3[i + 1];
+            }
 
             for (int i = 0; i < _table4.Length; ++i)
+            {
                 _table4[i] = -1;
+            }
 
             for (int i = 0; i < list4.Count; i += 2)
-                _table4[(int)list4[i]] = (int)list4[i + 1];
+            {
+                _table4[list4[i]] = list4[i + 1];
+            }
         }
 
         public bool Contains(int body)
         {
             if (_table1 != null && body >= 0 && body < _table1.Length && _table1[body] != -1)
+            {
                 return true;
+            }
 
             if (_table2 != null && body >= 0 && body < _table2.Length && _table2[body] != -1)
+            {
                 return true;
+            }
 
             if (_table3 != null && body >= 0 && body < _table3.Length && _table3[body] != -1)
+            {
                 return true;
+            }
 
             if (_table4 != null && body >= 0 && body < _table4.Length && _table4[body] != -1)
+            {
                 return true;
+            }
 
             return false;
         }

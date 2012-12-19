@@ -1,21 +1,26 @@
 #region License Header
-/***************************************************************************
- *   Copyright (c) 2011 OpenUO Software Team.
- *   All Right Reserved.
- *
- *   $Id: $:
- *
- *   This program is free software; you can redistribute it and/or modify
- *   it under the terms of the GNU General Public License as published by
- *   the Free Software Foundation; either version 3 of the License, or
- *   (at your option) any later version.
- ***************************************************************************/
- #endregion
 
+// /***************************************************************************
+//  *   Copyright (c) 2011 OpenUO Software Team.
+//  *   All Right Reserved.
+//  *
+//  *   UopFileIndex.cs
+//  *
+//  *   This program is free software; you can redistribute it and/or modify
+//  *   it under the terms of the GNU General Public License as published by
+//  *   the Free Software Foundation; either version 3 of the License, or
+//  *   (at your option) any later version.
+//  ***************************************************************************/
+
+#endregion
+
+#region Usings
+
+using System;
 using System.Collections.Generic;
 using System.IO;
-using OpenUO.Core.Diagnostics;
-using System;
+
+#endregion
 
 namespace OpenUO.Ultima
 {
@@ -45,7 +50,9 @@ namespace OpenUO.Ultima
             // In the mul file index, we read everything sequentially, and -1 is applied to invalid lookups.
             // UOP does not do this, so we need to do it ourselves.
             for (int i = 0; i < entries.Length; i++)
+            {
                 entries[i].Lookup = -1;
+            }
 
             using (FileStream index = new FileStream(dataPath, FileMode.Open, FileAccess.Read, FileShare.Read))
             {
@@ -57,7 +64,9 @@ namespace OpenUO.Ultima
                     br.BaseStream.Seek(0, SeekOrigin.Begin);
 
                     if (br.ReadInt32() != UOP_MAGIC_NUMBER)
+                    {
                         throw new ArgumentException("Bad UOP file.");
+                    }
 
                     br.ReadInt64(); // version + signature
                     long nextBlock = br.ReadInt64();
@@ -72,7 +81,9 @@ namespace OpenUO.Ultima
                         ulong hash = CreateHash(entryName);
 
                         if (!hashes.ContainsKey(hash))
+                        {
                             hashes.Add(hash, i);
+                        }
                     }
 
                     br.BaseStream.Seek(nextBlock, SeekOrigin.Begin);
@@ -95,13 +106,17 @@ namespace OpenUO.Ultima
                             int entryLength = flag == 1 ? compressedLength : decompressedLength;
 
                             if (offset == 0)
+                            {
                                 continue;
+                            }
 
                             int idx;
                             if (hashes.TryGetValue(hash, out idx))
                             {
                                 if (idx < 0 || idx > entries.Length)
+                                {
                                     throw new IndexOutOfRangeException("hashes dictionary and files collection have different count of entries!");
+                                }
 
                                 entries[idx].Lookup = (int)(offset + headerLength);
                                 entries[idx].Length = entryLength;
@@ -175,7 +190,7 @@ namespace OpenUO.Ultima
                         esi += (uint)s[i + 9] << 8;
                         goto case 9;
                     case 9:
-                        esi += (uint)s[i + 8];
+                        esi += s[i + 8];
                         goto case 8;
                     case 8:
                         edi += (uint)s[i + 7] << 24;
@@ -187,7 +202,7 @@ namespace OpenUO.Ultima
                         edi += (uint)s[i + 5] << 8;
                         goto case 5;
                     case 5:
-                        edi += (uint)s[i + 4];
+                        edi += s[i + 4];
                         goto case 4;
                     case 4:
                         ebx += (uint)s[i + 3] << 24;
@@ -199,7 +214,7 @@ namespace OpenUO.Ultima
                         ebx += (uint)s[i + 1] << 8;
                         goto case 1;
                     case 1:
-                        ebx += (uint)s[i];
+                        ebx += s[i];
                         break;
                 }
 

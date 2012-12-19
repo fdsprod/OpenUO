@@ -1,24 +1,25 @@
 ﻿#region License Header
-/***************************************************************************
- *   Copyright (c) 2011 OpenUO Software Team.
- *   All Right Reserved.
- *
- *   $Id: $:
- *
- *   This program is free software; you can redistribute it and/or modify
- *   it under the terms of the GNU General Public License as published by
- *   the Free Software Foundation; either version 3 of the License, or
- *   (at your option) any later version.
- ***************************************************************************/
- #endregion
 
+// /***************************************************************************
+//  *   Copyright (c) 2011 OpenUO Software Team.
+//  *   All Right Reserved.
+//  *
+//  *   LandData.cs
+//  *
+//  *   This program is free software; you can redistribute it and/or modify
+//  *   it under the terms of the GNU General Public License as published by
+//  *   the Free Software Foundation; either version 3 of the License, or
+//  *   (at your option) any later version.
+//  ***************************************************************************/
+
+#endregion
 
 namespace OpenUO.Ultima
 {
     public struct LandData
     {
-        private readonly string _name;
         private readonly TileFlag _flags;
+        private readonly string _name;
 
         public LandData(string name, TileFlag flags)
         {
@@ -27,7 +28,7 @@ namespace OpenUO.Ultima
         }
 
         /// <summary>
-        /// Gets the name of this land tile.
+        ///     Gets the name of this land tile.
         /// </summary>
         public string Name
         {
@@ -35,7 +36,7 @@ namespace OpenUO.Ultima
         }
 
         /// <summary>
-        /// Gets a bitfield representing the 32 individual flags of this land tile.
+        ///     Gets a bitfield representing the 32 individual flags of this land tile.
         /// </summary>
         public TileFlag Flags
         {

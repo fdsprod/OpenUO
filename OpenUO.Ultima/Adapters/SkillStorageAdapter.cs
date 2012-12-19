@@ -1,49 +1,68 @@
 ﻿#region License Header
-/***************************************************************************
- *   Copyright (c) 2011 OpenUO Software Team.
- *   All Right Reserved.
- *
- *   $Id: $:
- *
- *   This program is free software; you can redistribute it and/or modify
- *   it under the terms of the GNU General Public License as published by
- *   the Free Software Foundation; either version 3 of the License, or
- *   (at your option) any later version.
- ***************************************************************************/
- #endregion
+
+// /***************************************************************************
+//  *   Copyright (c) 2011 OpenUO Software Team.
+//  *   All Right Reserved.
+//  *
+//  *   SkillStorageAdapter.cs
+//  *
+//  *   This program is free software; you can redistribute it and/or modify
+//  *   it under the terms of the GNU General Public License as published by
+//  *   the Free Software Foundation; either version 3 of the License, or
+//  *   (at your option) any later version.
+//  ***************************************************************************/
+
+#endregion
+
+#region Usings
 
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
+#endregion
+
 namespace OpenUO.Ultima.Adapters
 {
     public class SkillStorageAdapter : StorageAdapterBase, ISkillStorageAdapter<Skill>
     {
-        private Skill[] _skills;
         private SkillCategory[] _categories;
         private int[] _categoryLookup;
+        private Skill[] _skills;
 
         public override int Length
         {
             get
             {
                 if (!IsInitialized)
+                {
                     Initialize();
+                }
 
                 return _skills.Length;
             }
         }
-        
+
         public override void Initialize()
         {
             base.Initialize();
 
-            var install = Install;
+            InstallLocation install = Install;
 
             ReadCategories(install);
             ReadSkills(install);
         }
+
+        public Skill GetSkill(int index)
+        {
+            if (index < _skills.Length)
+            {
+                return _skills[index];
+            }
+
+            return null;
+        }
+
         private void ReadCategories(InstallLocation install)
         {
             List<SkillCategory> categories = new List<SkillCategory>();
@@ -75,7 +94,9 @@ namespace OpenUO.Ultima.Adapters
                         char ch = (char)nameBuffer[j];
 
                         if (char.IsLetterOrDigit(ch) || char.IsWhiteSpace(ch) || char.IsPunctuation(ch))
+                        {
                             nameBuilder.Append(ch);
+                        }
                     }
 
                     string name = nameBuilder.ToString();
@@ -86,7 +107,9 @@ namespace OpenUO.Ultima.Adapters
                 _categoryLookup = new int[(stream.Length - stream.Position) / 4];
 
                 for (int i = 0; i < _categoryLookup.Length; i++)
+                {
                     _categoryLookup[i] = bin.ReadInt32();
+                }
             }
 
             _categories = categories.ToArray();
@@ -94,7 +117,7 @@ namespace OpenUO.Ultima.Adapters
 
         private void ReadSkills(InstallLocation install)
         {
-            var fileIndex = install.CreateFileIndex("skills.idx", "skills.mul");
+            FileIndexBase fileIndex = install.CreateFileIndex("skills.idx", "skills.mul");
 
             _skills = new Skill[fileIndex.Length];
 
@@ -112,7 +135,9 @@ namespace OpenUO.Ultima.Adapters
             Stream stream = fileIndex.Seek(index, out length, out extra);
 
             if (stream == null)
+            {
                 return null;
+            }
 
             BinaryReader bin = new BinaryReader(stream);
             int nameLength = length - 2;
@@ -125,24 +150,20 @@ namespace OpenUO.Ultima.Adapters
             StringBuilder sb = new StringBuilder(nameBuffer.Length);
 
             for (int i = 0; i < nameBuffer.Length; i++)
+            {
                 sb.Append((char)nameBuffer[i]);
+            }
 
             SkillCategory category = _categories[0];
 
             if (index < _categoryLookup.Length)
+            {
                 category = _categories[_categoryLookup[index]];
+            }
 
             Skill skill = new Skill(new SkillData(index, sb.ToString(), useBtn > 0, extra, unk, category));
 
             return skill;
-        }
-
-        public unsafe Skill GetSkill(int index)
-        {
-            if (index < _skills.Length)
-                return _skills[index];
-
-            return null;
         }
     }
 }

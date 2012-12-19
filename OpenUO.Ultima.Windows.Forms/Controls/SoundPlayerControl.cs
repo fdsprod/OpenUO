@@ -1,19 +1,40 @@
-﻿using System;
+﻿#region License Header
+
+// /***************************************************************************
+//  *   Copyright (c) 2011 OpenUO Software Team.
+//  *   All Right Reserved.
+//  *
+//  *   SoundPlayerControl.cs
+//  *
+//  *   This program is free software; you can redistribute it and/or modify
+//  *   it under the terms of the GNU General Public License as published by
+//  *   the Free Software Foundation; either version 3 of the License, or
+//  *   (at your option) any later version.
+//  ***************************************************************************/
+
+#endregion
+
+#region Usings
+
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Drawing;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
+
+#endregion
 
 namespace OpenUO.Ultima.Windows.Forms.Controls
 {
     public partial class SoundPlayerControl : UserControl
     {
+        private Sound _currentSound;
         private SoundFactory _soundFactory;
-        
+
+        public SoundPlayerControl()
+        {
+            InitializeComponent();
+        }
+
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public SoundFactory Factory
@@ -33,7 +54,7 @@ namespace OpenUO.Ultima.Windows.Forms.Controls
 
         private void BindSounds()
         {
-            if(_soundFactory == null)
+            if (_soundFactory == null)
             {
                 comboBox1.DataSource = null;
                 return;
@@ -45,15 +66,14 @@ namespace OpenUO.Ultima.Windows.Forms.Controls
 
             for (int i = 0; i < length; i++)
             {
-                var sound = _soundFactory.GetSound<Sound>(i);
+                Sound sound = _soundFactory.GetSound<Sound>(i);
 
                 if (sound == null)
                 {
                     continue;
                 }
 
-                var listItem = new ListItem<Sound>()
-                {
+                ListItem<Sound> listItem = new ListItem<Sound> {
                     Value = sound,
                     DisplayName = sound.Name
                 };
@@ -65,19 +85,6 @@ namespace OpenUO.Ultima.Windows.Forms.Controls
             comboBox1.DisplayMember = "DisplayName";
             comboBox1.ValueMember = "Value";
         }
-
-        public class ListItem<T>
-        {
-            public T Value { get; set; }
-            public string DisplayName { get; set; }
-        }
-
-        public SoundPlayerControl()
-        {
-            InitializeComponent();
-        }
-
-        private Sound _currentSound;
 
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -109,6 +116,21 @@ namespace OpenUO.Ultima.Windows.Forms.Controls
         private void nextButton_Click(object sender, EventArgs e)
         {
             comboBox1.SelectedIndex += 1;
+        }
+
+        public class ListItem<T>
+        {
+            public T Value
+            {
+                get;
+                set;
+            }
+
+            public string DisplayName
+            {
+                get;
+                set;
+            }
         }
     }
 }
