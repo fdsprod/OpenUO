@@ -17,6 +17,7 @@
 #region Usings
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -37,7 +38,7 @@ namespace OpenUO.Ultima.Windows.Forms.Controls
     {
         private const int MAX_WIDTH = 48;
         private const int MAX_HEIGHT = 48;
-        private const int LAND_TILE_COUNT = 0x4000;
+        private readonly Dictionary<int, Bitmap> _cache;
         private readonly Rectangle _cellBounds;
 
         private readonly VScrollBar _scrollBar;
@@ -49,6 +50,8 @@ namespace OpenUO.Ultima.Windows.Forms.Controls
         public ArtworkControl()
         {
             DoubleBuffered = true;
+
+            _cache = new Dictionary<int, Bitmap>();
 
             _cellBounds = new Rectangle(
                 0,
@@ -93,6 +96,19 @@ namespace OpenUO.Ultima.Windows.Forms.Controls
 
                     Recalculate(true);
                     Invalidate();
+                }
+            }
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+
+            if (_cache != null)
+            {
+                foreach (var value in _cache.Values)
+                {
+                    value.Dispose();
                 }
             }
         }
@@ -182,11 +198,19 @@ namespace OpenUO.Ultima.Windows.Forms.Controls
 
                             if (_artworkControlType == ArtworkControlType.Land)
                             {
-                                bmp = _artworkFactory.GetLand<Bitmap>(index);
+                                if (!_cache.TryGetValue(index, out bmp))
+                                {
+                                    bmp = _artworkFactory.GetLand<Bitmap>(index);
+                                    _cache.Add(index, bmp);
+                                }
                             }
                             else
                             {
-                                bmp = _artworkFactory.GetStatic<Bitmap>(index);
+                                if (!_cache.TryGetValue(index, out bmp))
+                                {
+                                    bmp = _artworkFactory.GetStatic<Bitmap>(index);
+                                    _cache.Add(index, bmp);
+                                }
                             }
 
                             if (bmp != null)
