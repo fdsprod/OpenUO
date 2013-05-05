@@ -1,0 +1,332 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{957F8375-0AA9-4F4D-ADCB-F3A083F92914}</ProjectGuid>
+    <OutputType>library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>OpenUO.Core.PresentationFramework.Net45</RootNamespace>
+    <AssemblyName>OpenUO.Core.PresentationFramework.Net45</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Xaml">
+      <RequiredTargetFramework>4.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="WindowsBase" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\OpenUO.Core.PresentationFramework\ComponentModel\Design\DataModelBase.cs">
+      <Link>ComponentModel\Design\DataModelBase.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core.PresentationFramework\ComponentModel\Design\PropertyChangedNotifierBase.cs">
+      <Link>ComponentModel\Design\PropertyChangedNotifierBase.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core.PresentationFramework\ComponentModel\Design\PropertySupport.cs">
+      <Link>ComponentModel\Design\PropertySupport.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core.PresentationFramework\ComponentModel\Design\RaisePropertyChangedAttribute.cs">
+      <Link>ComponentModel\Design\RaisePropertyChangedAttribute.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core.PresentationFramework\ComponentModel\Design\ViewModelBase.cs">
+      <Link>ComponentModel\Design\ViewModelBase.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core.PresentationFramework\Controls\Converters\BoolToOppositeConverter.cs">
+      <Link>Controls\Converters\BoolToOppositeConverter.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core.PresentationFramework\Controls\Converters\DoubleTypeConverter.cs">
+      <Link>Controls\Converters\DoubleTypeConverter.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core.PresentationFramework\Controls\Converters\EnumTypeConverter.cs">
+      <Link>Controls\Converters\EnumTypeConverter.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core.PresentationFramework\Controls\Data\CompositeItem.cs">
+      <Link>Controls\Data\CompositeItem.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core.PresentationFramework\Controls\Data\ExpandableProperty.cs">
+      <Link>Controls\Data\ExpandableProperty.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core.PresentationFramework\Controls\Data\Item.cs">
+      <Link>Controls\Data\Item.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core.PresentationFramework\Controls\Data\Property.cs">
+      <Link>Controls\Data\Property.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core.PresentationFramework\Controls\Data\PropertyCategory.cs">
+      <Link>Controls\Data\PropertyCategory.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core.PresentationFramework\Controls\Data\PropertyCollection.cs">
+      <Link>Controls\Data\PropertyCollection.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core.PresentationFramework\Controls\FlatAttribute.cs">
+      <Link>Controls\FlatAttribute.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core.PresentationFramework\Controls\PropertyGrid.cs">
+      <Link>Controls\PropertyGrid.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core.PresentationFramework\Controls\PropertyTemplateSelector.cs">
+      <Link>Controls\PropertyTemplateSelector.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core.PresentationFramework\Controls\TypeEditors\CollectionEditorWindow.xaml.cs">
+      <Link>Controls\TypeEditors\CollectionEditorWindow.xaml.cs</Link>
+      <DependentUpon>CollectionEditorWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="..\OpenUO.Core.PresentationFramework\Controls\TypeEditors\IntegerTypeEditor.cs">
+      <Link>Controls\TypeEditors\IntegerTypeEditor.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core.PresentationFramework\Controls\TypeEditors\NumberTypeEditor.cs">
+      <Link>Controls\TypeEditors\NumberTypeEditor.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core.PresentationFramework\Controls\VirtualizingWrapPanel.cs">
+      <Link>Controls\VirtualizingWrapPanel.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core.PresentationFramework\Converters\BinaryToImageConverter.cs">
+      <Link>Converters\BinaryToImageConverter.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core.PresentationFramework\Converters\BoolToNotBoolConverter.cs">
+      <Link>Converters\BoolToNotBoolConverter.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core.PresentationFramework\Converters\BoolToOpacityConverter.cs">
+      <Link>Converters\BoolToOpacityConverter.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core.PresentationFramework\Converters\BoolToVisibilityConverter.cs">
+      <Link>Converters\BoolToVisibilityConverter.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core.PresentationFramework\Converters\CountToVisibilityConverter.cs">
+      <Link>Converters\CountToVisibilityConverter.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core.PresentationFramework\Converters\DivideByTwoConverter.cs">
+      <Link>Converters\DivideByTwoConverter.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core.PresentationFramework\Converters\EnumToDescriptionConverter.cs">
+      <Link>Converters\EnumToDescriptionConverter.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core.PresentationFramework\Converters\HasValueConverter.cs">
+      <Link>Converters\HasValueConverter.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core.PresentationFramework\Converters\MultiplyByConverter.cs">
+      <Link>Converters\MultiplyByConverter.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core.PresentationFramework\Converters\NotBoolToVisibilityConverter.cs">
+      <Link>Converters\NotBoolToVisibilityConverter.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core.PresentationFramework\Converters\NotNullToBoolConverter.cs">
+      <Link>Converters\NotNullToBoolConverter.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core.PresentationFramework\Converters\NullToBoolConverter.cs">
+      <Link>Converters\NullToBoolConverter.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core.PresentationFramework\Converters\StringLengthConverter.cs">
+      <Link>Converters\StringLengthConverter.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core.PresentationFramework\Converters\StringLengthToBoolConverter.cs">
+      <Link>Converters\StringLengthToBoolConverter.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core.PresentationFramework\Converters\StringLengthToVisibilityConverter.cs">
+      <Link>Converters\StringLengthToVisibilityConverter.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core.PresentationFramework\Converters\StringToLowerCaseConverter.cs">
+      <Link>Converters\StringToLowerCaseConverter.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core.PresentationFramework\Converters\StringToUpperCaseConverter.cs">
+      <Link>Converters\StringToUpperCaseConverter.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core.PresentationFramework\Converters\VisibilityIfEmptyStringConverter.cs">
+      <Link>Converters\VisibilityIfEmptyStringConverter.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core.PresentationFramework\Converters\VisibilityIfNotEmptyStringConverter.cs">
+      <Link>Converters\VisibilityIfNotEmptyStringConverter.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core.PresentationFramework\Converters\VisibilityIfNotNullConverter.cs">
+      <Link>Converters\VisibilityIfNotNullConverter.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core.PresentationFramework\Converters\VisibilityIfNullConverter.cs">
+      <Link>Converters\VisibilityIfNullConverter.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core.PresentationFramework\Input\CommandBase.cs">
+      <Link>Input\CommandBase.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core.PresentationFramework\Input\IRaiseCanExecuteChanged.cs">
+      <Link>Input\IRaiseCanExecuteChanged.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core.PresentationFramework\Input\RelayCommand.cs">
+      <Link>Input\RelayCommand.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core.PresentationFramework\Themes\TypeEditors\CollectionEditorControl.xaml.cs">
+      <Link>Themes\TypeEditors\CollectionEditorControl.xaml.cs</Link>
+      <DependentUpon>CollectionEditorControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="..\OpenUO.Core.PresentationFramework\Threading\DispatcherProxy.cs">
+      <Link>Threading\DispatcherProxy.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core.PresentationFramework\WeakAction.cs">
+      <Link>WeakAction.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core.PresentationFramework\WeakReferenceManager.cs">
+      <Link>WeakReferenceManager.cs</Link>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <None Include="..\OpenUO.Core.PresentationFramework\packages.config">
+      <Link>packages.config</Link>
+    </None>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <AppDesigner Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="..\OpenUO.Core.PresentationFramework\Controls\TypeEditors\CollectionEditorWindow.xaml">
+      <Link>Controls\TypeEditors\CollectionEditorWindow.xaml</Link>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="..\OpenUO.Core.PresentationFramework\Themes\ExpressionBlend.xaml">
+      <Link>Themes\ExpressionBlend.xaml</Link>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="..\OpenUO.Core.PresentationFramework\Themes\ExpressionBlend\Brushes.xaml">
+      <Link>Themes\ExpressionBlend\Brushes.xaml</Link>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="..\OpenUO.Core.PresentationFramework\Themes\ExpressionBlend\CheckBox.xaml">
+      <Link>Themes\ExpressionBlend\CheckBox.xaml</Link>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="..\OpenUO.Core.PresentationFramework\Themes\ExpressionBlend\ComboBox.xaml">
+      <Link>Themes\ExpressionBlend\ComboBox.xaml</Link>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="..\OpenUO.Core.PresentationFramework\Themes\ExpressionBlend\Expander.xaml">
+      <Link>Themes\ExpressionBlend\Expander.xaml</Link>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="..\OpenUO.Core.PresentationFramework\Themes\ExpressionBlend\ListBox.xaml">
+      <Link>Themes\ExpressionBlend\ListBox.xaml</Link>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="..\OpenUO.Core.PresentationFramework\Themes\ExpressionBlend\PropertyGrid.xaml">
+      <Link>Themes\ExpressionBlend\PropertyGrid.xaml</Link>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="..\OpenUO.Core.PresentationFramework\Themes\ExpressionBlend\ScrollViewer.xaml">
+      <Link>Themes\ExpressionBlend\ScrollViewer.xaml</Link>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="..\OpenUO.Core.PresentationFramework\Themes\ExpressionBlend\TextBlock.xaml">
+      <Link>Themes\ExpressionBlend\TextBlock.xaml</Link>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="..\OpenUO.Core.PresentationFramework\Themes\ExpressionBlend\TextBox.xaml">
+      <Link>Themes\ExpressionBlend\TextBox.xaml</Link>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="..\OpenUO.Core.PresentationFramework\Themes\ExpressionBlend\WPGTemplates.xaml">
+      <Link>Themes\ExpressionBlend\WPGTemplates.xaml</Link>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="..\OpenUO.Core.PresentationFramework\Themes\Generic.xaml">
+      <Link>Themes\Generic.xaml</Link>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="..\OpenUO.Core.PresentationFramework\Themes\TypeEditors\CollectionEditorControl.xaml">
+      <Link>Themes\TypeEditors\CollectionEditorControl.xaml</Link>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="..\OpenUO.Core.PresentationFramework\Themes\TypeEditors\IntegerTypeEditor.xaml">
+      <Link>Themes\TypeEditors\IntegerTypeEditor.xaml</Link>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="..\OpenUO.Core.PresentationFramework\Themes\Icons\abc.png">
+      <Link>Themes\Icons\abc.png</Link>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="..\OpenUO.Core.PresentationFramework\Themes\Icons\grouped.png">
+      <Link>Themes\Icons\grouped.png</Link>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\OpenUO.Core.Net45\OpenUO.Core.Net45.csproj">
+      <Project>{921d6c7a-5b62-4f99-a6a7-710c6920d494}</Project>
+      <Name>OpenUO.Core.Net45</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties ProjectLinkReference="84b7dd45-fb07-4d91-aa9a-2c11edefd38e" ProjectLinkerExcludeFilter="\\?desktop(\\.*)?$;\\?silverlight(\\.*)?$;\.desktop;\.silverlight;\.xaml;^service references(\\.*)?$;\.clientconfig;^web references(\\.*)?$" />
+    </VisualStudio>
+  </ProjectExtensions>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

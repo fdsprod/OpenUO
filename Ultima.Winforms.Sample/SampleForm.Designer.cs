@@ -29,9 +29,6 @@
         private void InitializeComponent()
         {
             this.label1 = new System.Windows.Forms.Label();
-            this.soundControl = new OpenUO.Ultima.Windows.Forms.Controls.SoundPlayerControl();
-            this.gumpControl = new OpenUO.Ultima.Windows.Forms.Controls.GumpControl();
-            this.artworkControl2 = new OpenUO.Ultima.Windows.Forms.Controls.ArtworkControl();
             this.artworkControl1 = new OpenUO.Ultima.Windows.Forms.Controls.ArtworkControl();
             this.uoInstallationComboBox1 = new OpenUO.Ultima.Windows.Forms.Controls.UOInstallationComboBox();
             this.SuspendLayout();
@@ -45,36 +42,15 @@
             this.label1.TabIndex = 3;
             this.label1.Text = "Installation:";
             // 
-            // soundControl
-            // 
-            this.soundControl.Location = new System.Drawing.Point(15, 334);
-            this.soundControl.Name = "soundControl";
-            this.soundControl.Size = new System.Drawing.Size(309, 73);
-            this.soundControl.TabIndex = 8;
-            // 
-            // gumpControl
-            // 
-            this.gumpControl.Location = new System.Drawing.Point(648, 33);
-            this.gumpControl.Name = "gumpControl";
-            this.gumpControl.Size = new System.Drawing.Size(309, 295);
-            this.gumpControl.TabIndex = 7;
-            this.gumpControl.Text = "gumpControl";
-            // 
-            // artworkControl2
-            // 
-            this.artworkControl2.ArtworkControlType = OpenUO.Ultima.Windows.Forms.Controls.ArtworkControlType.Statics;
-            this.artworkControl2.Location = new System.Drawing.Point(333, 33);
-            this.artworkControl2.Name = "artworkControl2";
-            this.artworkControl2.Size = new System.Drawing.Size(309, 295);
-            this.artworkControl2.TabIndex = 6;
-            this.artworkControl2.Text = "artworkControl2";
-            // 
             // artworkControl1
             // 
+            this.artworkControl1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.artworkControl1.ArtworkControlType = OpenUO.Ultima.Windows.Forms.Controls.ArtworkControlType.Land;
             this.artworkControl1.Location = new System.Drawing.Point(15, 33);
             this.artworkControl1.Name = "artworkControl1";
-            this.artworkControl1.Size = new System.Drawing.Size(312, 295);
+            this.artworkControl1.Size = new System.Drawing.Size(1005, 549);
             this.artworkControl1.TabIndex = 5;
             this.artworkControl1.Text = "artworkControl1";
             // 
@@ -97,9 +73,6 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1032, 594);
-            this.Controls.Add(this.soundControl);
-            this.Controls.Add(this.gumpControl);
-            this.Controls.Add(this.artworkControl2);
             this.Controls.Add(this.artworkControl1);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.uoInstallationComboBox1);
@@ -115,9 +88,6 @@
         private OpenUO.Ultima.Windows.Forms.Controls.UOInstallationComboBox uoInstallationComboBox1;
         private System.Windows.Forms.Label label1;
         private OpenUO.Ultima.Windows.Forms.Controls.ArtworkControl artworkControl1;
-        private OpenUO.Ultima.Windows.Forms.Controls.ArtworkControl artworkControl2;
-        private OpenUO.Ultima.Windows.Forms.Controls.GumpControl gumpControl;
-        private OpenUO.Ultima.Windows.Forms.Controls.SoundPlayerControl soundControl;
     }
 }
 

@@ -25,23 +25,23 @@ using System.Linq;
 
 namespace OpenUO.Core.Collections
 {
-    public class Cache<T, U> : IDisposable, IEnumerable<U>
+    public class Cache<TKey, TValue> : IDisposable, IEnumerable<TValue>
     {
-        protected readonly Dictionary<T, CacheItem<U>> InternalCache;
+        protected readonly Dictionary<TKey, CacheItem<TValue>> InternalCache;
         protected readonly TimeSpan TimeToExpire;
 
         public Cache(TimeSpan timeToExpire, int capacity)
         {
             TimeToExpire = timeToExpire;
-            InternalCache = new Dictionary<T, CacheItem<U>>(capacity);
+            InternalCache = new Dictionary<TKey, CacheItem<TValue>>(capacity);
         }
 
-        public virtual U this[T index]
+        public virtual TValue this[TKey index]
         {
             get
             {
-                U item = default(U);
-                CacheItem<U> cacheItem;
+                TValue item = default(TValue);
+                CacheItem<TValue> cacheItem;
 
                 if (InternalCache.TryGetValue(index, out cacheItem))
                 {
@@ -52,11 +52,11 @@ namespace OpenUO.Core.Collections
             }
             set
             {
-                CacheItem<U> cacheItem;
+                CacheItem<TValue> cacheItem;
 
                 if (!InternalCache.TryGetValue(index, out cacheItem))
                 {
-                    cacheItem = new CacheItem<U>(value, TimeToExpire);
+                    cacheItem = new CacheItem<TValue>(value, TimeToExpire);
                     InternalCache.Add(index, cacheItem);
                 }
 
@@ -75,7 +75,7 @@ namespace OpenUO.Core.Collections
             InternalCache.Clear();
         }
 
-        public IEnumerator<U> GetEnumerator()
+        public IEnumerator<TValue> GetEnumerator()
         {
             return InternalCache.Values.Select(ci => ci.Value).GetEnumerator();
         }
@@ -87,12 +87,12 @@ namespace OpenUO.Core.Collections
 
         public void Clean()
         {
-            T[] keys = InternalCache.Keys.ToArray();
+            TKey[] keys = InternalCache.Keys.ToArray();
 
             for (int i = 0; i < keys.Length; i++)
             {
-                T key = keys[i];
-                CacheItem<U> cacheItem = InternalCache[key];
+                TKey key = keys[i];
+                CacheItem<TValue> cacheItem = InternalCache[key];
 
                 if (cacheItem.IsExpired)
                 {
@@ -101,7 +101,7 @@ namespace OpenUO.Core.Collections
             }
         }
 
-        protected virtual void OnItemDisposing(CacheItem<U> cacheItem)
+        protected virtual void OnItemDisposing(CacheItem<TValue> cacheItem)
         {
         }
 
@@ -140,6 +140,7 @@ namespace OpenUO.Core.Collections
             public void Dispose()
             {
                 IDisposable disposable = _value as IDisposable;
+
                 if (disposable != null)
                 {
                     disposable.Dispose();

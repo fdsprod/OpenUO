@@ -76,9 +76,9 @@ namespace Ultima.Winforms.Sample
             _soundFactory = new SoundFactory(uoInstallationComboBox1.SelectedInstallation, _container);
 
             artworkControl1.Factory = _artFactory;
-            artworkControl2.Factory = _artFactory;
-            gumpControl.Factory = _gumpFactory;
-            soundControl.Factory = _soundFactory;
+            //artworkControl2.Factory = _artFactory;
+            //gumpControl.Factory = _gumpFactory;
+            //soundControl.Factory = _soundFactory;
         }
 
         private void uoInstallationComboBox1_SelectedInstallationChanged(object sender, EventArgs e)

@@ -17,20 +17,26 @@
 #region Usings
 
 using System;
+using System.ComponentModel;
+using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 
 #endregion
 
 namespace OpenUO.Core
 {
-    public abstract class TrackableBase : IDisposable
+    public abstract class NotifiableBase : IDisposable, INotifyPropertyChanged
     {
         public void Dispose()
         {
             Dispose(true);
         }
 
-        protected bool SetProperty<T>(ref T storage, T value, [CallerMemberName] String propertyName = null)
+#if NET_45
+        protected virtual bool SetProperty<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
+#else
+        protected virtual bool SetProperty<T>(ref T storage, T value, string propertyName = null)
+#endif
         {
             if (Equals(storage, value))
             {
@@ -43,12 +49,24 @@ namespace OpenUO.Core
             return true;
         }
 
-        protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
+#if NET_45
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+#else
+        protected virtual void OnPropertyChanged(string propertyName = null)
+#endif
         {
+            var handler = PropertyChanged;
+
+            if (handler != null)
+            {
+                handler(this, new PropertyChangedEventArgs(propertyName));
+            }
         }
 
         protected virtual void Dispose(bool disposing)
         {
         }
+
+        public event PropertyChangedEventHandler PropertyChanged;
     }
 }

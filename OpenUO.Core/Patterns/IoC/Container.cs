@@ -2962,7 +2962,7 @@ namespace OpenUO.Core.Patterns
 
         private void RegisterDefaultTypes()
         {
-            Register(this);
+            Register<IContainer>(this);
 
 #if MESSENGER
     // Only register the Messenger singleton if we are the root container

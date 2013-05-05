@@ -1,0 +1,206 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{921D6C7A-5B62-4F99-A6A7-710C6920D494}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>OpenUO.Core</RootNamespace>
+    <AssemblyName>OpenUO.Core</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;NET_45</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE;NET_45</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\OpenUO.Core\AssemblyInfo.cs">
+      <Link>AssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core\Collections\Cache.cs">
+      <Link>Collections\Cache.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core\Configuration\ConfigFile.cs">
+      <Link>Configuration\ConfigFile.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core\ConsoleHelper.cs">
+      <Link>ConsoleHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core\Data\ColumnAttribute.cs">
+      <Link>Data\ColumnAttribute.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core\Diagnostics\ITraceListener.cs">
+      <Link>Diagnostics\ITraceListener.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core\Diagnostics\Listeners\ConsoleTraceListener.cs">
+      <Link>Diagnostics\Listeners\ConsoleTraceListener.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core\Diagnostics\Listeners\DebugLogTraceListener.cs">
+      <Link>Diagnostics\Listeners\DebugLogTraceListener.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core\Diagnostics\Listeners\DebugTraceListener.cs">
+      <Link>Diagnostics\Listeners\DebugTraceListener.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core\Diagnostics\TraceListener.cs">
+      <Link>Diagnostics\TraceListener.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core\Diagnostics\TraceMessage.cs">
+      <Link>Diagnostics\TraceMessage.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core\Diagnostics\TraceMessageEventArgs.cs">
+      <Link>Diagnostics\TraceMessageEventArgs.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core\Diagnostics\Tracer.cs">
+      <Link>Diagnostics\Tracer.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core\Diagnostics\TraceType.cs">
+      <Link>Diagnostics\TraceType.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core\Extensions\ArrayExtensions.cs">
+      <Link>Extensions\ArrayExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core\Extensions\ByteArrayExtensions.cs">
+      <Link>Extensions\ByteArrayExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core\Extensions\CollectionExtensions.cs">
+      <Link>Extensions\CollectionExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core\Extensions\EnumExtensions.cs">
+      <Link>Extensions\EnumExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core\Extensions\IDataReaderExtensions.cs">
+      <Link>Extensions\IDataReaderExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core\Extensions\IDataRecordExtensions.cs">
+      <Link>Extensions\IDataRecordExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core\Extensions\IPAddressExtensions.cs">
+      <Link>Extensions\IPAddressExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core\Extensions\ObjectExtensions.cs">
+      <Link>Extensions\ObjectExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core\Extensions\SingleExtensions.cs">
+      <Link>Extensions\SingleExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core\Extensions\StreamExtensions.cs">
+      <Link>Extensions\StreamExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core\Extensions\StringExtensions.cs">
+      <Link>Extensions\StringExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core\Extensions\TypeExtensions.cs">
+      <Link>Extensions\TypeExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core\Guard.cs">
+      <Link>Guard.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core\IO\BufferPool.cs">
+      <Link>IO\BufferPool.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core\IO\FileSystemHelper.cs">
+      <Link>IO\FileSystemHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core\IO\HuffmanCompression.cs">
+      <Link>IO\HuffmanCompression.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core\IO\ZlibCompression.cs">
+      <Link>IO\ZlibCompression.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core\NotifiableBase.cs">
+      <Link>NotifiableBase.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core\ObjectConverterter.cs">
+      <Link>ObjectConverterter.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core\Patterns\Chaining\ExecutionChainBase.cs">
+      <Link>Patterns\Chaining\ExecutionChainBase.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core\Patterns\Chaining\ExecutionChainStepBase.cs">
+      <Link>Patterns\Chaining\ExecutionChainStepBase.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core\Patterns\Chaining\Interfaces\IChain.cs">
+      <Link>Patterns\Chaining\Interfaces\IChain.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core\Patterns\Chaining\Interfaces\IChainStep.cs">
+      <Link>Patterns\Chaining\Interfaces\IChainStep.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core\Patterns\Graphs\DirectedAcyclicGraph.cs">
+      <Link>Patterns\Graphs\DirectedAcyclicGraph.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core\Patterns\Graphs\GraphNode.cs">
+      <Link>Patterns\Graphs\GraphNode.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core\Patterns\IoC\Container.cs">
+      <Link>Patterns\IoC\Container.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core\Patterns\IoC\IContainer.cs">
+      <Link>Patterns\IoC\IContainer.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core\ProgressEventArgs.cs">
+      <Link>ProgressEventArgs.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core\Reflection\BaseFieldAccessor.cs">
+      <Link>Reflection\BaseFieldAccessor.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core\Reflection\BaseMethodInvoker.cs">
+      <Link>Reflection\BaseMethodInvoker.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core\Reflection\BasePropertyAccessor.cs">
+      <Link>Reflection\BasePropertyAccessor.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core\Reflection\Delegates.cs">
+      <Link>Reflection\Delegates.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core\Reflection\FieldAccessor.cs">
+      <Link>Reflection\FieldAccessor.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core\Reflection\MethodInvoker.cs">
+      <Link>Reflection\MethodInvoker.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenUO.Core\Reflection\PropertyAccesor.cs">
+      <Link>Reflection\PropertyAccesor.cs</Link>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties ProjectLinkReference="25b50e34-555e-497e-901e-628494b0c954" ProjectLinkerExcludeFilter="\\?desktop(\\.*)?$;\\?silverlight(\\.*)?$;\.desktop;\.silverlight;\.xaml;^service references(\\.*)?$;\.clientconfig;^web references(\\.*)?$" />
+    </VisualStudio>
+  </ProjectExtensions>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

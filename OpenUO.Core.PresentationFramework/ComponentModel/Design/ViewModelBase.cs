@@ -1,19 +1,18 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq.Expressions;
 using System.Windows;
 using System.Windows.Threading;
 using OpenUO.Core.PresentationFramework.Input;
-using System.Linq.Expressions;
-using System.Collections.Concurrent;
 
 namespace OpenUO.Core.PresentationFramework.ComponentModel.Design
 {
     public abstract class ViewModelBase : PropertyChangedNotifierBase, IDataErrorInfo
     {
-        private List<CommandBase> _commands;
+        private readonly List<CommandBase> _commands;
         private readonly ConcurrentDictionary<string, object> _errors;
-
 
         public List<CommandBase> Commands
         {
@@ -27,26 +26,32 @@ namespace OpenUO.Core.PresentationFramework.ComponentModel.Design
 
         public bool IsDesignMode
         {
-            get { return (bool)(DesignerProperties.IsInDesignModeProperty.GetMetadata(typeof(DependencyObject)).DefaultValue); }
+            get { return (bool)(DesignerProperties.IsInDesignModeProperty.GetMetadata(typeof (DependencyObject)).DefaultValue); }
         }
-        
+
         public string Error
         {
             get { return string.Empty; }
         }
-    
+
         public ViewModelBase()
         {
             _commands = new List<CommandBase>();
             _errors = new ConcurrentDictionary<string, object>();
         }
 
-        protected override void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
+#if NET_45
+        protected override void OnPropertyChanged([CallerMemberName] string propertyName = null)
+#else
+        protected override void OnPropertyChanged(string propertyName = null)
+#endif
         {
-            foreach (var command in _commands)
+            foreach (CommandBase command in _commands)
+            {
                 command.RaiseCanExecuteChanged();
+            }
 
-            base.OnPropertyChanged(sender, e);
+            base.OnPropertyChanged(propertyName);
         }
 
         protected CommandBase CreateCommand(Action execute)
@@ -57,7 +62,9 @@ namespace OpenUO.Core.PresentationFramework.ComponentModel.Design
         protected CommandBase CreateCommand(Action execute, Func<bool> canExecute)
         {
             if (canExecute == null)
+            {
                 canExecute = () => true;
+            }
 
             CommandBase command = new RelayCommand(execute, canExecute);
 
@@ -68,13 +75,15 @@ namespace OpenUO.Core.PresentationFramework.ComponentModel.Design
 
         protected CommandBase CreateCommand<T>(Action<T> execute)
         {
-            return CreateCommand<T>(execute, null);
+            return CreateCommand(execute, null);
         }
 
         protected CommandBase CreateCommand<T>(Action<T> execute, Func<T, bool> canExecute)
         {
             if (canExecute == null)
+            {
                 canExecute = (o) => true;
+            }
 
             CommandBase command = new RelayCommand<T>(execute, canExecute);
 
@@ -105,7 +114,9 @@ namespace OpenUO.Core.PresentationFramework.ComponentModel.Design
             object value;
 
             if (_errors.TryRemove(propertyName, out value))
-                OnPropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            {
+                OnPropertyChanged(propertyName);
+            }
         }
 
         protected object GetError<T>(Expression<Func<T>> propertyExpression)
@@ -119,7 +130,9 @@ namespace OpenUO.Core.PresentationFramework.ComponentModel.Design
             object error = null;
 
             if (_errors.ContainsKey(propertyName))
+            {
                 _errors.TryRemove(propertyName, out error);
+            }
 
             return error;
         }
@@ -133,7 +146,7 @@ namespace OpenUO.Core.PresentationFramework.ComponentModel.Design
         protected void RegisterError(string propertyName, object error)
         {
             _errors[propertyName] = error;
-            OnPropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            OnPropertyChanged(propertyName);
         }
 
         protected DispatcherTimer CreateTimer(TimeSpan interval, EventHandler onTick)
@@ -143,13 +156,15 @@ namespace OpenUO.Core.PresentationFramework.ComponentModel.Design
 
         protected DispatcherTimer CreateTimer(TimeSpan interval, EventHandler onTick, bool start)
         {
-            DispatcherTimer timer = new DispatcherTimer();
+            var timer = new DispatcherTimer();
 
             timer.Interval = interval;
             timer.Tick += onTick;
 
             if (start)
+            {
                 timer.Start();
+            }
 
             return timer;
         }

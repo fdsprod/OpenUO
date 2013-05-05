@@ -57,9 +57,9 @@
     <Compile Include="Adapters\UnicodeFontImageSourceAdapter.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\OpenUO.Core\OpenUO.Core.csproj">
+    <ProjectReference Include="..\OpenUO.Core\OpenUO.Core.Net40.csproj">
       <Project>{25B50E34-555E-497E-901E-628494B0C954}</Project>
-      <Name>OpenUO.Core</Name>
+      <Name>OpenUO.Core.Net40</Name>
     </ProjectReference>
     <ProjectReference Include="..\OpenUO.Ultima\OpenUO.Ultima.csproj">
       <Project>{911C0A0F-1A08-4DA0-B103-EB24D9E19402}</Project>

@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>OpenUO.Core</RootNamespace>
     <AssemblyName>OpenUO.Core</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -102,7 +102,7 @@
     <Compile Include="Reflection\FieldAccessor.cs" />
     <Compile Include="Reflection\MethodInvoker.cs" />
     <Compile Include="Reflection\PropertyAccesor.cs" />
-    <Compile Include="TrackableBase.cs" />
+    <Compile Include="NotifiableBase.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

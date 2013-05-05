@@ -82,9 +82,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\OpenUO.Core\OpenUO.Core.csproj">
+    <ProjectReference Include="..\OpenUO.Core\OpenUO.Core.Net40.csproj">
       <Project>{25B50E34-555E-497E-901E-628494B0C954}</Project>
-      <Name>OpenUO.Core</Name>
+      <Name>OpenUO.Core.Net40</Name>
     </ProjectReference>
     <ProjectReference Include="..\OpenUO.Ultima.Windows.Forms\OpenUO.Ultima.Windows.Forms.csproj">
       <Project>{5050B1A5-4683-4935-81DE-1B7A4403831B}</Project>

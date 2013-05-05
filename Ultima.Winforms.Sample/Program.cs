@@ -44,7 +44,6 @@ namespace Ultima.Winforms.Sample
 
             container.RegisterModule<UltimaSDKCoreModule>();
             container.RegisterModule<UltimaSDKBitmapModule>();
-
             container.Register<SampleForm>();
 
             Application.EnableVisualStyles();

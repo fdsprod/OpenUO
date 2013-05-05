@@ -14,7 +14,6 @@ namespace OpenUO.Core.PresentationFramework.Controls
 {
     public class VirtualizingWrapPanel : VirtualizingPanel, IScrollInfo
     {
-
         #region Fields
 
         UIElementCollection _children;
