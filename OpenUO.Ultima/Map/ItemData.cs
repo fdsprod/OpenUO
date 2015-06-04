@@ -152,7 +152,7 @@ namespace OpenUO.Ultima
         {
             get
             {
-                if ((_flags & TileFlag.Bridge) != 0)
+                if((_flags & TileFlag.Bridge) != 0)
                 {
                     return _height / 2;
                 }

@@ -32,7 +32,6 @@ namespace OpenUO.Core.Configuration
     public class ConfigFile
     {
         private static readonly object _syncRoot = new object();
-
         private readonly string _filename;
         private readonly Dictionary<string, Dictionary<string, string>> _sections;
 
@@ -57,25 +56,25 @@ namespace OpenUO.Core.Configuration
 
             try
             {
-                lock (_syncRoot)
+                lock(_syncRoot)
                 {
-                    if (!File.Exists(_filename))
+                    if(!File.Exists(_filename))
                     {
                         return;
                     }
 
-                    using (Stream stream = File.Open(_filename, FileMode.Open))
+                    using(Stream stream = File.Open(_filename, FileMode.Open))
                     {
-                        XDocument document = XDocument.Load(stream);
-                        
-                        foreach (XElement section in document.Root.Descendants("section"))
+                        var document = XDocument.Load(stream);
+
+                        foreach(var section in document.Root.Descendants("section"))
                         {
                             try
                             {
-                                Dictionary<string, string> sectionTable = new Dictionary<string, string>();
+                                var sectionTable = new Dictionary<string, string>();
                                 _sections.Add(section.Attribute("name").Value, sectionTable);
 
-                                foreach (XElement element in section.DescendantNodes())
+                                foreach(XElement element in section.DescendantNodes())
                                 {
                                     try
                                     {
@@ -83,13 +82,13 @@ namespace OpenUO.Core.Configuration
                                             element.Attribute("name").Value,
                                             element.Attribute("value").Value);
                                     }
-                                    catch (Exception e)
+                                    catch(Exception e)
                                     {
                                         Tracer.Error(e);
                                     }
                                 }
                             }
-                            catch (Exception e)
+                            catch(Exception e)
                             {
                                 Tracer.Error(e);
                             }
@@ -97,7 +96,7 @@ namespace OpenUO.Core.Configuration
                     }
                 }
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 Tracer.Error(e);
             }
@@ -107,24 +106,25 @@ namespace OpenUO.Core.Configuration
         {
             try
             {
-                XmlWriterSettings settings = new XmlWriterSettings {
-                    CheckCharacters = false,
-                    CloseOutput = true,
-                    Encoding = Encoding.UTF8,
-                    Indent = true,
-                    NewLineHandling = NewLineHandling.Entitize
-                };
+                var settings = new XmlWriterSettings
+                               {
+                                   CheckCharacters = false,
+                                   CloseOutput = true,
+                                   Encoding = Encoding.UTF8,
+                                   Indent = true,
+                                   NewLineHandling = NewLineHandling.Entitize
+                               };
 
-                XDocument document = new XDocument(settings);
+                var document = new XDocument(settings);
                 document.Add(new XElement("configuration"));
 
-                XElement configuration = document.Element("configuration");
+                var configuration = document.Element("configuration");
 
-                foreach (var section in _sections)
+                foreach(var section in _sections)
                 {
-                    XElement xSection = new XElement("section", new XAttribute("name", section.Key));
+                    var xSection = new XElement("section", new XAttribute("name", section.Key));
 
-                    foreach (var setting in section.Value)
+                    foreach(var setting in section.Value)
                     {
                         xSection.Add(
                             new XElement(
@@ -136,20 +136,22 @@ namespace OpenUO.Core.Configuration
                     configuration.Add(xSection);
                 }
 
-                lock (_syncRoot)
+                lock(_syncRoot)
                 {
-                    string directory = Path.GetDirectoryName(_filename);
+                    var directory = Path.GetDirectoryName(_filename);
 
-                    if (!string.IsNullOrEmpty(directory))
+                    if(!string.IsNullOrEmpty(directory))
                     {
                         FileSystemHelper.EnsureDirectoryExists(directory);
                     }
 
-                    using (Stream stream = File.Open(_filename, FileMode.Create))
+                    using(Stream stream = File.Open(_filename, FileMode.Create))
+                    {
                         document.Save(stream);
+                    }
                 }
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 Tracer.Error(e);
             }
@@ -159,13 +161,13 @@ namespace OpenUO.Core.Configuration
         {
             Dictionary<string, string> sectionTable;
 
-            if (!_sections.TryGetValue(section, out sectionTable))
+            if(!_sections.TryGetValue(section, out sectionTable))
             {
                 sectionTable = new Dictionary<string, string>();
                 _sections.Add(section, sectionTable);
             }
 
-            if (sectionTable.ContainsKey(key))
+            if(sectionTable.ContainsKey(key))
             {
                 sectionTable[key] = value.ToString();
             }
@@ -184,19 +186,19 @@ namespace OpenUO.Core.Configuration
 
         public T GetValue<T>(string section, string key, T defaultValue)
         {
-            if (!_sections.ContainsKey(section))
+            if(!_sections.ContainsKey(section))
             {
                 return defaultValue;
             }
 
-            Dictionary<string, string> sectionTable = _sections[section];
+            var sectionTable = _sections[section];
 
             return !sectionTable.ContainsKey(key) ? defaultValue : sectionTable[key].ConvertTo<T>();
         }
 
         public void Reload()
         {
-            if (File.Exists(_filename))
+            if(File.Exists(_filename))
             {
                 LoadSettings();
             }

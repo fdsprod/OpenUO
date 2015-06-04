@@ -2,41 +2,29 @@
 
 namespace OpenUO.Core.PresentationFramework.Data
 {
-	public abstract class CompositeItem : Item
-	{
-		#region Fields
+    public abstract class CompositeItem : Item
+    {
+        private readonly ObservableCollection<Item> _items = new ObservableCollection<Item>();
 
-		private readonly ObservableCollection<Item> _items = new ObservableCollection<Item>();
+        public ObservableCollection<Item> Items
+        {
+            get { return _items; }
+        }
 
-		#endregion
-
-		#region Properties
-
-		public ObservableCollection<Item> Items
-		{
-			get { return _items; }
-		} 
-
-		#endregion
-
-		#region IDisposable Members
-
-		protected override void Dispose(bool disposing)
-		{
-			if (Disposed)
-			{
-				return;
-			}
-			if (disposing)
-			{
-				foreach (Item item in Items)
-				{
-					item.Dispose();
-				}
-			}
-			base.Dispose(disposing);
-		}
-
-		#endregion
-	}
+        protected override void Dispose(bool disposing)
+        {
+            if(Disposed)
+            {
+                return;
+            }
+            if(disposing)
+            {
+                foreach(var item in Items)
+                {
+                    item.Dispose();
+                }
+            }
+            base.Dispose(disposing);
+        }
+    }
 }

@@ -22,7 +22,7 @@ using System;
 
 namespace OpenUO.Core.Data
 {
-    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
+    [AttributeUsage(AttributeTargets.Property)]
     public sealed class ColumnAttribute : Attribute
     {
         private readonly string _name;

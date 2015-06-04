@@ -29,7 +29,7 @@ namespace OpenUO.Core.Reflection
 
         public MethodInvoker(string Method)
         {
-            methodHandler = BaseMethodInvoker.GetMethodInvoker(typeof (TargetObjectType).GetMethod(Method));
+            methodHandler = BaseMethodInvoker.GetMethodInvoker(typeof(TargetObjectType).GetMethod(Method));
         }
 
         public MethodInvoker(MethodInfo Method)

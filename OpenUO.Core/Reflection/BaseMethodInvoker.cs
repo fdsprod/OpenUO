@@ -28,19 +28,22 @@ namespace OpenUO.Core.Reflection
     {
         public static FastInvokeHandler GetMethodInvoker(MethodInfo Method)
         {
-            DynamicMethod dynamicMethod = new DynamicMethod(
+            var dynamicMethod = new DynamicMethod(
                 string.Empty,
-                typeof (object),
-                new[] {typeof (object), typeof (object[])},
+                typeof(object),
+                new[]
+                {
+                    typeof(object), typeof(object[])
+                },
                 Method.DeclaringType.Module);
 
-            ILGenerator il = dynamicMethod.GetILGenerator();
-            ParameterInfo[] ps = Method.GetParameters();
-            Type[] paramTypes = new Type[ps.Length];
+            var il = dynamicMethod.GetILGenerator();
+            var ps = Method.GetParameters();
+            var paramTypes = new Type[ps.Length];
 
-            for (int i = 0; i < paramTypes.Length; i++)
+            for(var i = 0; i < paramTypes.Length; i++)
             {
-                if (ps[i].ParameterType.IsByRef)
+                if(ps[i].ParameterType.IsByRef)
                 {
                     paramTypes[i] = ps[i].ParameterType.GetElementType();
                 }
@@ -50,14 +53,14 @@ namespace OpenUO.Core.Reflection
                 }
             }
 
-            LocalBuilder[] locals = new LocalBuilder[paramTypes.Length];
+            var locals = new LocalBuilder[paramTypes.Length];
 
-            for (int i = 0; i < paramTypes.Length; i++)
+            for(var i = 0; i < paramTypes.Length; i++)
             {
                 locals[i] = il.DeclareLocal(paramTypes[i], true);
             }
 
-            for (int i = 0; i < paramTypes.Length; i++)
+            for(var i = 0; i < paramTypes.Length; i++)
             {
                 il.Emit(OpCodes.Ldarg_1);
                 EmitFastInt(il, i);
@@ -66,19 +69,19 @@ namespace OpenUO.Core.Reflection
                 il.Emit(OpCodes.Stloc, locals[i]);
             }
 
-            if (!Method.IsStatic)
+            if(!Method.IsStatic)
             {
                 il.Emit(OpCodes.Ldarg_0);
             }
 
-            for (int i = 0; i < paramTypes.Length; i++)
+            for(var i = 0; i < paramTypes.Length; i++)
             {
                 il.Emit(ps[i].ParameterType.IsByRef ? OpCodes.Ldloca_S : OpCodes.Ldloc, locals[i]);
             }
 
             il.EmitCall(Method.IsStatic ? OpCodes.Call : OpCodes.Callvirt, Method, null);
 
-            if (Method.ReturnType == typeof (void))
+            if(Method.ReturnType == typeof(void))
             {
                 il.Emit(OpCodes.Ldnull);
             }
@@ -87,9 +90,9 @@ namespace OpenUO.Core.Reflection
                 EmitBoxIfNeeded(il, Method.ReturnType);
             }
 
-            for (int i = 0; i < paramTypes.Length; i++)
+            for(var i = 0; i < paramTypes.Length; i++)
             {
-                if (!ps[i].ParameterType.IsByRef)
+                if(!ps[i].ParameterType.IsByRef)
                 {
                     continue;
                 }
@@ -98,7 +101,7 @@ namespace OpenUO.Core.Reflection
                 EmitFastInt(il, i);
                 il.Emit(OpCodes.Ldloc, locals[i]);
 
-                if (locals[i].LocalType.IsValueType)
+                if(locals[i].LocalType.IsValueType)
                 {
                     il.Emit(OpCodes.Box, locals[i].LocalType);
                 }
@@ -107,14 +110,14 @@ namespace OpenUO.Core.Reflection
             }
 
             il.Emit(OpCodes.Ret);
-            FastInvokeHandler invoder = (FastInvokeHandler)dynamicMethod.CreateDelegate(typeof (FastInvokeHandler));
+            var invoder = (FastInvokeHandler)dynamicMethod.CreateDelegate(typeof(FastInvokeHandler));
 
             return invoder;
         }
 
         public static FastInvokeHandler GetMethodInvoker(Type TargetType, string MethodName)
         {
-            MethodInfo methodInfo = TargetType.GetMethod(MethodName);
+            var methodInfo = TargetType.GetMethod(MethodName);
             return GetMethodInvoker(methodInfo);
         }
 
@@ -125,7 +128,7 @@ namespace OpenUO.Core.Reflection
 
         private static void EmitBoxIfNeeded(ILGenerator il, Type type)
         {
-            if (type.IsValueType)
+            if(type.IsValueType)
             {
                 il.Emit(OpCodes.Box, type);
             }
@@ -133,7 +136,7 @@ namespace OpenUO.Core.Reflection
 
         private static void EmitFastInt(ILGenerator il, int value)
         {
-            switch (value)
+            switch(value)
             {
                 case -1:
                     il.Emit(OpCodes.Ldc_I4_M1);
@@ -167,7 +170,7 @@ namespace OpenUO.Core.Reflection
                     return;
             }
 
-            if (value > -129 && value < 128)
+            if(value > -129 && value < 128)
             {
                 il.Emit(OpCodes.Ldc_I4_S, (SByte)value);
             }

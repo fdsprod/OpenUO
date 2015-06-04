@@ -24,12 +24,6 @@ namespace OpenUO.Core.Diagnostics
             Tracer.TraceReceived += OnTraceReceived;
         }
 
-        public bool Enabled
-        {
-            get;
-            set;
-        }
-
         public virtual TraceLevels? TraceLevel
         {
             get;
@@ -41,21 +35,27 @@ namespace OpenUO.Core.Diagnostics
             Dispose(true);
         }
 
+        public bool Enabled
+        {
+            get;
+            set;
+        }
+
         private void OnTraceReceived(TraceMessageEventArgs e)
         {
-            if (!Enabled)
+            if(!Enabled)
             {
                 return;
             }
 
-            TraceMessage message = e.TraceMessage;
+            var message = e.TraceMessage;
 
-            if (!TraceLevel.HasValue && message.Type < Tracer.TraceLevel)
+            if(!TraceLevel.HasValue && message.Type < Tracer.TraceLevel)
             {
                 return;
             }
 
-            if (TraceLevel.HasValue && message.Type < TraceLevel)
+            if(TraceLevel.HasValue && message.Type < TraceLevel)
             {
                 return;
             }
@@ -67,7 +67,7 @@ namespace OpenUO.Core.Diagnostics
 
         protected virtual void Dispose(bool disposing)
         {
-            if (disposing)
+            if(disposing)
             {
                 Tracer.TraceReceived -= OnTraceReceived;
             }

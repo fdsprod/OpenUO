@@ -25,10 +25,8 @@ namespace OpenUO.Core.Patterns
         }
 
         void Execute(T state);
-
         IChain<T> RegisterStep<TStep>() where TStep : class, IChainStep<T>;
         IChain<T> RegisterStep<TStep>(TStep step) where TStep : class, IChainStep<T>;
-
         void Freeze();
     }
 }

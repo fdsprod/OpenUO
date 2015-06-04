@@ -31,6 +31,21 @@ namespace OpenUO.Ultima
     {
         private readonly Dictionary<int, LocalizationEntry> _table = new Dictionary<int, LocalizationEntry>();
 
+        public void Dispose()
+        {
+            Unload();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return _table.Values.GetEnumerator();
+        }
+
+        public virtual IEnumerator<LocalizationEntry> GetEnumerator()
+        {
+            return _table.Values.GetEnumerator();
+        }
+
         public virtual ClientLocalizationLanguage Language
         {
             get;
@@ -59,24 +74,9 @@ namespace OpenUO.Ultima
             get { return Lookup(index); }
         }
 
-        public void Dispose()
-        {
-            Unload();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return _table.Values.GetEnumerator();
-        }
-
-        public virtual IEnumerator<LocalizationEntry> GetEnumerator()
-        {
-            return _table.Values.GetEnumerator();
-        }
-
         public void Clear()
         {
-            foreach (LocalizationEntry d in _table.Values)
+            foreach(var d in _table.Values)
             {
                 d.Clear();
             }
@@ -84,7 +84,7 @@ namespace OpenUO.Ultima
 
         public void Unload()
         {
-            if (!Loaded)
+            if(!Loaded)
             {
                 return;
             }
@@ -99,16 +99,16 @@ namespace OpenUO.Ultima
 
         public void Load(FileInfo file)
         {
-            if (Loaded)
+            if(Loaded)
             {
                 return;
             }
 
             try
             {
-                ClientLocalizationLanguage lng = ClientLocalizationLanguage.NULL;
+                var lng = ClientLocalizationLanguage.NULL;
 
-                if (!Enum.TryParse(file.Extension.TrimStart('.'), true, out lng))
+                if(!Enum.TryParse(file.Extension.TrimStart('.'), true, out lng))
                 {
                     throw new FileLoadException("Could not detect language for: " + file.FullName);
                 }
@@ -116,23 +116,23 @@ namespace OpenUO.Ultima
                 Language = lng;
                 InputFile = file;
 
-                using (BinaryReader reader = new BinaryReader(InputFile.OpenRead(), Encoding.UTF8))
+                using(var reader = new BinaryReader(InputFile.OpenRead(), Encoding.UTF8))
                 {
-                    long size = reader.BaseStream.Seek(0, SeekOrigin.End);
+                    var size = reader.BaseStream.Seek(0, SeekOrigin.End);
                     reader.BaseStream.Seek(0, SeekOrigin.Begin);
 
                     reader.ReadInt32();
                     reader.ReadInt16();
 
-                    while (reader.BaseStream.Position < size)
+                    while(reader.BaseStream.Position < size)
                     {
-                        int index = reader.ReadInt32();
+                        var index = reader.ReadInt32();
                         reader.ReadByte();
                         int length = reader.ReadInt16();
-                        long offset = reader.BaseStream.Position;
+                        var offset = reader.BaseStream.Position;
                         reader.BaseStream.Seek(length, SeekOrigin.Current);
 
-                        if (_table.ContainsKey(index))
+                        if(_table.ContainsKey(index))
                         {
                             _table[index] = new LocalizationEntry(Language, index, offset, length);
                         }
@@ -145,7 +145,7 @@ namespace OpenUO.Ultima
 
                 Loaded = true;
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 Tracer.Error(e);
             }
@@ -158,14 +158,14 @@ namespace OpenUO.Ultima
 
         public bool IsNullOrEmpty(int index)
         {
-            if (!Contains(index) || _table[index] == null)
+            if(!Contains(index) || _table[index] == null)
             {
                 return true;
             }
 
-            ClilocInfo info = _table[index].Lookup(InputFile);
+            var info = _table[index].Lookup(InputFile);
 
-            if (!String.IsNullOrWhiteSpace(info.Text))
+            if(!String.IsNullOrWhiteSpace(info.Text))
             {
                 return false;
             }
@@ -175,7 +175,7 @@ namespace OpenUO.Ultima
 
         public ClilocInfo Update(int index)
         {
-            if (!Contains(index) || _table[index] == null)
+            if(!Contains(index) || _table[index] == null)
             {
                 return null;
             }
@@ -185,7 +185,7 @@ namespace OpenUO.Ultima
 
         public ClilocInfo Lookup(int index)
         {
-            if (!Contains(index) || _table[index] == null)
+            if(!Contains(index) || _table[index] == null)
             {
                 return null;
             }

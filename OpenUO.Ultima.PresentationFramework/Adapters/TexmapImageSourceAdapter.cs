@@ -34,7 +34,7 @@ namespace OpenUO.Ultima.PresentationFramework.Adapters
         {
             get
             {
-                if (!IsInitialized)
+                if(!IsInitialized)
                 {
                     Initialize();
                 }
@@ -47,7 +47,7 @@ namespace OpenUO.Ultima.PresentationFramework.Adapters
         {
             base.Initialize();
 
-            InstallLocation install = Install;
+            var install = Install;
 
             _fileIndex = install.CreateFileIndex("texidx.mul", "texmaps.mul");
         }
@@ -55,28 +55,28 @@ namespace OpenUO.Ultima.PresentationFramework.Adapters
         public unsafe ImageSource GetTexmap(int index)
         {
             int length, extra;
-            Stream stream = _fileIndex.Seek(index, out length, out extra);
+            var stream = _fileIndex.Seek(index, out length, out extra);
 
-            if (stream == null)
+            if(stream == null)
             {
                 return null;
             }
 
-            int size = extra == 0 ? 64 : 128;
+            var size = extra == 0 ? 64 : 128;
 
-            BinaryReader bin = new BinaryReader(stream);
-            WriteableBitmap bmp = new WriteableBitmap(size, size, 96, 96, PixelFormats.Bgr555, null);
+            var bin = new BinaryReader(stream);
+            var bmp = new WriteableBitmap(size, size, 96, 96, PixelFormats.Bgr555, null);
             bmp.Lock();
 
-            ushort* line = (ushort*)bmp.BackBuffer;
-            int delta = bmp.BackBufferStride >> 1;
+            var line = (ushort*)bmp.BackBuffer;
+            var delta = bmp.BackBufferStride >> 1;
 
-            for (int y = 0; y < size; ++y, line += delta)
+            for(var y = 0; y < size; ++y, line += delta)
             {
-                ushort* cur = line;
-                ushort* end = cur + size;
+                var cur = line;
+                var end = cur + size;
 
-                while (cur < end)
+                while(cur < end)
                 {
                     *cur++ = (ushort)(bin.ReadUInt16() ^ 0x8000);
                 }
@@ -92,7 +92,7 @@ namespace OpenUO.Ultima.PresentationFramework.Adapters
         {
             base.Dispose(disposing);
 
-            if (_fileIndex != null)
+            if(_fileIndex != null)
             {
                 _fileIndex.Close();
                 _fileIndex = null;

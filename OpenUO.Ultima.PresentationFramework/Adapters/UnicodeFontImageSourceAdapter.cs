@@ -31,14 +31,13 @@ namespace OpenUO.Ultima.PresentationFramework.Adapters
     internal class UnicodeFontImageSourceAdapter : StorageAdapterBase, IUnicodeFontStorageAdapter<ImageSource>
     {
         private const string FILE_NAME_FORMAT = "unifont{0}.mul";
-
         private UnicodeFont[] _fonts;
 
         public override int Length
         {
             get
             {
-                if (!IsInitialized)
+                if(!IsInitialized)
                 {
                     Initialize();
                 }
@@ -51,46 +50,46 @@ namespace OpenUO.Ultima.PresentationFramework.Adapters
         {
             base.Initialize();
 
-            InstallLocation install = Install;
+            var install = Install;
 
-            List<UnicodeFont> fonts = new List<UnicodeFont>();
+            var fonts = new List<UnicodeFont>();
 
-            int i = 0;
-            string path = install.GetPath(FILE_NAME_FORMAT, string.Empty);
+            var i = 0;
+            var path = install.GetPath(FILE_NAME_FORMAT, string.Empty);
 
-            while (File.Exists(path))
+            while(File.Exists(path))
             {
-                UnicodeFont font = new UnicodeFont();
+                var font = new UnicodeFont();
 
-                int maxHeight = 0;
+                var maxHeight = 0;
 
-                using (FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read))
+                using(var fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read))
                 {
-                    int length = (int)fs.Length;
-                    byte[] buffer = new byte[length];
+                    var length = (int)fs.Length;
+                    var buffer = new byte[length];
 
-                    int read = fs.Read(buffer, 0, buffer.Length);
+                    var read = fs.Read(buffer, 0, buffer.Length);
 
-                    using (MemoryStream stream = new MemoryStream(buffer))
+                    using(var stream = new MemoryStream(buffer))
                     {
-                        using (BinaryReader bin = new BinaryReader(stream))
+                        using(var bin = new BinaryReader(stream))
                         {
-                            for (int c = 0; c < 0x10000; ++c)
+                            for(var c = 0; c < 0x10000; ++c)
                             {
                                 font.Chars[c] = new UnicodeChar();
                                 stream.Seek(((c) * 4), SeekOrigin.Begin);
 
-                                int index = bin.ReadInt32();
+                                var index = bin.ReadInt32();
 
-                                if ((index >= fs.Length) || (index <= 0))
+                                if((index >= fs.Length) || (index <= 0))
                                 {
                                     continue;
                                 }
 
                                 stream.Seek(index, SeekOrigin.Begin);
 
-                                sbyte xOffset = bin.ReadSByte();
-                                sbyte yOffset = bin.ReadSByte();
+                                var xOffset = bin.ReadSByte();
+                                var yOffset = bin.ReadSByte();
 
                                 int width = bin.ReadByte();
                                 int height = bin.ReadByte();
@@ -102,7 +101,7 @@ namespace OpenUO.Ultima.PresentationFramework.Adapters
                                 font.Chars[c].Width = width;
                                 font.Chars[c].Height = height;
 
-                                if (!((width == 0) || (height == 0)))
+                                if(!((width == 0) || (height == 0)))
                                 {
                                     font.Chars[c].Bytes = bin.ReadBytes(height * (((width - 1) / 8) + 1));
                                 }
@@ -121,53 +120,50 @@ namespace OpenUO.Ultima.PresentationFramework.Adapters
 
         public unsafe ImageSource GetText(int fontId, string text, short hueId)
         {
-            UnicodeFont font = _fonts[fontId];
+            var font = _fonts[fontId];
 
-            int width = font.GetWidth(text);
-            int height = font.GetHeight(text);
+            var width = font.GetWidth(text);
+            var height = font.GetHeight(text);
 
-            WriteableBitmap bmp = new WriteableBitmap(width, height, 96, 96, PixelFormats.Bgr555, null);
+            var bmp = new WriteableBitmap(width, height, 96, 96, PixelFormats.Bgr555, null);
             bmp.Lock();
 
-            ushort* line = (ushort*)bmp.BackBuffer;
-            int delta = bmp.BackBufferStride >> 1;
+            var line = (ushort*)bmp.BackBuffer;
+            var delta = bmp.BackBufferStride >> 1;
 
-            int dx = 2;
+            var dx = 2;
 
-            for (int i = 0; i < text.Length; ++i)
+            for(var i = 0; i < text.Length; ++i)
             {
-                int c = text[i] % 0x10000;
-                UnicodeChar ch = font.Chars[c];
+                var c = text[i] % 0x10000;
+                var ch = font.Chars[c];
 
-                int charWidth = ch.Width;
-                int charHeight = ch.Height;
+                var charWidth = ch.Width;
+                var charHeight = ch.Height;
 
-                byte[] data = ch.Bytes;
+                var data = ch.Bytes;
 
-                if (c == 32)
+                if(c == 32)
                 {
                     dx += 5;
                     continue;
                 }
-                else
-                {
-                    dx += ch.XOffset;
-                }
+                dx += ch.XOffset;
 
-                for (int dy = 0; dy < charHeight; ++dy)
+                for(var dy = 0; dy < charHeight; ++dy)
                 {
-                    ushort* dest = (line + (delta * (dy + (height - charHeight)))) + (dx);
+                    var dest = (line + (delta * (dy + (height - charHeight)))) + (dx);
 
-                    for (int k = 0; k < charWidth; ++k)
+                    for(var k = 0; k < charWidth; ++k)
                     {
-                        int offset = k / 8 + dy * ((charWidth + 7) / 8);
+                        var offset = k / 8 + dy * ((charWidth + 7) / 8);
 
-                        if (offset > data.Length)
+                        if(offset > data.Length)
                         {
                             continue;
                         }
 
-                        if ((data[offset] & (1 << (7 - (k % 8)))) != 0)
+                        if((data[offset] & (1 << (7 - (k % 8)))) != 0)
                         {
                             *dest++ = 0x8000;
                         }

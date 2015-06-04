@@ -1,4 +1,5 @@
 #region License Header
+
 /***************************************************************************
  *
  *   This program is free software; you can redistribute it and/or modify
@@ -7,7 +8,8 @@
  *   (at your option) any later version.
  *
  ***************************************************************************/
- #endregion
+
+#endregion
 
 namespace OpenUO.Ultima.Network
 {
@@ -15,9 +17,9 @@ namespace OpenUO.Ultima.Network
 
     public class PacketHandler
     {
-        private readonly int _packetId;
         private readonly int _length;
         private readonly OnPacketReceive _onReceive;
+        private readonly int _packetId;
 
         public PacketHandler(int packetId, int length, OnPacketReceive onReceive)
         {
@@ -28,26 +30,17 @@ namespace OpenUO.Ultima.Network
 
         public int PacketID
         {
-            get
-            {
-                return _packetId;
-            }
+            get { return _packetId; }
         }
 
         public int Length
         {
-            get
-            {
-                return _length;
-            }
+            get { return _length; }
         }
 
         public OnPacketReceive OnReceive
         {
-            get
-            {
-                return _onReceive;
-            }
+            get { return _onReceive; }
         }
     }
 }

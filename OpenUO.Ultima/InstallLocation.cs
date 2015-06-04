@@ -30,11 +30,10 @@ namespace OpenUO.Ultima
 {
     [Serializable]
     [XmlRoot("install")]
-    [TypeConverter(typeof (InstallLocationTypeConverter))]
+    [TypeConverter(typeof(InstallLocationTypeConverter))]
     public class InstallLocation
     {
         private static readonly Version _convertedToUOPVersion = new Version("7.0.24.0");
-
         private Version _version;
 
         public InstallLocation(string directory)
@@ -47,13 +46,13 @@ namespace OpenUO.Ultima
         {
             get
             {
-                if (_version == null)
+                if(_version == null)
                 {
-                    string clientExe = GetPath("client.exe");
+                    var clientExe = GetPath("client.exe");
 
-                    if (File.Exists(clientExe))
+                    if(File.Exists(clientExe))
                     {
-                        FileVersionInfo fileVersionInfo = GetClientVersion();
+                        var fileVersionInfo = GetClientVersion();
                         _version = new Version(
                             fileVersionInfo.FileMajorPart,
                             fileVersionInfo.FileMinorPart,
@@ -88,7 +87,7 @@ namespace OpenUO.Ultima
 
             FileIndexBase fileIndex = new UopFileIndex(uopFile, length, hasExtra, extension);
 
-            if (!fileIndex.FilesExist)
+            if(!fileIndex.FilesExist)
             {
                 Tracer.Warn(
                     "FileIndex was created but {0} was missing from {1}",
@@ -108,7 +107,7 @@ namespace OpenUO.Ultima
 
             FileIndexBase fileIndex = new MulFileIndex(idxFile, mulFile);
 
-            if (!fileIndex.FilesExist)
+            if(!fileIndex.FilesExist)
             {
                 Tracer.Warn(
                     "FileIndex was created but 1 or more files do not exist.  Either {0} or {1} were missing from {2}",
@@ -126,7 +125,7 @@ namespace OpenUO.Ultima
         {
             filename = GetPath(filename);
 
-            if (!File.Exists(filename))
+            if(!File.Exists(filename))
             {
                 throw new FileNotFoundException(filename);
             }
@@ -138,7 +137,7 @@ namespace OpenUO.Ultima
         {
             filename = GetPath(filename);
 
-            if (!File.Exists(filename))
+            if(!File.Exists(filename))
             {
                 throw new FileNotFoundException(filename);
             }
@@ -150,7 +149,7 @@ namespace OpenUO.Ultima
         {
             filename = GetPath(filename);
 
-            if (!File.Exists(filename))
+            if(!File.Exists(filename))
             {
                 throw new FileNotFoundException(filename);
             }
@@ -162,7 +161,7 @@ namespace OpenUO.Ultima
         {
             filename = GetPath(filename);
 
-            if (!File.Exists(filename))
+            if(!File.Exists(filename))
             {
                 throw new FileNotFoundException(filename);
             }
@@ -172,9 +171,9 @@ namespace OpenUO.Ultima
 
         public string GetPath(string filename, params object[] args)
         {
-            string path = Path.Combine(Directory, string.Format(filename, args));
+            var path = Path.Combine(Directory, string.Format(filename, args));
 
-            if (!File.Exists(path))
+            if(!File.Exists(path))
             {
                 Tracer.Warn("{0} does not exists.", path);
             }
@@ -184,9 +183,9 @@ namespace OpenUO.Ultima
 
         private FileVersionInfo GetClientVersion()
         {
-            string clientExe = GetPath("client.exe");
+            var clientExe = GetPath("client.exe");
 
-            if (!File.Exists(clientExe))
+            if(!File.Exists(clientExe))
             {
                 throw new FileNotFoundException("client.exe");
             }
@@ -196,11 +195,11 @@ namespace OpenUO.Ultima
 
         public void CalculateLoginKeys(out uint key1, out uint key2)
         {
-            FileVersionInfo info = GetClientVersion();
+            var info = GetClientVersion();
 
-            uint major = (uint)info.ProductMajorPart;
-            uint minor = (uint)info.ProductMinorPart;
-            uint build = (uint)info.ProductBuildPart;
+            var major = (uint)info.ProductMajorPart;
+            var minor = (uint)info.ProductMinorPart;
+            var build = (uint)info.ProductBuildPart;
 
             ClientUtility.CalculateLoginKeys(major, minor, 0, build, out key1, out key2);
         }
@@ -225,7 +224,7 @@ namespace OpenUO.Ultima
     {
         public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
         {
-            if (sourceType == typeof (string))
+            if(sourceType == typeof(string))
             {
                 return true;
             }
@@ -235,7 +234,7 @@ namespace OpenUO.Ultima
 
         public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
         {
-            if (destinationType == typeof (string))
+            if(destinationType == typeof(string))
             {
                 return true;
             }
@@ -245,7 +244,7 @@ namespace OpenUO.Ultima
 
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
-            if (value != null && value is string)
+            if(value != null && value is string)
             {
                 return new InstallLocation((string)value);
             }
@@ -255,7 +254,7 @@ namespace OpenUO.Ultima
 
         public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
         {
-            if (destinationType == typeof (string))
+            if(destinationType == typeof(string))
             {
                 return ((InstallLocation)value).Directory;
             }

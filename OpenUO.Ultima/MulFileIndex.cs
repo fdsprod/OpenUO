@@ -40,34 +40,36 @@ namespace OpenUO.Ultima
 
         protected override FileIndexEntry[] ReadEntries()
         {
-            List<FileIndexEntry> entries = new List<FileIndexEntry>();
+            var entries = new List<FileIndexEntry>();
 
-            int length = (int)((new FileInfo(_indexPath).Length / 3) / 4);
+            var length = (int)((new FileInfo(_indexPath).Length / 3) / 4);
 
-            using (FileStream index = new FileStream(_indexPath, FileMode.Open, FileAccess.Read, FileShare.Read))
+            using(var index = new FileStream(_indexPath, FileMode.Open, FileAccess.Read, FileShare.Read))
             {
-                BinaryReader bin = new BinaryReader(index);
+                var bin = new BinaryReader(index);
 
-                int count = (int)(index.Length / 12);
+                var count = (int)(index.Length / 12);
 
-                for (int i = 0; i < count && i < length; ++i)
+                for(var i = 0; i < count && i < length; ++i)
                 {
-                    FileIndexEntry entry = new FileIndexEntry {
-                        Lookup = bin.ReadInt32(),
-                        Length = bin.ReadInt32(),
-                        Extra = bin.ReadInt32(),
-                    };
+                    var entry = new FileIndexEntry
+                                {
+                                    Lookup = bin.ReadInt32(),
+                                    Length = bin.ReadInt32(),
+                                    Extra = bin.ReadInt32()
+                                };
 
                     entries.Add(entry);
                 }
 
-                for (int i = count; i < length; ++i)
+                for(var i = count; i < length; ++i)
                 {
-                    FileIndexEntry entry = new FileIndexEntry {
-                        Lookup = -1,
-                        Length = -1,
-                        Extra = -1,
-                    };
+                    var entry = new FileIndexEntry
+                                {
+                                    Lookup = -1,
+                                    Length = -1,
+                                    Extra = -1
+                                };
 
                     entries.Add(entry);
                 }

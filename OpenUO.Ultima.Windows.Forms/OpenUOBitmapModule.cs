@@ -25,7 +25,7 @@ using OpenUO.Ultima.Windows.Forms.Adapters;
 
 namespace OpenUO.Ultima.Windows.Forms
 {
-    public class UltimaSDKBitmapModule : IModule
+    public class OpenUOBitmapModule : IModule
     {
         public string Name
         {

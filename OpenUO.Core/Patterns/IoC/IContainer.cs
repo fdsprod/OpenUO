@@ -51,7 +51,6 @@ namespace OpenUO.Core.Patterns
         bool CanResolve<TResolveType>(string name, NamedParameterOverloads parameters) where TResolveType : class;
         bool CanResolve<TResolveType>(string name, NamedParameterOverloads parameters, ResolveOptions options) where TResolveType : class;
         bool CanResolve<TResolveType>(string name, ResolveOptions options) where TResolveType : class;
-
         Container GetChildContainer();
         Container.RegisterOptions Register(Type registerType);
         Container.RegisterOptions Register(Type registerType, Func<Container, NamedParameterOverloads, object> factory);

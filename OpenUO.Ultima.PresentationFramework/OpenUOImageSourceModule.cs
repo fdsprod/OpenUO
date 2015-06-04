@@ -25,7 +25,7 @@ using OpenUO.Ultima.PresentationFramework.Adapters;
 
 namespace OpenUO.Ultima.PresentationFramework
 {
-    public class UltimaSDKImageSourceModule : IModule
+    public class OpenUOImageSourceModule : IModule
     {
         public string Name
         {

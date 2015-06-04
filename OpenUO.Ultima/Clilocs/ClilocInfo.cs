@@ -59,29 +59,32 @@ namespace OpenUO.Ultima
 
         public virtual string ToString(string args)
         {
-            if (String.IsNullOrWhiteSpace(args))
+            if(String.IsNullOrWhiteSpace(args))
             {
                 return ToString();
             }
 
-            return ToString(args.Contains("\t") ? Regex.Split(args, "\t") : new[] {args});
+            return ToString(args.Contains("\t") ? Regex.Split(args, "\t") : new[]
+                                                                            {
+                                                                                args
+                                                                            });
         }
 
         public virtual string ToString(string[] args)
         {
-            if (args == null || args.Length == 0)
+            if(args == null || args.Length == 0)
             {
                 return ToString();
             }
 
-            string text = Text;
-            Match match = VarPattern.Match(text);
+            var text = Text;
+            var match = VarPattern.Match(text);
 
-            while (match.Success)
+            while(match.Success)
             {
-                int i = Int32.Parse(match.Groups[2].Value);
+                var i = Int32.Parse(match.Groups[2].Value);
 
-                if (args.Length < i)
+                if(args.Length < i)
                 {
                     text = null;
                     break;

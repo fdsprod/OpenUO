@@ -29,12 +29,12 @@ namespace OpenUO.Ultima.Windows.Forms
         {
             get
             {
-                if (LicenseManager.UsageMode == LicenseUsageMode.Designtime)
+                if(LicenseManager.UsageMode == LicenseUsageMode.Designtime)
                 {
                     return true;
                 }
 
-                if (Process.GetCurrentProcess().ProcessName.ToUpper().Equals("DEVENV"))
+                if(Process.GetCurrentProcess().ProcessName.ToUpper().Equals("DEVENV"))
                 {
                     return true;
                 }

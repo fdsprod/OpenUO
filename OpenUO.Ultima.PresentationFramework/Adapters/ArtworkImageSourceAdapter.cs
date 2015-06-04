@@ -34,7 +34,7 @@ namespace OpenUO.Ultima.PresentationFramework.Adapters
         {
             get
             {
-                if (!IsInitialized)
+                if(!IsInitialized)
                 {
                     Initialize();
                 }
@@ -47,7 +47,7 @@ namespace OpenUO.Ultima.PresentationFramework.Adapters
         {
             base.Initialize();
 
-            InstallLocation install = Install;
+            var install = Install;
 
             _fileIndex =
                 install.IsUOPFormat
@@ -60,24 +60,25 @@ namespace OpenUO.Ultima.PresentationFramework.Adapters
             index &= 0x3FFF;
 
             int length, extra;
-            Stream stream = _fileIndex.Seek(index, out length, out extra);
+            var stream = _fileIndex.Seek(index, out length, out extra);
 
-            BinaryReader bin = new BinaryReader(stream);
-            WriteableBitmap bmp = new WriteableBitmap(44, 44, 96, 96, PixelFormats.Bgr555, null);
+            var bin = new BinaryReader(stream);
+            var bmp = new WriteableBitmap(44, 44, 96, 96, PixelFormats.Bgr555, null);
+
             bmp.Lock();
 
-            int xOffset = 21;
-            int xRun = 2;
+            var xOffset = 21;
+            var xRun = 2;
 
-            ushort* line = (ushort*)bmp.BackBuffer;
-            int delta = bmp.BackBufferStride >> 1;
+            var line = (ushort*)bmp.BackBuffer;
+            var delta = bmp.BackBufferStride >> 1;
 
-            for (int y = 0; y < 22; ++y, --xOffset, xRun += 2, line += delta)
+            for(var y = 0; y < 22; ++y, --xOffset, xRun += 2, line += delta)
             {
-                ushort* cur = line + xOffset;
-                ushort* end = cur + xRun;
+                var cur = line + xOffset;
+                var end = cur + xRun;
 
-                while (cur < end)
+                while(cur < end)
                 {
                     *cur++ = (ushort)(bin.ReadUInt16() | 0x8000);
                 }
@@ -86,12 +87,12 @@ namespace OpenUO.Ultima.PresentationFramework.Adapters
             xOffset = 0;
             xRun = 44;
 
-            for (int y = 0; y < 22; ++y, ++xOffset, xRun -= 2, line += delta)
+            for(var y = 0; y < 22; ++y, ++xOffset, xRun -= 2, line += delta)
             {
-                ushort* cur = line + xOffset;
-                ushort* end = cur + xRun;
+                var cur = line + xOffset;
+                var end = cur + xRun;
 
-                while (cur < end)
+                while(cur < end)
                 {
                     *cur++ = (ushort)(bin.ReadUInt16() | 0x8000);
                 }
@@ -109,49 +110,50 @@ namespace OpenUO.Ultima.PresentationFramework.Adapters
             index &= 0xFFFF;
 
             int length, extra;
-            Stream stream = _fileIndex.Seek(index, out length, out extra);
-            BinaryReader bin = new BinaryReader(stream);
+            var stream = _fileIndex.Seek(index, out length, out extra);
+            var bin = new BinaryReader(stream);
 
             bin.ReadInt32(); // Unknown
 
             int width = bin.ReadInt16();
             int height = bin.ReadInt16();
 
-            if (width <= 0 || height <= 0)
+            if(width <= 0 || height <= 0)
             {
                 return null;
             }
 
-            int[] lookups = new int[height];
+            var lookups = new int[height];
 
-            int start = (int)bin.BaseStream.Position + (height * 2);
+            var start = (int)bin.BaseStream.Position + (height * 2);
 
-            for (int i = 0; i < height; ++i)
+            for(var i = 0; i < height; ++i)
             {
                 lookups[i] = (start + (bin.ReadUInt16() * 2));
             }
 
-            WriteableBitmap bmp = new WriteableBitmap(width, height, 96, 96, PixelFormats.Bgr555, null);
+            var bmp = new WriteableBitmap(width, height, 96, 96, PixelFormats.Bgr555, null);
+
             bmp.Lock();
 
-            ushort* line = (ushort*)bmp.BackBuffer;
-            int delta = bmp.BackBufferStride >> 1;
+            var line = (ushort*)bmp.BackBuffer;
+            var delta = bmp.BackBufferStride >> 1;
 
-            for (int y = 0; y < height; ++y, line += delta)
+            for(var y = 0; y < height; ++y, line += delta)
             {
                 bin.BaseStream.Seek(lookups[y], SeekOrigin.Begin);
 
-                ushort* cur = line;
+                var cur = line;
                 ushort* end;
 
                 int xOffset, xRun;
 
-                while (((xOffset = bin.ReadUInt16()) + (xRun = bin.ReadUInt16())) != 0)
+                while(((xOffset = bin.ReadUInt16()) + (xRun = bin.ReadUInt16())) != 0)
                 {
                     cur += xOffset;
                     end = cur + xRun;
 
-                    while (cur < end)
+                    while(cur < end)
                     {
                         *cur++ = (ushort)(bin.ReadUInt16() ^ 0x8000);
                     }

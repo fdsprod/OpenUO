@@ -1,4 +1,5 @@
 ﻿#region File Header
+
 /********************************************************
  * 
  *  $Id: BinaryToImageConverter.cs 111 2010-10-12 06:58:17Z jeff $
@@ -15,6 +16,7 @@
  *  All rights reserved. 
  *  
  ********************************************************/
+
 #endregion
 
 using System;
@@ -30,30 +32,30 @@ namespace OpenUO.Core.PresentationFramework.Converters
         {
             BitmapImage defaultImage = null;
 
-            if (parameter is BitmapImage)
+            if(parameter is BitmapImage)
             {
                 defaultImage = parameter as BitmapImage;
             }
 
-            string url = string.Empty;
+            var url = string.Empty;
 
-            if (parameter is string && !string.IsNullOrWhiteSpace(url = parameter.ToString()))
+            if(parameter is string && !string.IsNullOrWhiteSpace(url = parameter.ToString()))
             {
                 defaultImage = new BitmapImage(new Uri(url, UriKind.Relative));
             }
 
-            byte[] buffer = value as byte[];
+            var buffer = value as byte[];
 
-            if (buffer == null || buffer.Length == 0)
+            if(buffer == null || buffer.Length == 0)
             {
                 return defaultImage;
             }
 
-            BitmapImage image = new BitmapImage();
+            var image = new BitmapImage();
 
             try
             {
-                MemoryStream streamSource = new MemoryStream(buffer);
+                var streamSource = new MemoryStream(buffer);
 
 #if SILVERLIGHT
                 image.SetSource(streamSource);
@@ -64,7 +66,10 @@ namespace OpenUO.Core.PresentationFramework.Converters
                 image.EndInit();
 #endif
             }
-            catch { image = defaultImage; } // TODO: Need to log this, or do something other then swallow the exception...
+            catch
+            {
+                image = defaultImage;
+            } // TODO: Need to log this, or do something other then swallow the exception...
 
             return image;
         }

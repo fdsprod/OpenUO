@@ -1,4 +1,5 @@
 ﻿#region File Header
+
 /********************************************************
  * 
  *  $Id: VisibilityIfNullConverter.cs 111 2010-10-12 06:58:17Z jeff $
@@ -15,6 +16,7 @@
  *  All rights reserved. 
  *  
  ********************************************************/
+
 #endregion
 
 using System;

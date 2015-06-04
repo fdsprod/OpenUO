@@ -48,24 +48,24 @@ namespace Ultima.Winforms.Sample
 
         private void Initialize()
         {
-            if (uoInstallationComboBox1.SelectedInstallation == null)
+            if(uoInstallationComboBox1.SelectedInstallation == null)
             {
                 return;
             }
 
-            if (_artFactory != null)
+            if(_artFactory != null)
             {
                 _artFactory.Dispose();
                 _artFactory = null;
             }
 
-            if (_gumpFactory != null)
+            if(_gumpFactory != null)
             {
                 _gumpFactory.Dispose();
                 _gumpFactory = null;
             }
 
-            if (_soundFactory != null)
+            if(_soundFactory != null)
             {
                 _soundFactory.Dispose();
                 _soundFactory = null;

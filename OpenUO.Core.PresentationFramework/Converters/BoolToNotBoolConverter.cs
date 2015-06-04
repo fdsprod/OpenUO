@@ -1,4 +1,5 @@
 ﻿#region File Header
+
 /********************************************************
  * 
  *  $Id: BoolToNotBoolConverter.cs 111 2010-10-12 06:58:17Z jeff $
@@ -15,6 +16,7 @@
  *  All rights reserved. 
  *  
  ********************************************************/
+
 #endregion
 
 using System;
@@ -26,7 +28,7 @@ namespace OpenUO.Core.PresentationFramework.Converters
     {
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
-            if (value is bool)
+            if(value is bool)
             {
                 return !((bool)value);
             }
@@ -36,7 +38,7 @@ namespace OpenUO.Core.PresentationFramework.Converters
 
         public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
-            if (value is bool)
+            if(value is bool)
             {
                 return !((bool)value);
             }

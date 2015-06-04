@@ -33,7 +33,7 @@ namespace OpenUO.Ultima.Windows.Forms.Adapters
         {
             get
             {
-                if (!IsInitialized)
+                if(!IsInitialized)
                 {
                     Initialize();
                 }
@@ -46,48 +46,49 @@ namespace OpenUO.Ultima.Windows.Forms.Adapters
         {
             base.Initialize();
 
-            InstallLocation install = Install;
+            var install = Install;
 
             _fonts = new ASCIIFont[10];
 
-            using (BinaryReader reader = new BinaryReader(File.Open(install.GetPath("fonts.mul"), FileMode.Open)))
+            using(var reader = new BinaryReader(File.Open(install.GetPath("fonts.mul"), FileMode.Open)))
             {
-                for (int i = 0; i < 10; ++i)
+                for(var i = 0; i < 10; ++i)
                 {
                     reader.ReadByte(); //header
 
-                    ASCIIChar[] chars = new ASCIIChar[224];
-                    int fontHeight = 0;
+                    var chars = new ASCIIChar[224];
+                    var fontHeight = 0;
 
-                    for (int k = 0; k < 224; ++k)
+                    for(var k = 0; k < 224; ++k)
                     {
-                        byte width = reader.ReadByte();
-                        byte height = reader.ReadByte();
+                        var width = reader.ReadByte();
+                        var height = reader.ReadByte();
 
                         reader.ReadByte(); // delimeter?
 
-                        if (width > 0 && height > 0)
+                        if(width > 0 && height > 0)
                         {
-                            if (height > fontHeight && k < 96)
+                            if(height > fontHeight && k < 96)
                             {
                                 fontHeight = height;
                             }
 
-                            ushort[] pixels = new ushort[width * height];
+                            var pixels = new ushort[width * height];
 
-                            for (int y = 0; y < height; ++y)
+                            for(var y = 0; y < height; ++y)
                             {
-                                for (int x = 0; x < width; ++x)
+                                for(var x = 0; x < width; ++x)
                                 {
                                     pixels[y * width + x] = (ushort)(reader.ReadByte() | (reader.ReadByte() << 8));
                                 }
                             }
 
-                            chars[k] = new ASCIIChar {
-                                Pixels = pixels,
-                                Width = width,
-                                Height = height
-                            };
+                            chars[k] = new ASCIIChar
+                                       {
+                                           Pixels = pixels,
+                                           Width = width,
+                                           Height = height
+                                       };
                         }
                     }
 
@@ -98,36 +99,36 @@ namespace OpenUO.Ultima.Windows.Forms.Adapters
 
         public unsafe Bitmap GetText(int fontId, string text, short hueId)
         {
-            ASCIIFont font = _fonts[fontId];
+            var font = _fonts[fontId];
 
-            int width = font.GetWidth(text);
-            int height = font.Height;
+            var width = font.GetWidth(text);
+            var height = font.Height;
 
-            Bitmap bmp = new Bitmap(width, height, PixelFormat.Format32bppArgb);
-            BitmapData bd = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+            var bmp = new Bitmap(width, height, PixelFormat.Format32bppArgb);
+            var bd = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
 
-            int* line = (int*)bd.Scan0;
-            int delta = bd.Stride >> 2;
+            var line = (int*)bd.Scan0;
+            var delta = bd.Stride >> 2;
 
-            int dx = 0;
+            var dx = 0;
 
-            for (int i = 0; i < text.Length; ++i)
+            for(var i = 0; i < text.Length; ++i)
             {
-                int c = ((((text[i]) - 0x20) & 0x7FFFFFFF) % 224);
-                ASCIIChar ch = font.Chars[c];
+                var c = ((((text[i]) - 0x20) & 0x7FFFFFFF) % 224);
+                var ch = font.Chars[c];
 
-                int charWidth = ch.Width;
-                int charHeight = ch.Height;
+                var charWidth = ch.Width;
+                var charHeight = ch.Height;
 
-                ushort[] pixels = ch.Pixels;
+                var pixels = ch.Pixels;
 
-                for (int dy = 0; dy < charHeight; ++dy)
+                for(var dy = 0; dy < charHeight; ++dy)
                 {
-                    int* dest = (line + (delta * (dy + (font.Height - charHeight)))) + (dx);
+                    var dest = (line + (delta * (dy + (font.Height - charHeight)))) + (dx);
 
-                    for (int k = 0; k < charWidth; ++k)
+                    for(var k = 0; k < charWidth; ++k)
                     {
-                        ushort pixel = pixels[charWidth * dy + k];
+                        var pixel = pixels[charWidth * dy + k];
                         *dest++ = Color.FromArgb(pixel == 0 ? 0 : 255, (pixel & 0x7C00) >> 7, (pixel & 0x3E0) >> 2, (pixel & 0x1F) << 3).ToArgb();
                     }
                 }

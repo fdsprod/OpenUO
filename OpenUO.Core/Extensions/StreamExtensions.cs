@@ -28,14 +28,14 @@ namespace OpenUO.Core
     {
         public static string ToFormattedString(this Stream input)
         {
-            StringBuilder builder = new StringBuilder();
+            var builder = new StringBuilder();
             ToFormattedString(input, (int)input.Length, builder);
             return builder.ToString();
         }
 
         public static string ToFormattedString(this Stream input, int length)
         {
-            StringBuilder builder = new StringBuilder();
+            var builder = new StringBuilder();
             ToFormattedString(input, length, builder);
             return builder.ToString();
         }
@@ -47,22 +47,22 @@ namespace OpenUO.Core
             builder.AppendLine("        0  1  2  3  4  5  6  7   8  9  A  B  C  D  E  F");
             builder.AppendLine("       -- -- -- -- -- -- -- --  -- -- -- -- -- -- -- --");
 
-            int byteIndex = 0;
-            int whole = length >> 4;
-            int rem = length & 0xF;
+            var byteIndex = 0;
+            var whole = length >> 4;
+            var rem = length & 0xF;
 
-            for (int i = 0; i < whole; ++i, byteIndex += 16)
+            for(var i = 0; i < whole; ++i, byteIndex += 16)
             {
-                StringBuilder bytes = new StringBuilder(49);
-                StringBuilder chars = new StringBuilder(16);
+                var bytes = new StringBuilder(49);
+                var chars = new StringBuilder(16);
 
-                for (int j = 0; j < 16; ++j)
+                for(var j = 0; j < 16; ++j)
                 {
-                    int c = input.ReadByte();
+                    var c = input.ReadByte();
 
                     bytes.Append(c.ToString("X2"));
 
-                    if (j != 7)
+                    if(j != 7)
                     {
                         bytes.Append(' ');
                     }
@@ -71,7 +71,7 @@ namespace OpenUO.Core
                         bytes.Append("  ");
                     }
 
-                    if (c >= 0x20 && c < 0x80)
+                    if(c >= 0x20 && c < 0x80)
                     {
                         chars.Append((char)c);
                     }
@@ -88,20 +88,20 @@ namespace OpenUO.Core
                 builder.AppendLine(chars.ToString());
             }
 
-            if (rem != 0)
+            if(rem != 0)
             {
-                StringBuilder bytes = new StringBuilder(49);
-                StringBuilder chars = new StringBuilder(rem);
+                var bytes = new StringBuilder(49);
+                var chars = new StringBuilder(rem);
 
-                for (int j = 0; j < 16; ++j)
+                for(var j = 0; j < 16; ++j)
                 {
-                    if (j < rem)
+                    if(j < rem)
                     {
-                        int c = input.ReadByte();
+                        var c = input.ReadByte();
 
                         bytes.Append(c.ToString("X2"));
 
-                        if (j != 7)
+                        if(j != 7)
                         {
                             bytes.Append(' ');
                         }
@@ -110,7 +110,7 @@ namespace OpenUO.Core
                             bytes.Append("  ");
                         }
 
-                        if (c >= 0x20 && c < 0x80)
+                        if(c >= 0x20 && c < 0x80)
                         {
                             chars.Append((char)c);
                         }
@@ -140,22 +140,22 @@ namespace OpenUO.Core
             writer.WriteLine("        0  1  2  3  4  5  6  7   8  9  A  B  C  D  E  F");
             writer.WriteLine("       -- -- -- -- -- -- -- --  -- -- -- -- -- -- -- --");
 
-            int byteIndex = 0;
-            int whole = length >> 4;
-            int rem = length & 0xF;
+            var byteIndex = 0;
+            var whole = length >> 4;
+            var rem = length & 0xF;
 
-            for (int i = 0; i < whole; ++i, byteIndex += 16)
+            for(var i = 0; i < whole; ++i, byteIndex += 16)
             {
-                StringBuilder bytes = new StringBuilder(49);
-                StringBuilder chars = new StringBuilder(16);
+                var bytes = new StringBuilder(49);
+                var chars = new StringBuilder(16);
 
-                for (int j = 0; j < 16; ++j)
+                for(var j = 0; j < 16; ++j)
                 {
-                    int c = input.ReadByte();
+                    var c = input.ReadByte();
 
                     bytes.Append(c.ToString("X2"));
 
-                    if (j != 7)
+                    if(j != 7)
                     {
                         bytes.Append(' ');
                     }
@@ -164,7 +164,7 @@ namespace OpenUO.Core
                         bytes.Append("  ");
                     }
 
-                    if (c >= 0x20 && c < 0x80)
+                    if(c >= 0x20 && c < 0x80)
                     {
                         chars.Append((char)c);
                     }
@@ -181,20 +181,20 @@ namespace OpenUO.Core
                 writer.WriteLine(chars.ToString());
             }
 
-            if (rem != 0)
+            if(rem != 0)
             {
-                StringBuilder bytes = new StringBuilder(49);
-                StringBuilder chars = new StringBuilder(rem);
+                var bytes = new StringBuilder(49);
+                var chars = new StringBuilder(rem);
 
-                for (int j = 0; j < 16; ++j)
+                for(var j = 0; j < 16; ++j)
                 {
-                    if (j < rem)
+                    if(j < rem)
                     {
-                        int c = input.ReadByte();
+                        var c = input.ReadByte();
 
                         bytes.Append(c.ToString("X2"));
 
-                        if (j != 7)
+                        if(j != 7)
                         {
                             bytes.Append(' ');
                         }
@@ -203,7 +203,7 @@ namespace OpenUO.Core
                             bytes.Append("  ");
                         }
 
-                        if (c >= 0x20 && c < 0x80)
+                        if(c >= 0x20 && c < 0x80)
                         {
                             chars.Append((char)c);
                         }

@@ -10,23 +10,31 @@ namespace OpenUO.Core.PresentationFramework.ComponentModel.Design
     {
         public static string ExtractPropertyName<T>(Expression<Func<T>> propertyExpression)
         {
-            if (propertyExpression == null)
+            if(propertyExpression == null)
+            {
                 throw new ArgumentNullException("propertyExpression");
+            }
 
-            MemberExpression memberExpression = propertyExpression.Body as MemberExpression;
+            var memberExpression = propertyExpression.Body as MemberExpression;
 
-            if (memberExpression == null)
+            if(memberExpression == null)
+            {
                 throw new ArgumentException("The expression is not a member access expression.", "propertyExpression");
+            }
 
-            PropertyInfo property = memberExpression.Member as PropertyInfo;
+            var property = memberExpression.Member as PropertyInfo;
 
-            if (property == null)
+            if(property == null)
+            {
                 throw new ArgumentException("The member access expression does not access a property.", "propertyExpression");
+            }
 
-            MethodInfo getMethod = property.GetGetMethod(true);
+            var getMethod = property.GetGetMethod(true);
 
-            if (getMethod.IsStatic)
+            if(getMethod.IsStatic)
+            {
                 throw new ArgumentException("The referenced property is a static property.", "propertyExpression");
+            }
 
             return memberExpression.Member.Name;
         }
@@ -35,23 +43,31 @@ namespace OpenUO.Core.PresentationFramework.ComponentModel.Design
         {
             columnName = string.Empty;
 
-            if (propertyExpression == null)
+            if(propertyExpression == null)
+            {
                 throw new ArgumentNullException("propertyExpression");
+            }
 
-            MemberExpression memberExpression = propertyExpression.Body as MemberExpression;
+            var memberExpression = propertyExpression.Body as MemberExpression;
 
-            if (memberExpression == null)
+            if(memberExpression == null)
+            {
                 throw new ArgumentException("The expression is not a member access expression.", "propertyExpression");
+            }
 
-            PropertyInfo property = memberExpression.Member as PropertyInfo;
+            var property = memberExpression.Member as PropertyInfo;
 
-            if (property == null)
+            if(property == null)
+            {
                 throw new ArgumentException("The member access expression does not access a property.", "propertyExpression");
+            }
 
-            ColumnAttribute[] columnAttributes = Attribute.GetCustomAttributes(property, true).Where(c => c is ColumnAttribute).Cast<ColumnAttribute>().ToArray();
+            var columnAttributes = Attribute.GetCustomAttributes(property, true).Where(c => c is ColumnAttribute).Cast<ColumnAttribute>().ToArray();
 
-            if (columnAttributes.Length == 0)
+            if(columnAttributes.Length == 0)
+            {
                 return false;
+            }
 
             columnName = columnAttributes[0].Name;
 

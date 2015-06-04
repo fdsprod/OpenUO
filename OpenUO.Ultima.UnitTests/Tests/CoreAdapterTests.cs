@@ -34,7 +34,7 @@ namespace OpenUO.Ultima.UnitTests
         {
             get
             {
-                if (!_configuredKernelForTest)
+                if(!_configuredKernelForTest)
                 {
                     _container = new Container();
                     _container.RegisterModule<UltimaSDKCoreModule>();
@@ -48,8 +48,8 @@ namespace OpenUO.Ultima.UnitTests
         [TestMethod]
         public void TestSoundFactory()
         {
-            SoundFactory factory = new SoundFactory(Install, Container);
-            Sound sound = factory.GetSound<Sound>(1);
+            var factory = new SoundFactory(Install, Container);
+            var sound = factory.GetSound<Sound>(1);
 
             Guard.AssertIsNotNull(sound, "Sound was not created.");
 
@@ -59,8 +59,8 @@ namespace OpenUO.Ultima.UnitTests
         [TestMethod]
         public void TestSkillFactory()
         {
-            SkillsFactory factory = new SkillsFactory(Install, Container);
-            Skill skill = factory.GetSkill<Skill>(0);
+            var factory = new SkillsFactory(Install, Container);
+            var skill = factory.GetSkill<Skill>(0);
 
             Guard.AssertIsNotNull(skill, "Skill was not created.");
         }
@@ -68,8 +68,8 @@ namespace OpenUO.Ultima.UnitTests
         [TestMethod]
         public void TestAnimiationDataFactory()
         {
-            AnimationDataFactory factory = new AnimationDataFactory(Install, Container);
-            AnimationData animData = factory.GetAnimationData<AnimationData>(0);
+            var factory = new AnimationDataFactory(Install, Container);
+            var animData = factory.GetAnimationData<AnimationData>(0);
 
             Guard.AssertIsNotNull(animData, "Animation Data was not created.");
         }
@@ -77,7 +77,7 @@ namespace OpenUO.Ultima.UnitTests
         [TestMethod]
         public void TestRadarColors()
         {
-            RadarColors colors = new RadarColors(Install);
+            var colors = new RadarColors(Install);
 
             Guard.Assert(colors.Length > 0, "Radarcol was not parsed correctly");
         }

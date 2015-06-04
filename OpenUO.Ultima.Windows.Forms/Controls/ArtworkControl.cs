@@ -40,7 +40,6 @@ namespace OpenUO.Ultima.Windows.Forms.Controls
         private const int MAX_HEIGHT = 48;
         private readonly Dictionary<int, Bitmap> _cache;
         private readonly Rectangle _cellBounds;
-
         private readonly VScrollBar _scrollBar;
         private ArtworkControlType _artworkControlType;
         private ArtworkFactory _artworkFactory;
@@ -73,7 +72,7 @@ namespace OpenUO.Ultima.Windows.Forms.Controls
             get { return _artworkControlType; }
             set
             {
-                if (_artworkControlType != value)
+                if(_artworkControlType != value)
                 {
                     _artworkControlType = value;
 
@@ -90,7 +89,7 @@ namespace OpenUO.Ultima.Windows.Forms.Controls
             get { return _artworkFactory; }
             set
             {
-                if (_artworkFactory != value)
+                if(_artworkFactory != value)
                 {
                     _artworkFactory = value;
 
@@ -104,9 +103,9 @@ namespace OpenUO.Ultima.Windows.Forms.Controls
         {
             base.Dispose(disposing);
 
-            if (_cache != null)
+            if(_cache != null)
             {
-                foreach (var value in _cache.Values)
+                foreach(var value in _cache.Values)
                 {
                     value.Dispose();
                 }
@@ -127,22 +126,22 @@ namespace OpenUO.Ultima.Windows.Forms.Controls
             _visibleColumnsCount = Math.Max(0, (((Width - _scrollBar.Width) - 1) / MAX_WIDTH));
             _visibleRowsCount = Math.Max(0, ((Height - 1) / MAX_HEIGHT));
 
-            if (_visibleColumnsCount == 0)
+            if(_visibleColumnsCount == 0)
             {
                 _scrollBar.Maximum = 0;
                 return;
             }
 
-            if (_artworkFactory == null)
+            if(_artworkFactory == null)
             {
                 return;
             }
 
-            if (_artworkControlType == ArtworkControlType.Land)
+            if(_artworkControlType == ArtworkControlType.Land)
             {
-                int count = _artworkFactory.GetLandTileCount<Bitmap>() / _visibleColumnsCount;
+                var count = _artworkFactory.GetLandTileCount<Bitmap>() / _visibleColumnsCount;
 
-                if (_artworkFactory.GetStaticTileCount<Bitmap>() % _visibleColumnsCount > 0)
+                if(_artworkFactory.GetStaticTileCount<Bitmap>() % _visibleColumnsCount > 0)
                 {
                     count++;
                 }
@@ -151,9 +150,9 @@ namespace OpenUO.Ultima.Windows.Forms.Controls
             }
             else
             {
-                int count = _artworkFactory.GetStaticTileCount<Bitmap>() / _visibleColumnsCount;
+                var count = _artworkFactory.GetStaticTileCount<Bitmap>() / _visibleColumnsCount;
 
-                if (_artworkFactory.GetStaticTileCount<Bitmap>() % _visibleColumnsCount > 0)
+                if(_artworkFactory.GetStaticTileCount<Bitmap>() % _visibleColumnsCount > 0)
                 {
                     count++;
                 }
@@ -161,7 +160,7 @@ namespace OpenUO.Ultima.Windows.Forms.Controls
                 _scrollBar.Maximum = count;
             }
 
-            if (resetScrollbar)
+            if(resetScrollbar)
             {
                 _scrollBar.Value = 0;
             }
@@ -176,82 +175,92 @@ namespace OpenUO.Ultima.Windows.Forms.Controls
         {
             base.OnPaint(e);
 
-            using (Brush backBrush = new LinearGradientBrush(_cellBounds, Color.Gainsboro, Color.White, LinearGradientMode.ForwardDiagonal))
-            using (Brush borderBrush = new SolidBrush(Color.LightSteelBlue))
-            using (Pen borderPen = new Pen(borderBrush))
+            using(Brush backBrush = new LinearGradientBrush(_cellBounds, Color.Gainsboro, Color.White, LinearGradientMode.ForwardDiagonal))
             {
-                int startingIndex = _scrollBar.Value * _visibleColumnsCount;
-
-                for (int y = 0; y < _visibleRowsCount; y++)
+                using(Brush borderBrush = new SolidBrush(Color.LightSteelBlue))
                 {
-                    e.Graphics.TranslateTransform(0, y * MAX_HEIGHT);
-
-                    for (int x = 0; x < _visibleColumnsCount; x++)
+                    using(var borderPen = new Pen(borderBrush))
                     {
-                        int index = startingIndex + ((y * _visibleColumnsCount) + x);
+                        var startingIndex = _scrollBar.Value * _visibleColumnsCount;
 
-                        e.Graphics.FillRectangle(backBrush, _cellBounds);
-
-                        if (_artworkFactory != null)
+                        for(var y = 0; y < _visibleRowsCount; y++)
                         {
-                            Bitmap bmp = null;
+                            e.Graphics.TranslateTransform(0, y * MAX_HEIGHT);
 
-                            if (_artworkControlType == ArtworkControlType.Land)
+                            for(var x = 0; x < _visibleColumnsCount; x++)
                             {
-                                if (!_cache.TryGetValue(index, out bmp))
+                                var index = startingIndex + ((y * _visibleColumnsCount) + x);
+
+                                e.Graphics.FillRectangle(backBrush, _cellBounds);
+
+                                if(_artworkFactory != null)
                                 {
-                                    bmp = _artworkFactory.GetLand<Bitmap>(index);
-                                    _cache.Add(index, bmp);
+                                    Bitmap bmp = null;
+
+                                    if(_artworkControlType == ArtworkControlType.Land)
+                                    {
+                                        if(!_cache.TryGetValue(index, out bmp))
+                                        {
+                                            bmp = _artworkFactory.GetLand<Bitmap>(index);
+                                            _cache.Add(index, bmp);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        if(!_cache.TryGetValue(index, out bmp))
+                                        {
+                                            bmp = _artworkFactory.GetStatic<Bitmap>(index);
+                                            _cache.Add(index, bmp);
+                                        }
+                                    }
+
+                                    if(bmp != null)
+                                    {
+                                        e.Graphics.DrawImageUnscaledAndClipped(bmp, _cellBounds);
+                                    }
                                 }
-                            }
-                            else
-                            {
-                                if (!_cache.TryGetValue(index, out bmp))
-                                {
-                                    bmp = _artworkFactory.GetStatic<Bitmap>(index);
-                                    _cache.Add(index, bmp);
-                                }
+
+                                e.Graphics.DrawRectangle(borderPen, _cellBounds);
+                                e.Graphics.TranslateTransform(MAX_WIDTH, 0);
                             }
 
-                            if (bmp != null)
-                            {
-                                e.Graphics.DrawImageUnscaledAndClipped(bmp, _cellBounds);
-                            }
+                            e.Graphics.ResetTransform();
                         }
 
-                        e.Graphics.DrawRectangle(borderPen, _cellBounds);
-                        e.Graphics.TranslateTransform(MAX_WIDTH, 0);
+                        e.Graphics.ResetTransform();
                     }
-
-                    e.Graphics.ResetTransform();
                 }
-
-                e.Graphics.ResetTransform();
             }
 
-            if (_artworkFactory == null)
+            if(_artworkFactory == null)
             {
-                TextRenderingHint textRenderingHint = e.Graphics.TextRenderingHint;
+                var textRenderingHint = e.Graphics.TextRenderingHint;
                 e.Graphics.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
 
-                using (Brush backBrush = new SolidBrush(Color.Red))
-                using (Brush foreBrush = new SolidBrush(Color.Maroon))
-                using (StringFormat format = new StringFormat())
+                using(Brush backBrush = new SolidBrush(Color.Red))
                 {
-                    format.LineAlignment = StringAlignment.Center;
-                    format.Alignment = StringAlignment.Center;
+                    using(Brush foreBrush = new SolidBrush(Color.Maroon))
+                    {
+                        using(var format = new StringFormat())
+                        {
+                            format.LineAlignment = StringAlignment.Center;
+                            format.Alignment = StringAlignment.Center;
 
-                    e.Graphics.DrawString("ArtworkControl.Factory is not set.", Font, backBrush, new RectangleF(0, 0, Width, Height), format);
-                    e.Graphics.DrawString("ArtworkControl.Factory is not set.", Font, foreBrush, new RectangleF(1, 1, Width, Height), format);
+                            e.Graphics.DrawString("ArtworkControl.Factory is not set.", Font, backBrush, new RectangleF(0, 0, Width, Height), format);
+                            e.Graphics.DrawString("ArtworkControl.Factory is not set.", Font, foreBrush, new RectangleF(1, 1, Width, Height), format);
+                        }
+                    }
                 }
 
                 e.Graphics.TextRenderingHint = textRenderingHint;
             }
 
-            using (Brush borderBrush = new SolidBrush(Color.LightSteelBlue))
-            using (Pen borderPen = new Pen(borderBrush))
+            using(Brush borderBrush = new SolidBrush(Color.LightSteelBlue))
             {
-                e.Graphics.DrawRectangle(borderPen, new Rectangle(0, 0, Width - 1, Height - 1));
+                using(var borderPen = new Pen(borderBrush))
+                {
+                    e.Graphics.DrawRectangle(borderPen, new Rectangle(0, 0, Width - 1, Height - 1));
+                }
             }
         }
     }

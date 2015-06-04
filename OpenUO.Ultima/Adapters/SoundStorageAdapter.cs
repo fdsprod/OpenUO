@@ -32,7 +32,7 @@ namespace OpenUO.Ultima.Adapters
         {
             get
             {
-                if (!IsInitialized)
+                if(!IsInitialized)
                 {
                     Initialize();
                 }
@@ -45,7 +45,7 @@ namespace OpenUO.Ultima.Adapters
         {
             base.Initialize();
 
-            InstallLocation install = Install;
+            var install = Install;
 
             _fileIndex =
                 install.IsUOPFormat
@@ -56,29 +56,29 @@ namespace OpenUO.Ultima.Adapters
         public Sound GetSound(int index)
         {
             int length, extra;
-            Stream stream = _fileIndex.Seek(index, out length, out extra);
+            var stream = _fileIndex.Seek(index, out length, out extra);
 
-            if (stream == null)
+            if(stream == null)
             {
                 return null;
             }
 
-            int[] waveHeader = CreateWaveHeader(length);
+            var waveHeader = CreateWaveHeader(length);
 
             length -= 40;
 
-            int headerLength = (waveHeader.Length << 2);
+            var headerLength = (waveHeader.Length << 2);
 
-            byte[] stringBuffer = new byte[40];
-            byte[] buffer = new byte[length + headerLength];
+            var stringBuffer = new byte[40];
+            var buffer = new byte[length + headerLength];
 
             Buffer.BlockCopy(waveHeader, 0, buffer, 0, headerLength);
 
             stream.Read(stringBuffer, 0, 40);
             stream.Read(buffer, headerLength, length);
 
-            string name = Encoding.ASCII.GetString(stringBuffer).Trim();
-            int end = name.IndexOf("\0");
+            var name = Encoding.ASCII.GetString(stringBuffer).Trim();
+            var end = name.IndexOf("\0");
             name = name.Substring(0, end);
 
             return new Sound(name, new MemoryStream(buffer));
@@ -105,7 +105,10 @@ namespace OpenUO.Ultima.Adapters
              * short[..] - data /
              * ====================
              * */
-            return new[] {0x46464952, (length + 12), 0x45564157, 0x20746D66, 0x10, 0x010001, 0x5622, 0xAC44, 0x100002, 0x61746164, (length - 24)};
+            return new[]
+                   {
+                       0x46464952, (length + 12), 0x45564157, 0x20746D66, 0x10, 0x010001, 0x5622, 0xAC44, 0x100002, 0x61746164, (length - 24)
+                   };
         }
     }
 }

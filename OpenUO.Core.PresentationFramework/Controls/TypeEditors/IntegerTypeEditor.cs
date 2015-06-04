@@ -4,72 +4,70 @@ using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace OpenUO.Core.PresentationFramework.TypeEditors
-{    
+{
     public class IntegerTypeEditor : TextBox
     {
+        private readonly int _step = 1;
+
         static IntegerTypeEditor()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(IntegerTypeEditor), new FrameworkPropertyMetadata(typeof(IntegerTypeEditor)));
         }
 
-
         public IntegerTypeEditor()
         {
             InitializeCommands();
-        }       
-
-        int _step = 1;
-
-        #region Commands
-
-        private static RoutedCommand _UpCommand;
+        }
 
         public static RoutedCommand UpCommand
-        { get { return _UpCommand; } }
-
-        private static RoutedCommand _DownCommand;
+        {
+            get;
+            private set;
+        }
 
         public static RoutedCommand DownCommand
-        { get { return _DownCommand; } }
+        {
+            get;
+            private set;
+        }
 
         private static void InitializeCommands()
         {
-            _UpCommand = new RoutedCommand("UpCommand", typeof(IntegerTypeEditor));
-            CommandManager.RegisterClassCommandBinding(typeof(IntegerTypeEditor), new CommandBinding(_UpCommand, OnUpCommand));
-            CommandManager.RegisterClassInputBinding(typeof(IntegerTypeEditor), new InputBinding(_UpCommand, new KeyGesture(Key.Up)));
+            UpCommand = new RoutedCommand("UpCommand", typeof(IntegerTypeEditor));
+            CommandManager.RegisterClassCommandBinding(typeof(IntegerTypeEditor), new CommandBinding(UpCommand, OnUpCommand));
+            CommandManager.RegisterClassInputBinding(typeof(IntegerTypeEditor), new InputBinding(UpCommand, new KeyGesture(Key.Up)));
 
-            _DownCommand = new RoutedCommand("DownCommand", typeof(IntegerTypeEditor));
-            CommandManager.RegisterClassCommandBinding(typeof(IntegerTypeEditor), new CommandBinding(_DownCommand, OnDownCommand));
-            CommandManager.RegisterClassInputBinding(typeof(IntegerTypeEditor), new InputBinding(_DownCommand, new KeyGesture(Key.Down)));
+            DownCommand = new RoutedCommand("DownCommand", typeof(IntegerTypeEditor));
+            CommandManager.RegisterClassCommandBinding(typeof(IntegerTypeEditor), new CommandBinding(DownCommand, OnDownCommand));
+            CommandManager.RegisterClassInputBinding(typeof(IntegerTypeEditor), new InputBinding(DownCommand, new KeyGesture(Key.Down)));
         }
 
         private static void OnUpCommand(object sender, ExecutedRoutedEventArgs e)
         {
-            if (sender.GetType() == typeof(IntegerTypeEditor))
+            if(sender.GetType() == typeof(IntegerTypeEditor))
             {
-                IntegerTypeEditor _myIntegerTypeEditor = (IntegerTypeEditor)sender;
-                _myIntegerTypeEditor.CountUp();   
+                var _myIntegerTypeEditor = (IntegerTypeEditor)sender;
+                _myIntegerTypeEditor.CountUp();
             }
         }
+
         private static void OnDownCommand(object sender, ExecutedRoutedEventArgs e)
         {
-            if (sender.GetType() == typeof(IntegerTypeEditor))
+            if(sender.GetType() == typeof(IntegerTypeEditor))
             {
-                IntegerTypeEditor _myIntegerTypeEditor = (IntegerTypeEditor)sender;
+                var _myIntegerTypeEditor = (IntegerTypeEditor)sender;
                 _myIntegerTypeEditor.CountDown();
             }
         }
 
         protected void CountUp()
         {
-            this.Text = (Int32.Parse(this.Text) + _step).ToString();                    
+            Text = (Int32.Parse(Text) + _step).ToString();
         }
 
         protected void CountDown()
         {
-            this.Text = (Int32.Parse(this.Text) - _step).ToString();
+            Text = (Int32.Parse(Text) - _step).ToString();
         }
-        #endregion
-
     }
 }

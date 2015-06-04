@@ -30,7 +30,6 @@ namespace OpenUO.Ultima
     public class UopFileIndex : FileIndexBase
     {
         public const int UOP_MAGIC_NUMBER = 0x50594D;
-
         private readonly string _extension;
         private readonly bool _hasExtra;
 
@@ -43,44 +42,44 @@ namespace OpenUO.Ultima
 
         protected override FileIndexEntry[] ReadEntries()
         {
-            int length = Length;
-            string dataPath = DataPath;
-            FileIndexEntry[] entries = new FileIndexEntry[length];
+            var length = Length;
+            var dataPath = DataPath;
+            var entries = new FileIndexEntry[length];
 
             // In the mul file index, we read everything sequentially, and -1 is applied to invalid lookups.
             // UOP does not do this, so we need to do it ourselves.
-            for (int i = 0; i < entries.Length; i++)
+            for(var i = 0; i < entries.Length; i++)
             {
                 entries[i].Lookup = -1;
             }
 
-            using (FileStream index = new FileStream(dataPath, FileMode.Open, FileAccess.Read, FileShare.Read))
+            using(var index = new FileStream(dataPath, FileMode.Open, FileAccess.Read, FileShare.Read))
             {
-                FileInfo fi = new FileInfo(dataPath);
-                string uopPattern = Path.GetFileNameWithoutExtension(fi.Name).ToLowerInvariant();
+                var fi = new FileInfo(dataPath);
+                var uopPattern = Path.GetFileNameWithoutExtension(fi.Name).ToLowerInvariant();
 
-                using (BinaryReader br = new BinaryReader(index))
+                using(var br = new BinaryReader(index))
                 {
                     br.BaseStream.Seek(0, SeekOrigin.Begin);
 
-                    if (br.ReadInt32() != UOP_MAGIC_NUMBER)
+                    if(br.ReadInt32() != UOP_MAGIC_NUMBER)
                     {
                         throw new ArgumentException("Bad UOP file.");
                     }
 
                     br.ReadInt64(); // version + signature
-                    long nextBlock = br.ReadInt64();
+                    var nextBlock = br.ReadInt64();
                     br.ReadInt32(); // block capacity
-                    int count = br.ReadInt32();
+                    var count = br.ReadInt32();
 
-                    Dictionary<ulong, int> hashes = new Dictionary<ulong, int>();
+                    var hashes = new Dictionary<ulong, int>();
 
-                    for (int i = 0; i < length; i++)
+                    for(var i = 0; i < length; i++)
                     {
-                        string entryName = string.Format("build/{0}/{1:D8}{2}", uopPattern, i, _extension);
-                        ulong hash = CreateHash(entryName);
+                        var entryName = string.Format("build/{0}/{1:D8}{2}", uopPattern, i, _extension);
+                        var hash = CreateHash(entryName);
 
-                        if (!hashes.ContainsKey(hash))
+                        if(!hashes.ContainsKey(hash))
                         {
                             hashes.Add(hash, i);
                         }
@@ -90,30 +89,30 @@ namespace OpenUO.Ultima
 
                     do
                     {
-                        int filesCount = br.ReadInt32();
+                        var filesCount = br.ReadInt32();
                         nextBlock = br.ReadInt64();
 
-                        for (int i = 0; i < filesCount; i++)
+                        for(var i = 0; i < filesCount; i++)
                         {
-                            long offset = br.ReadInt64();
-                            int headerLength = br.ReadInt32();
-                            int compressedLength = br.ReadInt32();
-                            int decompressedLength = br.ReadInt32();
-                            ulong hash = br.ReadUInt64();
+                            var offset = br.ReadInt64();
+                            var headerLength = br.ReadInt32();
+                            var compressedLength = br.ReadInt32();
+                            var decompressedLength = br.ReadInt32();
+                            var hash = br.ReadUInt64();
                             br.ReadUInt32(); // Adler32
-                            short flag = br.ReadInt16();
+                            var flag = br.ReadInt16();
 
-                            int entryLength = flag == 1 ? compressedLength : decompressedLength;
+                            var entryLength = flag == 1 ? compressedLength : decompressedLength;
 
-                            if (offset == 0)
+                            if(offset == 0)
                             {
                                 continue;
                             }
 
                             int idx;
-                            if (hashes.TryGetValue(hash, out idx))
+                            if(hashes.TryGetValue(hash, out idx))
                             {
-                                if (idx < 0 || idx > entries.Length)
+                                if(idx < 0 || idx > entries.Length)
                                 {
                                     throw new IndexOutOfRangeException("hashes dictionary and files collection have different count of entries!");
                                 }
@@ -121,16 +120,16 @@ namespace OpenUO.Ultima
                                 entries[idx].Lookup = (int)(offset + headerLength);
                                 entries[idx].Length = entryLength;
 
-                                if (_hasExtra)
+                                if(_hasExtra)
                                 {
-                                    long curPos = br.BaseStream.Position;
+                                    var curPos = br.BaseStream.Position;
 
                                     br.BaseStream.Seek(offset + headerLength, SeekOrigin.Begin);
 
-                                    byte[] extra = br.ReadBytes(8);
+                                    var extra = br.ReadBytes(8);
 
-                                    ushort extra1 = (ushort)((extra[3] << 24) | (extra[2] << 16) | (extra[1] << 8) | extra[0]);
-                                    ushort extra2 = (ushort)((extra[7] << 24) | (extra[6] << 16) | (extra[5] << 8) | extra[4]);
+                                    var extra1 = (ushort)((extra[3] << 24) | (extra[2] << 16) | (extra[1] << 8) | extra[0]);
+                                    var extra2 = (ushort)((extra[7] << 24) | (extra[6] << 16) | (extra[5] << 8) | extra[4]);
 
                                     entries[idx].Lookup += 8;
                                     entries[idx].Extra = extra1 << 16 | extra2;
@@ -139,8 +138,7 @@ namespace OpenUO.Ultima
                                 }
                             }
                         }
-                    }
-                    while (br.BaseStream.Seek(nextBlock, SeekOrigin.Begin) != 0);
+                    } while(br.BaseStream.Seek(nextBlock, SeekOrigin.Begin) != 0);
                 }
             }
 
@@ -154,9 +152,9 @@ namespace OpenUO.Ultima
             eax = ecx = edx = ebx = esi = edi = 0;
             ebx = edi = esi = (uint)s.Length + 0xDEADBEEF;
 
-            int i = 0;
+            var i = 0;
 
-            for (i = 0; i + 12 < s.Length; i += 12)
+            for(i = 0; i + 12 < s.Length; i += 12)
             {
                 edi = (uint)((s[i + 7] << 24) | (s[i + 6] << 16) | (s[i + 5] << 8) | s[i + 4]) + edi;
                 esi = (uint)((s[i + 11] << 24) | (s[i + 10] << 16) | (s[i + 9] << 8) | s[i + 8]) + esi;
@@ -176,9 +174,9 @@ namespace OpenUO.Ultima
                 edi += ebx;
             }
 
-            if (s.Length - i > 0)
+            if(s.Length - i > 0)
             {
-                switch (s.Length - i)
+                switch(s.Length - i)
                 {
                     case 12:
                         esi += (uint)s[i + 11] << 24;

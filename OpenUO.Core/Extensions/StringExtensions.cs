@@ -20,8 +20,8 @@ namespace OpenUO.Core
     {
         public static string Remove(this string str, string phrase)
         {
-            int index = -1;
-            while ((index = str.IndexOf(phrase)) != -1)
+            var index = -1;
+            while((index = str.IndexOf(phrase)) != -1)
             {
                 str = str.Remove(index, phrase.Length);
             }

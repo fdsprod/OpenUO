@@ -18,20 +18,20 @@ namespace OpenUO.Ultima
 {
     public class SkillCategory
     {
-        private SkillCategoryData _data;
         private int _index = -1;
         private string _name = string.Empty;
 
         public SkillCategory(SkillCategoryData data)
         {
-            _data = data;
-            _index = _data.Index;
-            _name = _data.Name;
+            Data = data;
+            _index = Data.Index;
+            _name = Data.Name;
         }
 
         public SkillCategoryData Data
         {
-            get { return _data; }
+            get;
+            private set;
         }
 
         public int Index
@@ -46,15 +46,15 @@ namespace OpenUO.Ultima
 
         public void ResetFromData()
         {
-            _index = _data.Index;
-            _name = _data.Name;
+            _index = Data.Index;
+            _name = Data.Name;
         }
 
         public void ResetFromData(SkillCategoryData data)
         {
-            _data = data;
-            _index = _data.Index;
-            _name = _data.Name;
+            Data = data;
+            _index = Data.Index;
+            _name = Data.Name;
         }
 
         public override string ToString()

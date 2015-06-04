@@ -1,4 +1,5 @@
 ﻿#region File Header
+
 /********************************************************
  * 
  *  $Id: WeakAction.cs 111 2010-10-12 06:58:17Z jeff $
@@ -15,6 +16,7 @@
  *  All rights reserved. 
  *  
  ********************************************************/
+
 #endregion
 
 using System;
@@ -34,8 +36,10 @@ namespace OpenUO.Core.PresentationFramework
         {
             get
             {
-                if (_reference == null)
+                if(_reference == null)
+                {
                     return false;
+                }
 
                 return _reference.IsAlive;
             }
@@ -45,8 +49,10 @@ namespace OpenUO.Core.PresentationFramework
         {
             get
             {
-                if (_reference == null)
+                if(_reference == null)
+                {
                     return null;
+                }
 
                 return _reference.Target;
             }
@@ -70,8 +76,10 @@ namespace OpenUO.Core.PresentationFramework
 
         public void Execute()
         {
-            if (_action != null && IsAlive)
+            if(_action != null && IsAlive)
+            {
                 _action();
+            }
         }
     }
 
@@ -84,11 +92,13 @@ namespace OpenUO.Core.PresentationFramework
         {
             _action = action;
         }
-        
+
         public void Execute(T item)
         {
-            if (_action != null && IsAlive)
+            if(_action != null && IsAlive)
+            {
                 _action(item);
+            }
         }
     }
 }

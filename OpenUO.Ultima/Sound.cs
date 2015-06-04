@@ -34,20 +34,20 @@ namespace OpenUO.Ultima
             _player = new SoundPlayer(stream);
         }
 
-        public string Name
-        {
-            get;
-            private set;
-        }
-
         public void Dispose()
         {
-            if (_player == null)
+            if(_player == null)
             {
                 return;
             }
 
             _player.Dispose();
+        }
+
+        public string Name
+        {
+            get;
+            private set;
         }
 
         public void Play()

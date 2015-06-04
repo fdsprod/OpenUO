@@ -6,16 +6,9 @@ namespace OpenUO.Core.PresentationFramework.Input
 {
     public abstract class CommandBase : ICommand, IRaiseCanExecuteChanged
     {
-        private List<WeakReference> _canExecuteChangedHandlers;
-
         private readonly Func<object, bool> _canExecuteMethod;
         private readonly Action<object> _executeMethod;
-
-        public event EventHandler CanExecuteChanged
-        {
-            add { WeakReferenceManager.AddWeakReferenceHandler(ref _canExecuteChangedHandlers, value, 2); }
-            remove { WeakReferenceManager.RemoveWeakReferenceHandler(_canExecuteChangedHandlers, value); }
-        }
+        private List<WeakReference> _canExecuteChangedHandlers;
 
         protected CommandBase(Action<object> executeMethod, Func<object, bool> canExecuteMethod)
         {
@@ -26,11 +19,12 @@ namespace OpenUO.Core.PresentationFramework.Input
             _canExecuteMethod = canExecuteMethod;
         }
 
-        public void RaiseCanExecuteChanged()
+        public event EventHandler CanExecuteChanged
         {
-            OnCanExecuteChanged();
+            add { WeakReferenceManager.AddWeakReferenceHandler(ref _canExecuteChangedHandlers, value, 2); }
+            remove { WeakReferenceManager.RemoveWeakReferenceHandler(_canExecuteChangedHandlers, value); }
         }
-        
+
         bool ICommand.CanExecute(object parameter)
         {
             return CanExecute(parameter);
@@ -40,7 +34,12 @@ namespace OpenUO.Core.PresentationFramework.Input
         {
             Execute(parameter);
         }
-        
+
+        public void RaiseCanExecuteChanged()
+        {
+            OnCanExecuteChanged();
+        }
+
         public bool CanExecute(object parameter)
         {
             return ((_canExecuteMethod == null) ? true : _canExecuteMethod(parameter));

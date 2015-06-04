@@ -33,55 +33,6 @@ namespace OpenUO.Ultima.UnitTests
             Text = "Select an Installation " + testSet;
         }
 
-        public InstallLocation SelectedInstall
-        {
-            get { return installsComboBox.SelectedValue as InstallLocation; }
-        }
-
-        protected override void OnLoad(EventArgs e)
-        {
-            base.OnLoad(e);
-
-            IEnumerable<ComboBoxItem<InstallLocation>> installs =
-                InstallationLocator.Locate().Select(
-                    il =>
-                    new ComboBoxItem<InstallLocation>(
-                        string.Format("{0} - {1}", il.Version, il.Directory),
-                        il)).ToList();
-
-            installsComboBox.DisplayMember = "Display";
-            installsComboBox.ValueMember = "Value";
-            installsComboBox.DataSource = installs;
-        }
-
-        private void okButton_Click(object sender, EventArgs e)
-        {
-            if (SelectedInstall == null)
-            {
-                MessageBox.Show(
-                    this, "You must choose a valid Ultima Online installation", "Invalid Install", MessageBoxButtons.OK, MessageBoxIcon.Hand);
-                return;
-            }
-
-            Close();
-        }
-
-        private void findDirectoryButton_Click(object sender, EventArgs e)
-        {
-            using (FolderBrowserDialog dialog = new FolderBrowserDialog())
-            {
-                dialog.Description = "Select your Ultima Online directory";
-
-                if (dialog.ShowDialog() == DialogResult.OK)
-                {
-                    InstallLocation install = new InstallLocation(dialog.SelectedPath);
-                    installsComboBox.SelectedItem = new ComboBoxItem<InstallLocation>(
-                        string.Format("{0} - {1}", install.Version, install.Directory),
-                        install);
-                }
-            }
-        }
-
         private class ComboBoxItem<T>
         {
             public ComboBoxItem(string display, T value)
@@ -100,6 +51,55 @@ namespace OpenUO.Ultima.UnitTests
             {
                 get;
                 private set;
+            }
+        }
+
+        public InstallLocation SelectedInstall
+        {
+            get { return installsComboBox.SelectedValue as InstallLocation; }
+        }
+
+        protected override void OnLoad(EventArgs e)
+        {
+            base.OnLoad(e);
+
+            IEnumerable<ComboBoxItem<InstallLocation>> installs =
+                InstallationLocator.Locate().Select(
+                    il =>
+                        new ComboBoxItem<InstallLocation>(
+                            string.Format("{0} - {1}", il.Version, il.Directory),
+                            il)).ToList();
+
+            installsComboBox.DisplayMember = "Display";
+            installsComboBox.ValueMember = "Value";
+            installsComboBox.DataSource = installs;
+        }
+
+        private void okButton_Click(object sender, EventArgs e)
+        {
+            if(SelectedInstall == null)
+            {
+                MessageBox.Show(
+                    this, "You must choose a valid Ultima Online installation", "Invalid Install", MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                return;
+            }
+
+            Close();
+        }
+
+        private void findDirectoryButton_Click(object sender, EventArgs e)
+        {
+            using(var dialog = new FolderBrowserDialog())
+            {
+                dialog.Description = "Select your Ultima Online directory";
+
+                if(dialog.ShowDialog() == DialogResult.OK)
+                {
+                    var install = new InstallLocation(dialog.SelectedPath);
+                    installsComboBox.SelectedItem = new ComboBoxItem<InstallLocation>(
+                        string.Format("{0} - {1}", install.Version, install.Directory),
+                        install);
+                }
             }
         }
     }

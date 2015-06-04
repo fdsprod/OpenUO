@@ -1,4 +1,5 @@
 ﻿#region File Header
+
 /********************************************************
  * 
  *  $Id: StringLengthConverter.cs 111 2010-10-12 06:58:17Z jeff $
@@ -15,6 +16,7 @@
  *  All rights reserved. 
  *  
  ********************************************************/
+
 #endregion
 
 using System;
@@ -26,21 +28,21 @@ namespace OpenUO.Core.PresentationFramework.Converters
     {
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
-            if (value == null)
+            if(value == null)
             {
                 return string.Empty;
             }
 
-            string s = value.ToString();
-            int length = 100;
+            var s = value.ToString();
+            var length = 100;
             int outLength;
 
-            if (parameter != null && int.TryParse(parameter.ToString(), out outLength))
+            if(parameter != null && int.TryParse(parameter.ToString(), out outLength))
             {
                 length = outLength;
             }
 
-            if (s.Length <= length)
+            if(s.Length <= length)
             {
                 return s;
             }

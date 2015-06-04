@@ -28,6 +28,12 @@ namespace OpenUO.Ultima
         internal short _id;
         internal sbyte _z;
 
+        public Tile(short id, sbyte z)
+        {
+            _id = id;
+            _z = z;
+        }
+
         public int Id
         {
             get { return _id; }
@@ -42,12 +48,6 @@ namespace OpenUO.Ultima
         public bool Ignored
         {
             get { return (_id == 2 || _id == 0x1DB || (_id >= 0x1AE && _id <= 0x1B5)); }
-        }
-
-        public Tile(short id, sbyte z)
-        {
-            _id = id;
-            _z = z;
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿#region License Header
+
 /***************************************************************************
  *
  *   This program is free software; you can redistribute it and/or modify
@@ -7,7 +8,8 @@
  *   (at your option) any later version.
  *
  ***************************************************************************/
- #endregion
+
+#endregion
 
 namespace OpenUO.Ultima.Network
 {
@@ -18,24 +20,26 @@ namespace OpenUO.Ultima.Network
 
         public bool OnReceive(NetState ns)
         {
-            ByteQueue buffer = ns.Buffer;
+            var buffer = ns.Buffer;
 
-            if (buffer == null || buffer.Length <= 0)
-                return true;
-
-            lock (buffer)
+            if(buffer == null || buffer.Length <= 0)
             {
-                int length = buffer.Length;
+                return true;
+            }
 
-                while (length > 0)
+            lock(buffer)
+            {
+                var length = buffer.Length;
+
+                while(length > 0)
                 {
                     int packetID = buffer.GetPacketID();
 
-                    PacketHandler handler = ns.GetHandler(packetID);
+                    var handler = ns.GetHandler(packetID);
 
-                    if (handler == null)
+                    if(handler == null)
                     {
-                        byte[] data = new byte[length];
+                        var data = new byte[length];
                         length = buffer.Dequeue(data, 0, length);
 
                         new PacketReader(data, length, false).Trace(ns);
@@ -43,15 +47,15 @@ namespace OpenUO.Ultima.Network
                         break;
                     }
 
-                    int packetLength = handler.Length;
+                    var packetLength = handler.Length;
 
-                    if (packetLength <= 0)
+                    if(packetLength <= 0)
                     {
-                        if (length >= 3)
+                        if(length >= 3)
                         {
                             packetLength = buffer.GetPacketLength();
 
-                            if (packetLength < 3)
+                            if(packetLength < 3)
                             {
                                 ns.Dispose();
                                 break;
@@ -63,20 +67,24 @@ namespace OpenUO.Ultima.Network
                         }
                     }
 
-                    if (length < packetLength)
+                    if(length < packetLength)
+                    {
                         break;
+                    }
 
-                    byte[] packetBuffer = BufferSize >= packetLength ? _buffers.AcquireBuffer() : new byte[packetLength];
+                    var packetBuffer = BufferSize >= packetLength ? _buffers.AcquireBuffer() : new byte[packetLength];
                     packetLength = buffer.Dequeue(packetBuffer, 0, packetLength);
 
-                    PacketReader r = new PacketReader(packetBuffer, packetLength, handler.Length != 0);
+                    var r = new PacketReader(packetBuffer, packetLength, handler.Length != 0);
 
                     handler.OnReceive(ns, r);
 
                     length = buffer.Length;
 
-                    if (BufferSize >= packetLength)
+                    if(BufferSize >= packetLength)
+                    {
                         _buffers.ReleaseBuffer(packetBuffer);
+                    }
                 }
             }
 

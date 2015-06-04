@@ -18,12 +18,10 @@ namespace OpenUO.Ultima
 {
     public class ASCIIFont
     {
-        private ASCIIChar[] _chars;
-
         public ASCIIFont(int height, ASCIIChar[] chars)
         {
             Height = height;
-            _chars = chars;
+            Chars = chars;
         }
 
         public int Height
@@ -34,29 +32,29 @@ namespace OpenUO.Ultima
 
         public ASCIIChar[] Chars
         {
-            get { return _chars; }
-            set { _chars = value; }
+            get;
+            set;
         }
 
         public int GetWidth(string text)
         {
-            if (string.IsNullOrEmpty(text))
+            if(string.IsNullOrEmpty(text))
             {
                 return 0;
             }
 
-            int width = 0;
+            var width = 0;
 
-            for (int i = 0; i < text.Length; ++i)
+            for(var i = 0; i < text.Length; ++i)
             {
-                int c = ((((text[i]) - 0x20) & 0x7FFFFFFF) % 224);
+                var c = ((((text[i]) - 0x20) & 0x7FFFFFFF) % 224);
 
-                if (c >= _chars.Length)
+                if(c >= Chars.Length)
                 {
                     continue;
                 }
 
-                width += _chars[c].Width;
+                width += Chars[c].Width;
             }
 
             return width;

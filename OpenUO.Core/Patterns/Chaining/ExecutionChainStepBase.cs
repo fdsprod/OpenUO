@@ -57,13 +57,13 @@ namespace OpenUO.Core.Patterns
             {
                 Guard.AssertIsNotNull(value, "value");
 
-                if (_successor == null)
+                if(_successor == null)
                 {
                     _successor = value;
                 }
                 else
                 {
-                    IChainStep<T> successor = _successor;
+                    var successor = _successor;
                     _successor = value;
                     value.Successor = successor;
                 }
@@ -79,7 +79,7 @@ namespace OpenUO.Core.Patterns
         {
             ExecuteOverride(state);
 
-            if (!CancelExecution && _successor != null)
+            if(!CancelExecution && _successor != null)
             {
                 _successor.Execute(state);
             }

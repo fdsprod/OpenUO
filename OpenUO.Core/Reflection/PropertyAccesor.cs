@@ -30,14 +30,14 @@ namespace OpenUO.Core.Reflection
 
         public PropertyAccessor(string Property)
         {
-            getMethodHandler = BasePropertyAccessor.GetPropertyInvoker(typeof (TargetType), Property);
-            setMethodHandler = BasePropertyAccessor.SetPropertyInvoker(typeof (TargetType), typeof (TargetType).GetProperty(Property));
+            getMethodHandler = BasePropertyAccessor.GetPropertyInvoker(typeof(TargetType), Property);
+            setMethodHandler = BasePropertyAccessor.SetPropertyInvoker(typeof(TargetType), typeof(TargetType).GetProperty(Property));
         }
 
         public PropertyAccessor(PropertyInfo Property)
         {
-            getMethodHandler = BasePropertyAccessor.GetPropertyInvoker(typeof (TargetType), Property.Name);
-            setMethodHandler = BasePropertyAccessor.SetPropertyInvoker(typeof (TargetType), Property);
+            getMethodHandler = BasePropertyAccessor.GetPropertyInvoker(typeof(TargetType), Property.Name);
+            setMethodHandler = BasePropertyAccessor.SetPropertyInvoker(typeof(TargetType), Property);
         }
 
         public PropertyType Get(TargetType TargetObject, params object[] Paramters)

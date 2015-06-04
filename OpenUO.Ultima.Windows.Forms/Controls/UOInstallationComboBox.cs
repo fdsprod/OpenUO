@@ -33,17 +33,23 @@ namespace OpenUO.Ultima.Windows.Forms.Controls
             base.ValueMember = "Value";
             base.DropDownStyle = ComboBoxStyle.DropDownList;
 
-            if (!DesignModeUtility.IsDesignMode)
+            if(!DesignModeUtility.IsDesignMode)
             {
                 IEnumerable<ComboBoxItem<InstallLocation>> installs =
                     InstallationLocator.Locate().Select(
                         il =>
-                        new ComboBoxItem<InstallLocation>(
-                            string.Format("{0} - {1}", il.Version, il.Directory),
-                            il)).ToList();
+                            new ComboBoxItem<InstallLocation>(
+                                string.Format("{0} - {1}", il.Version, il.Directory),
+                                il)).ToList();
 
                 base.DataSource = installs;
             }
+        }
+
+        public event EventHandler SelectedInstallationChanged
+        {
+            add { SelectedIndexChanged += value; }
+            remove { SelectedIndexChanged -= value; }
         }
 
         public new ComboBoxStyle DropDownStyle
@@ -73,12 +79,6 @@ namespace OpenUO.Ultima.Windows.Forms.Controls
         public InstallLocation SelectedInstallation
         {
             get { return SelectedValue as InstallLocation; }
-        }
-
-        public event EventHandler SelectedInstallationChanged
-        {
-            add { SelectedIndexChanged += value; }
-            remove { SelectedIndexChanged -= value; }
         }
     }
 }

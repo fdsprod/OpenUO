@@ -36,14 +36,15 @@ namespace Ultima.Winforms.Sample
         private static void Main()
         {
 #if DEBUG
-            new DebugTraceListener {
+            new DebugTraceListener
+            {
                 TraceLevel = TraceLevels.Verbose
             };
 #endif
-            Container container = new Container();
+            var container = new Container();
 
             container.RegisterModule<UltimaSDKCoreModule>();
-            container.RegisterModule<UltimaSDKBitmapModule>();
+            container.RegisterModule<OpenUOBitmapModule>();
             container.Register<SampleForm>();
 
             Application.EnableVisualStyles();

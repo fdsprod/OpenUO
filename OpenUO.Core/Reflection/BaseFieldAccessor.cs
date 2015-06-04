@@ -28,22 +28,25 @@ namespace OpenUO.Core.Reflection
     {
         public static FieldFastSetInvokeHandler<TargetType, FieldType> SetFieldInvoker<TargetType, FieldType>(string FieldName)
         {
-            return SetFieldInvoker<TargetType, FieldType>(typeof (TargetType).GetField(FieldName));
+            return SetFieldInvoker<TargetType, FieldType>(typeof(TargetType).GetField(FieldName));
         }
 
         public static FieldFastGetInvokeHandler<TargetType, FieldType> GetFieldInvoker<TargetType, FieldType>(string FieldName)
         {
-            return GetFieldInvoker<TargetType, FieldType>(typeof (TargetType).GetField(FieldName));
+            return GetFieldInvoker<TargetType, FieldType>(typeof(TargetType).GetField(FieldName));
         }
 
         public static FieldFastSetInvokeHandler<TargetType, FieldType> SetFieldInvoker<TargetType, FieldType>(FieldInfo Field)
         {
-            Type objectType = typeof (TargetType);
+            var objectType = typeof(TargetType);
 
-            if (Field != null)
+            if(Field != null)
             {
-                DynamicMethod dm = new DynamicMethod("Set" + Field.Name, null, new[] {objectType, typeof (FieldType)}, objectType);
-                ILGenerator il = dm.GetILGenerator();
+                var dm = new DynamicMethod("Set" + Field.Name, null, new[]
+                                                                     {
+                                                                         objectType, typeof(FieldType)
+                                                                     }, objectType);
+                var il = dm.GetILGenerator();
 
                 // Load the instance of the object (argument 0) onto the stack
                 il.Emit(OpCodes.Ldarg_0);
@@ -53,7 +56,7 @@ namespace OpenUO.Core.Reflection
                 // return the value on the top of the stack
                 il.Emit(OpCodes.Ret);
 
-                return (FieldFastSetInvokeHandler<TargetType, FieldType>)dm.CreateDelegate(typeof (FieldFastSetInvokeHandler<TargetType, FieldType>));
+                return (FieldFastSetInvokeHandler<TargetType, FieldType>)dm.CreateDelegate(typeof(FieldFastSetInvokeHandler<TargetType, FieldType>));
             }
 
             throw new Exception(String.Format("Member: '{0}' is not a Field of Type: '{1}'", Field.Name, objectType.Name));
@@ -61,9 +64,9 @@ namespace OpenUO.Core.Reflection
 
         public static FieldFastGetInvokeHandler<TargetType, FieldType> GetFieldInvoker<TargetType, FieldType>(FieldInfo Field)
         {
-            Type objectType = typeof (TargetType);
+            var objectType = typeof(TargetType);
 
-            if (Field == null)
+            if(Field == null)
             {
                 throw new Exception(
                     String.Format(
@@ -72,12 +75,15 @@ namespace OpenUO.Core.Reflection
                         objectType.Name));
             }
 
-            DynamicMethod dm = new DynamicMethod(
+            var dm = new DynamicMethod(
                 "Get" + Field.Name,
-                typeof (FieldType),
-                new[] {objectType},
+                typeof(FieldType),
+                new[]
+                {
+                    objectType
+                },
                 objectType);
-            ILGenerator il = dm.GetILGenerator();
+            var il = dm.GetILGenerator();
 
             // Load the instance of the object (argument 0) onto the stack
             il.Emit(OpCodes.Ldarg_0);
@@ -88,7 +94,7 @@ namespace OpenUO.Core.Reflection
 
             return
                 (FieldFastGetInvokeHandler<TargetType, FieldType>)
-                dm.CreateDelegate(typeof (FieldFastGetInvokeHandler<TargetType, FieldType>));
+                    dm.CreateDelegate(typeof(FieldFastGetInvokeHandler<TargetType, FieldType>));
         }
     }
 }

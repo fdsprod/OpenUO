@@ -36,7 +36,7 @@ namespace OpenUO.Core
 
         public static T GetData<T>(this IDataReader reader, int index, T defaultValue) where T : struct
         {
-            if (reader.IsDBNull(index))
+            if(reader.IsDBNull(index))
             {
                 return defaultValue;
             }
@@ -46,7 +46,7 @@ namespace OpenUO.Core
 
         public static T GetData<T>(this IDataReader reader, string columnName, T defaultValue) where T : struct
         {
-            return reader.GetData<T>(reader.GetOrdinal(columnName), default(T));
+            return reader.GetData(reader.GetOrdinal(columnName), default(T));
         }
     }
 }

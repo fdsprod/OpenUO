@@ -37,12 +37,12 @@ namespace OpenUO.Core.Diagnostics
 
             object syncRoot;
 
-            if (!_lockTable.TryGetValue(filename, out syncRoot))
+            if(!_lockTable.TryGetValue(filename, out syncRoot))
             {
                 syncRoot = new object();
                 _lockTable.Add(filename, syncRoot);
 
-                if (File.Exists(_filename))
+                if(File.Exists(_filename))
                 {
                     File.Delete(_filename);
                 }
@@ -60,25 +60,25 @@ namespace OpenUO.Core.Diagnostics
         {
             try
             {
-                object syncRoot = _lockTable[_filename];
+                var syncRoot = _lockTable[_filename];
 
-                lock (syncRoot)
+                lock(syncRoot)
                 {
-                    string directory = Path.GetDirectoryName(_filename);
+                    var directory = Path.GetDirectoryName(_filename);
 
-                    if (!string.IsNullOrWhiteSpace(directory))
+                    if(!string.IsNullOrWhiteSpace(directory))
                     {
                         FileSystemHelper.EnsureDirectoryExists(directory);
                     }
 
-                    using (StreamWriter writer = new StreamWriter(_filename, true))
+                    using(var writer = new StreamWriter(_filename, true))
                     {
                         writer.WriteLine(message);
                         writer.Flush();
                     }
                 }
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 Dispose(true);
                 Tracer.Error(e);

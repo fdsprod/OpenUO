@@ -28,19 +28,19 @@ namespace OpenUO.Ultima
 
         public TileMatrixPatch(TileMatrix matrix, InstallLocation install, int index)
         {
-            string mapDataPath = install.GetPath("mapdif{0}.mul", index);
-            string mapIndexPath = install.GetPath("mapdifl{0}.mul", index);
+            var mapDataPath = install.GetPath("mapdif{0}.mul", index);
+            var mapIndexPath = install.GetPath("mapdifl{0}.mul", index);
 
-            if (File.Exists(mapDataPath) && File.Exists(mapIndexPath))
+            if(File.Exists(mapDataPath) && File.Exists(mapIndexPath))
             {
                 _landBlocks = PatchLand(matrix, mapDataPath, mapIndexPath);
             }
 
-            string staDataPath = install.GetPath("stadif{0}.mul", index);
-            string staIndexPath = install.GetPath("stadifl{0}.mul", index);
-            string staLookupPath = install.GetPath("stadifi{0}.mul", index);
+            var staDataPath = install.GetPath("stadif{0}.mul", index);
+            var staIndexPath = install.GetPath("stadifl{0}.mul", index);
+            var staLookupPath = install.GetPath("stadifi{0}.mul", index);
 
-            if (File.Exists(staDataPath) && File.Exists(staIndexPath) && File.Exists(staLookupPath))
+            if(File.Exists(staDataPath) && File.Exists(staIndexPath) && File.Exists(staLookupPath))
             {
                 _staticBlocks = PatchStatics(matrix, staDataPath, staIndexPath, staLookupPath);
             }
@@ -58,109 +58,115 @@ namespace OpenUO.Ultima
 
         private static unsafe int PatchLand(TileMatrix matrix, string dataPath, string indexPath)
         {
-            using (FileStream fsData = new FileStream(dataPath, FileMode.Open, FileAccess.Read, FileShare.Read))
-            using (FileStream fsIndex = new FileStream(indexPath, FileMode.Open, FileAccess.Read, FileShare.Read))
+            using(var fsData = new FileStream(dataPath, FileMode.Open, FileAccess.Read, FileShare.Read))
             {
-                BinaryReader indexReader = new BinaryReader(fsIndex);
-
-                int count = (int)(indexReader.BaseStream.Length / 4);
-
-                for (int i = 0; i < count; ++i)
+                using(var fsIndex = new FileStream(indexPath, FileMode.Open, FileAccess.Read, FileShare.Read))
                 {
-                    int blockID = indexReader.ReadInt32();
-                    int x = blockID / matrix.BlockHeight;
-                    int y = blockID % matrix.BlockHeight;
+                    var indexReader = new BinaryReader(fsIndex);
 
-                    fsData.Seek(4, SeekOrigin.Current);
+                    var count = (int)(indexReader.BaseStream.Length / 4);
 
-                    Tile[] tiles = new Tile[64];
-
-                    fixed (Tile* pTiles = tiles)
+                    for(var i = 0; i < count; ++i)
                     {
-                        NativeMethods._lread(fsData.SafeFileHandle, pTiles, 192);
+                        var blockID = indexReader.ReadInt32();
+                        var x = blockID / matrix.BlockHeight;
+                        var y = blockID % matrix.BlockHeight;
+
+                        fsData.Seek(4, SeekOrigin.Current);
+
+                        var tiles = new Tile[64];
+
+                        fixed(Tile* pTiles = tiles)
+                        {
+                            NativeMethods._lread(fsData.SafeFileHandle, pTiles, 192);
+                        }
+
+                        //matrix.SetLandBlock(x, y, tiles);
                     }
 
-                    //matrix.SetLandBlock(x, y, tiles);
+                    return count;
                 }
-
-                return count;
             }
         }
 
         private static unsafe int PatchStatics(TileMatrix matrix, string dataPath, string indexPath, string lookupPath)
         {
-            using (FileStream fsData = new FileStream(dataPath, FileMode.Open, FileAccess.Read, FileShare.Read))
-            using (FileStream fsIndex = new FileStream(indexPath, FileMode.Open, FileAccess.Read, FileShare.Read))
-            using (FileStream fsLookup = new FileStream(lookupPath, FileMode.Open, FileAccess.Read, FileShare.Read))
+            using(var fsData = new FileStream(dataPath, FileMode.Open, FileAccess.Read, FileShare.Read))
             {
-                BinaryReader indexReader = new BinaryReader(fsIndex);
-                BinaryReader lookupReader = new BinaryReader(fsLookup);
-
-                int count = (int)(indexReader.BaseStream.Length / 4);
-
-                HuedTileList[][] lists = new HuedTileList[8][];
-
-                for (int x = 0; x < 8; ++x)
+                using(var fsIndex = new FileStream(indexPath, FileMode.Open, FileAccess.Read, FileShare.Read))
                 {
-                    lists[x] = new HuedTileList[8];
-
-                    for (int y = 0; y < 8; ++y)
+                    using(var fsLookup = new FileStream(lookupPath, FileMode.Open, FileAccess.Read, FileShare.Read))
                     {
-                        lists[x][y] = new HuedTileList();
-                    }
-                }
+                        var indexReader = new BinaryReader(fsIndex);
+                        var lookupReader = new BinaryReader(fsLookup);
 
-                for (int i = 0; i < count; ++i)
-                {
-                    int blockID = indexReader.ReadInt32();
-                    int blockX = blockID / matrix.BlockHeight;
-                    int blockY = blockID % matrix.BlockHeight;
+                        var count = (int)(indexReader.BaseStream.Length / 4);
 
-                    int offset = lookupReader.ReadInt32();
-                    int length = lookupReader.ReadInt32();
-                    lookupReader.ReadInt32(); // Extra
+                        var lists = new HuedTileList[8][];
 
-                    if (offset < 0 || length <= 0)
-                    {
-                        //matrix.SetStaticBlock(blockX, blockY, matrix.EmptyStaticBlock);
-                        continue;
-                    }
-
-                    fsData.Seek(offset, SeekOrigin.Begin);
-
-                    int tileCount = length / 7;
-
-                    StaticTileData[] staTiles = new StaticTileData[tileCount];
-
-                    fixed (StaticTileData* pTiles = staTiles)
-                    {
-                        NativeMethods._lread(fsData.SafeFileHandle, pTiles, length);
-
-                        StaticTileData* pCur = pTiles, pEnd = pTiles + tileCount;
-
-                        while (pCur < pEnd)
+                        for(var x = 0; x < 8; ++x)
                         {
-                            lists[pCur->X & 0x7][pCur->Y & 0x7].Add((short)((pCur->Id & 0x3FFF) + 0x4000), pCur->Hue, pCur->Z);
-                            ++pCur;
-                        }
+                            lists[x] = new HuedTileList[8];
 
-                        HuedTile[][][] tiles = new HuedTile[8][][];
-
-                        for (int x = 0; x < 8; ++x)
-                        {
-                            tiles[x] = new HuedTile[8][];
-
-                            for (int y = 0; y < 8; ++y)
+                            for(var y = 0; y < 8; ++y)
                             {
-                                tiles[x][y] = lists[x][y].ToArray();
+                                lists[x][y] = new HuedTileList();
                             }
                         }
 
-                        //matrix.SetStaticBlock(blockX, blockY, tiles);
+                        for(var i = 0; i < count; ++i)
+                        {
+                            var blockID = indexReader.ReadInt32();
+                            var blockX = blockID / matrix.BlockHeight;
+                            var blockY = blockID % matrix.BlockHeight;
+
+                            var offset = lookupReader.ReadInt32();
+                            var length = lookupReader.ReadInt32();
+                            lookupReader.ReadInt32(); // Extra
+
+                            if(offset < 0 || length <= 0)
+                            {
+                                //matrix.SetStaticBlock(blockX, blockY, matrix.EmptyStaticBlock);
+                                continue;
+                            }
+
+                            fsData.Seek(offset, SeekOrigin.Begin);
+
+                            var tileCount = length / 7;
+
+                            var staTiles = new StaticTileData[tileCount];
+
+                            fixed(StaticTileData* pTiles = staTiles)
+                            {
+                                NativeMethods._lread(fsData.SafeFileHandle, pTiles, length);
+
+                                StaticTileData* pCur = pTiles, pEnd = pTiles + tileCount;
+
+                                while(pCur < pEnd)
+                                {
+                                    lists[pCur->X & 0x7][pCur->Y & 0x7].Add((short)((pCur->Id & 0x3FFF) + 0x4000), pCur->Hue, pCur->Z);
+                                    ++pCur;
+                                }
+
+                                var tiles = new HuedTile[8][][];
+
+                                for(var x = 0; x < 8; ++x)
+                                {
+                                    tiles[x] = new HuedTile[8][];
+
+                                    for(var y = 0; y < 8; ++y)
+                                    {
+                                        tiles[x][y] = lists[x][y].ToArray();
+                                    }
+                                }
+
+                                //matrix.SetStaticBlock(blockX, blockY, tiles);
+                            }
+                        }
+
+                        return count;
                     }
                 }
-
-                return count;
             }
         }
     }

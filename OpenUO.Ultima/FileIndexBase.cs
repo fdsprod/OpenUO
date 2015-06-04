@@ -25,9 +25,6 @@ namespace OpenUO.Ultima
     public abstract class FileIndexBase
     {
         private readonly string _dataPath;
-        private FileIndexEntry[] _entries;
-        private int _length;
-        private Stream _stream;
 
         protected FileIndexBase(string dataPath)
         {
@@ -36,28 +33,31 @@ namespace OpenUO.Ultima
 
         protected FileIndexBase(string dataPath, int length)
         {
-            _length = length;
+            Length = length;
             _dataPath = dataPath;
         }
 
         public int Length
         {
-            get { return _length; }
+            get;
+            private set;
         }
 
         public bool IsOpen
         {
-            get { return _stream != null && _stream.CanRead; }
+            get { return Stream != null && Stream.CanRead; }
         }
 
         public FileIndexEntry[] Entries
         {
-            get { return _entries; }
+            get;
+            private set;
         }
 
         public Stream Stream
         {
-            get { return _stream; }
+            get;
+            private set;
         }
 
         protected string DataPath
@@ -72,15 +72,15 @@ namespace OpenUO.Ultima
 
         public Stream Seek(int index, out int length, out int extra)
         {
-            if (!FilesExist || index < 0 || index >= _length)
+            if(!FilesExist || index < 0 || index >= Length)
             {
                 length = extra = 0;
                 return null;
             }
 
-            FileIndexEntry e = _entries[index];
+            var e = Entries[index];
 
-            if (e.Lookup < 0 || e.Length <= 0)
+            if(e.Lookup < 0 || e.Length <= 0)
             {
                 length = extra = 0;
                 return null;
@@ -89,48 +89,48 @@ namespace OpenUO.Ultima
             length = e.Length & 0x7FFFFFFF;
             extra = e.Extra;
 
-            if (_stream != null && (!_stream.CanRead || !_stream.CanSeek))
+            if(Stream != null && (!Stream.CanRead || !Stream.CanSeek))
             {
-                _stream.Dispose();
-                _stream = null;
+                Stream.Dispose();
+                Stream = null;
             }
 
-            if (_stream == null)
+            if(Stream == null)
             {
-                _stream = new FileStream(_dataPath, FileMode.Open, FileAccess.Read, FileShare.Read);
+                Stream = new FileStream(_dataPath, FileMode.Open, FileAccess.Read, FileShare.Read);
             }
 
-            _stream.Seek(e.Lookup, SeekOrigin.Begin);
+            Stream.Seek(e.Lookup, SeekOrigin.Begin);
 
-            return _stream;
+            return Stream;
         }
 
         public void Close()
         {
-            if (_stream == null)
+            if(Stream == null)
             {
                 return;
             }
 
-            _stream.Close();
-            _stream = null;
+            Stream.Close();
+            Stream = null;
         }
 
         public void Open()
         {
-            if (_stream != null)
+            if(Stream != null)
             {
                 return;
             }
 
-            if (!FilesExist)
+            if(!FilesExist)
             {
                 return;
             }
 
-            _entries = ReadEntries();
+            Entries = ReadEntries();
 
-            _length = _entries.Length;
+            Length = Entries.Length;
         }
 
         protected abstract FileIndexEntry[] ReadEntries();

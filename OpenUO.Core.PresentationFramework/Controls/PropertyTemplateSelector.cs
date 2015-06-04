@@ -11,36 +11,37 @@ namespace OpenUO.Core.PresentationFramework
     {
         public override DataTemplate SelectTemplate(object item, DependencyObject container)
         {
-            Property property = item as Property;
-            if (property == null)
+            var property = item as Property;
+            if(property == null)
             {
                 throw new ArgumentException("item must be of type Property");
             }
-            FrameworkElement element = container as FrameworkElement;
-            if (element == null)
+            var element = container as FrameworkElement;
+            if(element == null)
             {
                 return base.SelectTemplate(property.Value, container);
             }
-            DataTemplate template = FindDataTemplate(property, element);
+            var template = FindDataTemplate(property, element);
             return template;
         }
 
         private DataTemplate FindDataTemplate(Property property, FrameworkElement element)
         {
-            Type propertyType = property.PropertyType;
+            var propertyType = property.PropertyType;
 
-
-            if (!(property.PropertyType == typeof(string)) && property.PropertyType is IEnumerable)
+            if(!(property.PropertyType == typeof(string)) && property.PropertyType is IEnumerable)
+            {
                 propertyType = typeof(List<object>);
+            }
 
-            DataTemplate template = TryFindDataTemplate(element, propertyType);
+            var template = TryFindDataTemplate(element, propertyType);
 
-            while (template == null && propertyType.BaseType != null)
+            while(template == null && propertyType.BaseType != null)
             {
                 propertyType = propertyType.BaseType;
                 template = TryFindDataTemplate(element, propertyType);
             }
-            if (template == null)
+            if(template == null)
             {
                 template = TryFindDataTemplate(element, "default");
             }
@@ -49,8 +50,8 @@ namespace OpenUO.Core.PresentationFramework
 
         private static DataTemplate TryFindDataTemplate(FrameworkElement element, object dataTemplateKey)
         {
-            object dataTemplate = element.TryFindResource(dataTemplateKey);
-            if (dataTemplate == null)
+            var dataTemplate = element.TryFindResource(dataTemplateKey);
+            if(dataTemplate == null)
             {
                 dataTemplateKey = new ComponentResourceKey(typeof(PropertyGrid), dataTemplateKey);
                 dataTemplate = element.TryFindResource(dataTemplateKey);

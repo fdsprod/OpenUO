@@ -32,7 +32,7 @@ namespace OpenUO.Ultima.Adapters
         {
             get
             {
-                if (!IsInitialized)
+                if(!IsInitialized)
                 {
                     Initialize();
                 }
@@ -45,30 +45,33 @@ namespace OpenUO.Ultima.Adapters
         {
             base.Initialize();
 
-            InstallLocation install = Install;
+            var install = Install;
 
-            List<AnimationData> animationData = new List<AnimationData>();
+            var animationData = new List<AnimationData>();
 
-            using (FileStream stream = File.Open(install.GetPath("animdata.mul"), FileMode.Open))
-            using (BinaryReader reader = new BinaryReader(stream))
+            using(var stream = File.Open(install.GetPath("animdata.mul"), FileMode.Open))
             {
-                int totalBlocks = (int)(reader.BaseStream.Length / 548);
-
-                for (int i = 0; i < totalBlocks; i++)
+                using(var reader = new BinaryReader(stream))
                 {
-                    int header = reader.ReadInt32();
-                    byte[] frameData = reader.ReadBytes(64);
+                    var totalBlocks = (int)(reader.BaseStream.Length / 548);
 
-                    AnimationData animData = new AnimationData {
-                        FrameData = new sbyte[64],
-                        Unknown = reader.ReadByte(),
-                        FrameCount = reader.ReadByte(),
-                        FrameInterval = reader.ReadByte(),
-                        FrameStart = reader.ReadByte()
-                    };
+                    for(var i = 0; i < totalBlocks; i++)
+                    {
+                        var header = reader.ReadInt32();
+                        var frameData = reader.ReadBytes(64);
 
-                    Buffer.BlockCopy(frameData, 0, animData.FrameData, 0, 64);
-                    animationData.Add(animData);
+                        var animData = new AnimationData
+                                       {
+                                           FrameData = new sbyte[64],
+                                           Unknown = reader.ReadByte(),
+                                           FrameCount = reader.ReadByte(),
+                                           FrameInterval = reader.ReadByte(),
+                                           FrameStart = reader.ReadByte()
+                                       };
+
+                        Buffer.BlockCopy(frameData, 0, animData.FrameData, 0, 64);
+                        animationData.Add(animData);
+                    }
                 }
             }
 
@@ -77,7 +80,7 @@ namespace OpenUO.Ultima.Adapters
 
         public AnimationData GetAnimationData(int index)
         {
-            if (index < _animationData.Length)
+            if(index < _animationData.Length)
             {
                 return _animationData[index];
             }

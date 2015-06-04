@@ -6,7 +6,7 @@ namespace OpenUO.Core.PresentationFramework.Threading
 {
     public sealed class DispatcherProxy
     {
-        private Dispatcher _dispatcher;
+        private readonly Dispatcher _dispatcher;
 
         private DispatcherProxy(Dispatcher dispatcher)
         {
@@ -25,24 +25,27 @@ namespace OpenUO.Core.PresentationFramework.Threading
 
         public static DispatcherProxy CreateDispatcher()
         {
-            if (Application.Current == null)
+            if(Application.Current == null)
+            {
                 return null;
+            }
 
             return new DispatcherProxy(Application.Current.Dispatcher);
         }
 
         public void CallHandler(object sender, EventHandler handler)
         {
-            if (handler != null)
+            if(handler != null)
             {
-                if (CheckAccess())
-                    BeginInvoke(new Action<object, EventHandler>(CallHandler), new object[] { sender, handler });
+                if(CheckAccess())
+                {
+                    BeginInvoke(new Action<object, EventHandler>(CallHandler), sender, handler);
+                }
                 else
+                {
                     handler(sender, EventArgs.Empty);
+                }
             }
         }
     }
-
- 
-
 }

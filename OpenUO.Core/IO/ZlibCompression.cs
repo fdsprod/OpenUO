@@ -29,7 +29,7 @@ namespace OpenUO.Core.IO
 
         static ZlibCompression()
         {
-            if (IntPtr.Size == 8)
+            if(IntPtr.Size == 8)
             {
                 Compressor = new Compressor64();
             }
@@ -64,7 +64,6 @@ namespace OpenUO.Core.IO
 
         ZLibError Compress(byte[] dest, ref int destLength, byte[] source, int sourceLength);
         ZLibError Compress(byte[] dest, ref int destLength, byte[] source, int sourceLength, ZLibQuality quality);
-
         ZLibError Decompress(byte[] dest, ref int destLength, byte[] source, int sourceLength);
     }
 

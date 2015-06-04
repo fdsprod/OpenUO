@@ -48,24 +48,24 @@ namespace OpenUO.Ultima
             _index = index;
             _colors = new ushort[34];
 
-            for (int i = 0; i < 34; ++i)
+            for(var i = 0; i < 34; ++i)
             {
                 _colors[i] = (ushort)(bin.ReadUInt16() | 0x8000);
             }
 
-            bool nulled = false;
+            var nulled = false;
 
-            StringBuilder sb = new StringBuilder(20, 20);
+            var sb = new StringBuilder(20, 20);
 
-            for (int i = 0; i < 20; ++i)
+            for(var i = 0; i < 20; ++i)
             {
-                char c = (char)bin.ReadByte();
+                var c = (char)bin.ReadByte();
 
-                if (c == 0)
+                if(c == 0)
                 {
                     nulled = true;
                 }
-                else if (!nulled)
+                else if(!nulled)
                 {
                     sb.Append(c);
                 }

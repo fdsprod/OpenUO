@@ -39,6 +39,16 @@ namespace OpenUO.Core.Patterns
             _item = item;
         }
 
+        public int CompareTo(GraphNode<T> other)
+        {
+            if(other == null)
+            {
+                return -1;
+            }
+
+            return _identifier.CompareTo(other._identifier);
+        }
+
         public string Identifier
         {
             get { return _identifier; }
@@ -54,24 +64,14 @@ namespace OpenUO.Core.Patterns
             get { return _dependents; }
         }
 
-        public int CompareTo(GraphNode<T> other)
-        {
-            if (other == null)
-            {
-                return -1;
-            }
-
-            return _identifier.CompareTo(other._identifier);
-        }
-
         public void AddDependent(GraphNode<T> dependency)
         {
-            if (_dependents.Contains(dependency))
+            if(_dependents.Contains(dependency))
             {
                 return;
             }
 
-            if (Equals(dependency))
+            if(Equals(dependency))
             {
                 throw (new Exception(string.Format("Node named '{0}' cannot have a self-referencing dependency.", _identifier)));
             }

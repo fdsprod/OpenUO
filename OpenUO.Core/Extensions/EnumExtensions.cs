@@ -18,7 +18,6 @@
 
 using System;
 using System.ComponentModel;
-using System.Reflection;
 
 #endregion
 
@@ -29,17 +28,17 @@ namespace OpenUO.Core
         public static T GetAttribute<T>(this Enum en)
             where T : Attribute
         {
-            Type type = en.GetType();
+            var type = en.GetType();
 
-            MemberInfo[] memInfo = type.GetMember(en.ToString());
+            var memInfo = type.GetMember(en.ToString());
 
-            if (memInfo != null && memInfo.Length > 0)
+            if(memInfo != null && memInfo.Length > 0)
             {
-                object[] attrs = memInfo[0].GetCustomAttributes(typeof (T), false);
+                var attrs = memInfo[0].GetCustomAttributes(typeof(T), false);
 
-                foreach (object attr in attrs)
+                foreach(var attr in attrs)
                 {
-                    if (attr is T)
+                    if(attr is T)
                     {
                         return (T)attr;
                     }
@@ -51,9 +50,9 @@ namespace OpenUO.Core
 
         public static string GetDescription(this Enum en)
         {
-            DescriptionAttribute descAttr = en.GetAttribute<DescriptionAttribute>();
+            var descAttr = en.GetAttribute<DescriptionAttribute>();
 
-            if (descAttr == null)
+            if(descAttr == null)
             {
                 return string.Empty;
             }

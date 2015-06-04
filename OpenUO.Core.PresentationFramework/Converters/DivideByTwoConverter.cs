@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows.Data;
 
 namespace OpenUO.Core.PresentationFramework.Converters
@@ -10,13 +7,15 @@ namespace OpenUO.Core.PresentationFramework.Converters
     {
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
-            if (value == null)
+            if(value == null)
+            {
                 return 0;
+            }
 
-            string v = value.ToString();
+            var v = value.ToString();
             double outValue;
 
-            if (!double.TryParse(v, out outValue))
+            if(!double.TryParse(v, out outValue))
             {
                 return 0;
             }

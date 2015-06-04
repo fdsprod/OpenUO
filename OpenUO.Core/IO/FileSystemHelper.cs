@@ -26,7 +26,7 @@ namespace OpenUO.Core.IO
     {
         public static void EnsureDirectoryExists(string path)
         {
-            if (!Directory.Exists(path))
+            if(!Directory.Exists(path))
             {
                 Directory.CreateDirectory(path);
             }

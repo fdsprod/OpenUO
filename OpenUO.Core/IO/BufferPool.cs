@@ -25,9 +25,7 @@ namespace OpenUO.Core.IO
     public class BufferPool
     {
         private static List<BufferPool> _pools = new List<BufferPool>();
-
         private readonly int _bufferSize;
-
         private readonly Queue<byte[]> _freeBuffers;
         private readonly int _initialCapacity;
         private readonly string _name;
@@ -42,12 +40,12 @@ namespace OpenUO.Core.IO
 
             _freeBuffers = new Queue<byte[]>(initialCapacity);
 
-            for (int i = 0; i < initialCapacity; ++i)
+            for(var i = 0; i < initialCapacity; ++i)
             {
                 _freeBuffers.Enqueue(new byte[bufferSize]);
             }
 
-            lock (_pools)
+            lock(_pools)
                 _pools.Add(this);
         }
 
@@ -59,7 +57,7 @@ namespace OpenUO.Core.IO
 
         public void GetInfo(out string name, out int freeCount, out int initialCapacity, out int currentCapacity, out int bufferSize, out int misses)
         {
-            lock (this)
+            lock(this)
             {
                 name = _name;
                 freeCount = _freeBuffers.Count;
@@ -72,16 +70,16 @@ namespace OpenUO.Core.IO
 
         public byte[] AcquireBuffer()
         {
-            lock (this)
+            lock(this)
             {
-                if (_freeBuffers.Count > 0)
+                if(_freeBuffers.Count > 0)
                 {
                     return _freeBuffers.Dequeue();
                 }
 
                 ++_misses;
 
-                for (int i = 0; i < _initialCapacity; ++i)
+                for(var i = 0; i < _initialCapacity; ++i)
                 {
                     _freeBuffers.Enqueue(new byte[_bufferSize]);
                 }
@@ -92,18 +90,18 @@ namespace OpenUO.Core.IO
 
         public void ReleaseBuffer(byte[] buffer)
         {
-            if (buffer == null)
+            if(buffer == null)
             {
                 return;
             }
 
-            lock (this)
+            lock(this)
                 _freeBuffers.Enqueue(buffer);
         }
 
         public void Free()
         {
-            lock (_pools)
+            lock(_pools)
                 _pools.Remove(this);
         }
     }

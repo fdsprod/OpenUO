@@ -26,7 +26,7 @@ namespace OpenUO.Core.PresentationFramework.ComponentModel.Design
 
         public bool IsDesignMode
         {
-            get { return (bool)(DesignerProperties.IsInDesignModeProperty.GetMetadata(typeof (DependencyObject)).DefaultValue); }
+            get { return (bool)(DesignerProperties.IsInDesignModeProperty.GetMetadata(typeof(DependencyObject)).DefaultValue); }
         }
 
         public string Error
@@ -46,7 +46,7 @@ namespace OpenUO.Core.PresentationFramework.ComponentModel.Design
         protected override void OnPropertyChanged(string propertyName = null)
 #endif
         {
-            foreach (CommandBase command in _commands)
+            foreach(var command in _commands)
             {
                 command.RaiseCanExecuteChanged();
             }
@@ -61,7 +61,7 @@ namespace OpenUO.Core.PresentationFramework.ComponentModel.Design
 
         protected CommandBase CreateCommand(Action execute, Func<bool> canExecute)
         {
-            if (canExecute == null)
+            if(canExecute == null)
             {
                 canExecute = () => true;
             }
@@ -80,9 +80,9 @@ namespace OpenUO.Core.PresentationFramework.ComponentModel.Design
 
         protected CommandBase CreateCommand<T>(Action<T> execute, Func<T, bool> canExecute)
         {
-            if (canExecute == null)
+            if(canExecute == null)
             {
-                canExecute = (o) => true;
+                canExecute = o => true;
             }
 
             CommandBase command = new RelayCommand<T>(execute, canExecute);
@@ -94,7 +94,7 @@ namespace OpenUO.Core.PresentationFramework.ComponentModel.Design
 
         protected bool RegisterCommand(CommandBase command)
         {
-            if (!_commands.Contains(command))
+            if(!_commands.Contains(command))
             {
                 _commands.Add(command);
                 return false;
@@ -105,7 +105,7 @@ namespace OpenUO.Core.PresentationFramework.ComponentModel.Design
 
         protected void CancelError<T>(Expression<Func<T>> propertyExpression, object error)
         {
-            string propertyName = PropertySupport.ExtractPropertyName(propertyExpression);
+            var propertyName = PropertySupport.ExtractPropertyName(propertyExpression);
             CancelError(propertyName, error);
         }
 
@@ -113,7 +113,7 @@ namespace OpenUO.Core.PresentationFramework.ComponentModel.Design
         {
             object value;
 
-            if (_errors.TryRemove(propertyName, out value))
+            if(_errors.TryRemove(propertyName, out value))
             {
                 OnPropertyChanged(propertyName);
             }
@@ -121,7 +121,7 @@ namespace OpenUO.Core.PresentationFramework.ComponentModel.Design
 
         protected object GetError<T>(Expression<Func<T>> propertyExpression)
         {
-            string propertyName = PropertySupport.ExtractPropertyName(propertyExpression);
+            var propertyName = PropertySupport.ExtractPropertyName(propertyExpression);
             return GetError(propertyName);
         }
 
@@ -129,7 +129,7 @@ namespace OpenUO.Core.PresentationFramework.ComponentModel.Design
         {
             object error = null;
 
-            if (_errors.ContainsKey(propertyName))
+            if(_errors.ContainsKey(propertyName))
             {
                 _errors.TryRemove(propertyName, out error);
             }
@@ -139,7 +139,7 @@ namespace OpenUO.Core.PresentationFramework.ComponentModel.Design
 
         protected void RegisterError<T>(Expression<Func<T>> propertyExpression, object error)
         {
-            string propertyName = PropertySupport.ExtractPropertyName(propertyExpression);
+            var propertyName = PropertySupport.ExtractPropertyName(propertyExpression);
             RegisterError(propertyName, error);
         }
 
@@ -161,7 +161,7 @@ namespace OpenUO.Core.PresentationFramework.ComponentModel.Design
             timer.Interval = interval;
             timer.Tick += onTick;
 
-            if (start)
+            if(start)
             {
                 timer.Start();
             }
@@ -173,8 +173,8 @@ namespace OpenUO.Core.PresentationFramework.ComponentModel.Design
         {
             get
             {
-                object result = GetError(columnName);
-                if (result != null)
+                var result = GetError(columnName);
+                if(result != null)
                 {
                     return result.ToString();
                 }

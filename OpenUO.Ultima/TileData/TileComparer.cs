@@ -33,25 +33,25 @@ namespace OpenUO.Ultima
 
         public int Compare(Tile x, Tile y)
         {
-            if (x._z != y._z)
+            if(x._z != y._z)
             {
                 return x._z.CompareTo(y._z);
             }
 
-            ItemData xData = _tileData.ItemTable[x._id & 0x3FFF];
-            ItemData yData = _tileData.ItemTable[y._id & 0x3FFF];
+            var xData = _tileData.ItemTable[x._id & 0x3FFF];
+            var yData = _tileData.ItemTable[y._id & 0x3FFF];
 
-            if (xData._height != yData._height)
+            if(xData._height != yData._height)
             {
                 return xData._height.CompareTo(yData._height);
             }
 
-            if (xData._height != yData._height)
+            if(xData._height != yData._height)
             {
                 return xData._height.CompareTo(yData._height);
             }
 
-            if (xData.Background != yData.Background)
+            if(xData.Background != yData.Background)
             {
                 xData.Background.CompareTo(yData.Background);
             }

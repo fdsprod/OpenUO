@@ -1,4 +1,5 @@
 ﻿#region License Header
+
 /***************************************************************************
  *
  *   This program is free software; you can redistribute it and/or modify
@@ -7,7 +8,8 @@
  *   (at your option) any later version.
  *
  ***************************************************************************/
- #endregion
+
+#endregion
 
 using System;
 using System.Diagnostics;
@@ -17,6 +19,31 @@ namespace OpenUO.Ultima.Network
 {
     public abstract class Packet
     {
+        private const int BufferSize = 4096;
+        private static readonly BufferPool _buffers = new BufferPool("Compressed", 16, BufferSize);
+        private readonly int _length;
+        private readonly string _name;
+        private readonly int _packetID;
+        private byte[] _compiledBuffer;
+        private int _compiledLength;
+        private State _state;
+        protected PacketWriter Stream;
+
+        protected Packet(int packetID, string name)
+        {
+            _name = name;
+            _packetID = packetID;
+        }
+
+        protected Packet(int packetID, string name, int length)
+        {
+            _packetID = packetID;
+            _length = length;
+
+            Stream = PacketWriter.CreateInstance(length);
+            Stream.Write((byte)packetID);
+        }
+
         [Flags]
         private enum State
         {
@@ -28,21 +55,10 @@ namespace OpenUO.Ultima.Network
             Warned = 0x10
         }
 
-        private const int BufferSize = 4096;
-
-        private static readonly BufferPool _buffers = new BufferPool("Compressed", 16, BufferSize);
-
-        protected PacketWriter Stream;
-
-        private readonly int _packetID;
-        private readonly int _length;
-        private State _state;
-        private readonly string _name;
-
         public string Name
         {
             get { return _name; }
-        } 
+        }
 
         public PacketWriter UnderlyingStream
         {
@@ -52,20 +68,6 @@ namespace OpenUO.Ultima.Network
         public int PacketID
         {
             get { return _packetID; }
-        }
-
-        protected Packet(int packetID, string name)
-        {
-            _packetID = packetID;
-        }
-
-        protected Packet(int packetID, string name, int length)
-        {
-            _packetID = packetID;
-            _length = length;
-
-            Stream = PacketWriter.CreateInstance(length);
-            Stream.Write((byte)packetID);
         }
 
         public void EnsureCapacity(int length)
@@ -89,16 +91,20 @@ namespace OpenUO.Ultima.Network
 
         public static void Release(ref Packet p)
         {
-            if (p != null)
+            if(p != null)
+            {
                 p.Release();
+            }
 
             p = null;
         }
 
         public static void Release(Packet p)
         {
-            if (p != null)
+            if(p != null)
+            {
                 p.Release();
+            }
         }
 
         public void SetStatic()
@@ -113,17 +119,23 @@ namespace OpenUO.Ultima.Network
 
         public void OnSend()
         {
-            if ((_state & (State.Acquired | State.Static)) == 0)
+            if((_state & (State.Acquired | State.Static)) == 0)
+            {
                 Free();
+            }
         }
 
         private void Free()
         {
-            if (_compiledBuffer == null)
+            if(_compiledBuffer == null)
+            {
                 return;
+            }
 
-            if ((_state & State.Buffered) != 0)
+            if((_state & State.Buffered) != 0)
+            {
                 _buffers.ReleaseBuffer(_compiledBuffer);
+            }
 
             _state &= ~(State.Static | State.Acquired | State.Buffered);
 
@@ -132,24 +144,23 @@ namespace OpenUO.Ultima.Network
 
         public void Release()
         {
-            if ((_state & State.Acquired) != 0)
+            if((_state & State.Acquired) != 0)
+            {
                 Free();
+            }
         }
-
-        private byte[] _compiledBuffer;
-        private int _compiledLength;
 
         public byte[] Compile(bool compress, out int length)
         {
-            if (_compiledBuffer == null)
+            if(_compiledBuffer == null)
             {
-                if ((_state & State.Accessed) == 0)
+                if((_state & State.Accessed) == 0)
                 {
                     _state |= State.Accessed;
                 }
                 else
                 {
-                    if ((_state & State.Warned) == 0)
+                    if((_state & State.Warned) == 0)
                     {
                         _state |= State.Warned;
 
@@ -157,8 +168,8 @@ namespace OpenUO.Ultima.Network
                         {
                             //using ( StreamWriter op = new StreamWriter( "net_opt.log", true ) )
                             //{
-                            Debug.WriteLine(string.Format("Redundant compile for packet {0}, use Acquire() and Release()", this.GetType()));
-                            Debug.WriteLine(new System.Diagnostics.StackTrace());
+                            Debug.WriteLine("Redundant compile for packet {0}, use Acquire() and Release()", GetType());
+                            Debug.WriteLine(new StackTrace());
                             //}
                         }
                         catch
@@ -182,32 +193,32 @@ namespace OpenUO.Ultima.Network
 
         private void InternalCompile(bool compress)
         {
-            if (_length == 0)
+            if(_length == 0)
             {
-                long streamLen = Stream.Length;
+                var streamLen = Stream.Length;
 
                 Stream.Seek(1, SeekOrigin.Begin);
                 Stream.Write((ushort)streamLen);
             }
-            else if (Stream.Length != _length)
+            else if(Stream.Length != _length)
             {
-                int diff = (int)Stream.Length - _length;
+                var diff = (int)Stream.Length - _length;
 
                 Debug.WriteLine("Packet: 0x{0:X2}: Bad packet length! ({1}{2} bytes)", _packetID, diff >= 0 ? "+" : "", diff);
             }
 
-            MemoryStream ms = Stream.UnderlyingStream;
+            var ms = Stream.UnderlyingStream;
 
             _compiledBuffer = ms.GetBuffer();
-            int length = (int)ms.Length;
+            var length = (int)ms.Length;
 
-            if (_compiledBuffer != null)
+            if(_compiledBuffer != null)
             {
                 _compiledLength = length;
 
-                byte[] old = _compiledBuffer;
+                var old = _compiledBuffer;
 
-                if (length > BufferSize || (_state & State.Static) != 0)
+                if(length > BufferSize || (_state & State.Static) != 0)
                 {
                     _compiledBuffer = new byte[length];
                 }

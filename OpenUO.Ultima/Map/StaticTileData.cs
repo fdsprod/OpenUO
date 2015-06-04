@@ -25,10 +25,10 @@ namespace OpenUO.Ultima
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     internal struct StaticTileData
     {
+        public short Hue;
         public short Id;
         public byte X;
         public byte Y;
         public sbyte Z;
-        public short Hue;
     }
 }

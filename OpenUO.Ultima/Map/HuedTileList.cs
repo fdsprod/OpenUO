@@ -18,46 +18,46 @@ namespace OpenUO.Ultima
 {
     internal class HuedTileList
     {
-        private int _count;
         private HuedTile[] _tiles;
 
         public HuedTileList()
         {
             _tiles = new HuedTile[8];
-            _count = 0;
+            Count = 0;
         }
 
         public int Count
         {
-            get { return _count; }
+            get;
+            private set;
         }
 
         public void Add(short id, short hue, sbyte z)
         {
-            if ((_count + 1) > _tiles.Length)
+            if((Count + 1) > _tiles.Length)
             {
-                HuedTile[] old = _tiles;
+                var old = _tiles;
                 _tiles = new HuedTile[old.Length * 2];
 
-                for (int i = 0; i < old.Length; ++i)
+                for(var i = 0; i < old.Length; ++i)
                 {
                     _tiles[i] = old[i];
                 }
             }
 
-            _tiles[_count++].Set(id, hue, z);
+            _tiles[Count++].Set(id, hue, z);
         }
 
         public HuedTile[] ToArray()
         {
-            HuedTile[] tiles = new HuedTile[_count];
+            var tiles = new HuedTile[Count];
 
-            for (int i = 0; i < _count; ++i)
+            for(var i = 0; i < Count; ++i)
             {
                 tiles[i] = _tiles[i];
             }
 
-            _count = 0;
+            Count = 0;
 
             return tiles;
         }

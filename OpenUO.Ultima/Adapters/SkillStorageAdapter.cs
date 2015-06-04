@@ -34,7 +34,7 @@ namespace OpenUO.Ultima.Adapters
         {
             get
             {
-                if (!IsInitialized)
+                if(!IsInitialized)
                 {
                     Initialize();
                 }
@@ -47,7 +47,7 @@ namespace OpenUO.Ultima.Adapters
         {
             base.Initialize();
 
-            InstallLocation install = Install;
+            var install = Install;
 
             ReadCategories(install);
             ReadSkills(install);
@@ -55,7 +55,7 @@ namespace OpenUO.Ultima.Adapters
 
         public Skill GetSkill(int index)
         {
-            if (index < _skills.Length)
+            if(index < _skills.Length)
             {
                 return _skills[index];
             }
@@ -65,48 +65,48 @@ namespace OpenUO.Ultima.Adapters
 
         private void ReadCategories(InstallLocation install)
         {
-            List<SkillCategory> categories = new List<SkillCategory>();
+            var categories = new List<SkillCategory>();
 
-            string grpPath = install.GetPath("skillgrp.mul");
+            var grpPath = install.GetPath("skillgrp.mul");
 
-            if (grpPath == null)
+            if(grpPath == null)
             {
                 _categories = categories.ToArray();
                 return;
             }
 
-            using (FileStream stream = new FileStream(grpPath, FileMode.Open, FileAccess.Read, FileShare.Read))
+            using(var stream = new FileStream(grpPath, FileMode.Open, FileAccess.Read, FileShare.Read))
             {
-                BinaryReader bin = new BinaryReader(stream);
+                var bin = new BinaryReader(stream);
 
-                int categoryCount = bin.ReadInt32();
+                var categoryCount = bin.ReadInt32();
 
                 categories.Add(new SkillCategory(new SkillCategoryData(-17, 0, "Misc.")));
 
-                for (int i = 1; i < categoryCount; i++)
+                for(var i = 1; i < categoryCount; i++)
                 {
-                    BinaryReader nameReader = new BinaryReader(stream);
-                    StringBuilder nameBuilder = new StringBuilder();
-                    byte[] nameBuffer = bin.ReadBytes(17);
+                    var nameReader = new BinaryReader(stream);
+                    var nameBuilder = new StringBuilder();
+                    var nameBuffer = bin.ReadBytes(17);
 
-                    for (int j = 0; j < 17; j++)
+                    for(var j = 0; j < 17; j++)
                     {
-                        char ch = (char)nameBuffer[j];
+                        var ch = (char)nameBuffer[j];
 
-                        if (char.IsLetterOrDigit(ch) || char.IsWhiteSpace(ch) || char.IsPunctuation(ch))
+                        if(char.IsLetterOrDigit(ch) || char.IsWhiteSpace(ch) || char.IsPunctuation(ch))
                         {
                             nameBuilder.Append(ch);
                         }
                     }
 
-                    string name = nameBuilder.ToString();
-                    long fileIndex = stream.Position - name.Length;
+                    var name = nameBuilder.ToString();
+                    var fileIndex = stream.Position - name.Length;
                     categories.Add(new SkillCategory(new SkillCategoryData(fileIndex, i, name)));
                 }
 
                 _categoryLookup = new int[(stream.Length - stream.Position) / 4];
 
-                for (int i = 0; i < _categoryLookup.Length; i++)
+                for(var i = 0; i < _categoryLookup.Length; i++)
                 {
                     _categoryLookup[i] = bin.ReadInt32();
                 }
@@ -117,13 +117,13 @@ namespace OpenUO.Ultima.Adapters
 
         private void ReadSkills(InstallLocation install)
         {
-            FileIndexBase fileIndex = install.CreateFileIndex("skills.idx", "skills.mul");
+            var fileIndex = install.CreateFileIndex("skills.idx", "skills.mul");
 
             _skills = new Skill[fileIndex.Length];
 
-            for (int i = 0; i < _skills.Length; i++)
+            for(var i = 0; i < _skills.Length; i++)
             {
-                Skill skill = ReadSkill(fileIndex, i);
+                var skill = ReadSkill(fileIndex, i);
 
                 _skills[i] = skill;
             }
@@ -132,36 +132,36 @@ namespace OpenUO.Ultima.Adapters
         private Skill ReadSkill(FileIndexBase fileIndex, int index)
         {
             int length, extra;
-            Stream stream = fileIndex.Seek(index, out length, out extra);
+            var stream = fileIndex.Seek(index, out length, out extra);
 
-            if (stream == null)
+            if(stream == null)
             {
                 return null;
             }
 
-            BinaryReader bin = new BinaryReader(stream);
-            int nameLength = length - 2;
+            var bin = new BinaryReader(stream);
+            var nameLength = length - 2;
 
-            byte useBtn = bin.ReadByte();
-            byte[] nameBuffer = new byte[nameLength];
+            var useBtn = bin.ReadByte();
+            var nameBuffer = new byte[nameLength];
             bin.Read(nameBuffer, 0, nameLength);
-            byte unk = bin.ReadByte();
+            var unk = bin.ReadByte();
 
-            StringBuilder sb = new StringBuilder(nameBuffer.Length);
+            var sb = new StringBuilder(nameBuffer.Length);
 
-            for (int i = 0; i < nameBuffer.Length; i++)
+            for(var i = 0; i < nameBuffer.Length; i++)
             {
                 sb.Append((char)nameBuffer[i]);
             }
 
-            SkillCategory category = _categories[0];
+            var category = _categories[0];
 
-            if (index < _categoryLookup.Length)
+            if(index < _categoryLookup.Length)
             {
                 category = _categories[_categoryLookup[index]];
             }
 
-            Skill skill = new Skill(new SkillData(index, sb.ToString(), useBtn > 0, extra, unk, category));
+            var skill = new Skill(new SkillData(index, sb.ToString(), useBtn > 0, extra, unk, category));
 
             return skill;
         }

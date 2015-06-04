@@ -27,25 +27,33 @@ namespace OpenUO.Ultima.Adapters
     public class ClientLocalizationStorageAdapter : StorageAdapterBase, IClilocStorageAdapter<ClilocInfo>
     {
         private readonly Dictionary<ClientLocalizationLanguage, ClientLocalizations> _tables =
-            new Dictionary<ClientLocalizationLanguage, ClientLocalizations> {
-                {ClientLocalizationLanguage.ENU, new ClientLocalizations()},
-                {ClientLocalizationLanguage.DEU, new ClientLocalizations()},
-                {ClientLocalizationLanguage.ESP, new ClientLocalizations()},
-                {ClientLocalizationLanguage.FRA, new ClientLocalizations()},
-                {ClientLocalizationLanguage.JPN, new ClientLocalizations()},
-                {ClientLocalizationLanguage.KOR, new ClientLocalizations()}
+            new Dictionary<ClientLocalizationLanguage, ClientLocalizations>
+            {
+                {
+                    ClientLocalizationLanguage.ENU, new ClientLocalizations()
+                },
+                {
+                    ClientLocalizationLanguage.DEU, new ClientLocalizations()
+                },
+                {
+                    ClientLocalizationLanguage.ESP, new ClientLocalizations()
+                },
+                {
+                    ClientLocalizationLanguage.FRA, new ClientLocalizations()
+                },
+                {
+                    ClientLocalizationLanguage.JPN, new ClientLocalizations()
+                },
+                {
+                    ClientLocalizationLanguage.KOR, new ClientLocalizations()
+                }
             };
-
-        public Dictionary<ClientLocalizationLanguage, ClientLocalizations> Tables
-        {
-            get { return _tables; }
-        }
 
         public override int Length
         {
             get
             {
-                if (!IsInitialized)
+                if(!IsInitialized)
                 {
                     Initialize();
                 }
@@ -58,24 +66,24 @@ namespace OpenUO.Ultima.Adapters
         {
             base.Initialize();
 
-            List<ClientLocalizations> tables = new List<ClientLocalizations>(_tables.Values);
-            bool loaded = tables.TrueForAll(t => t.Loaded);
+            var tables = new List<ClientLocalizations>(_tables.Values);
+            var loaded = tables.TrueForAll(t => t.Loaded);
 
-            if (loaded || (Install == null || String.IsNullOrWhiteSpace(Install.Directory)))
+            if(loaded || (Install == null || String.IsNullOrWhiteSpace(Install.Directory)))
             {
                 return;
             }
 
-            foreach (var kvp in _tables)
+            foreach(var kvp in _tables)
             {
-                if (kvp.Value.Loaded)
+                if(kvp.Value.Loaded)
                 {
                     continue;
                 }
 
-                string stub = Path.Combine(Install.Directory, "/Cliloc." + kvp.Key.ToString().ToLower());
+                var stub = Path.Combine(Install.Directory, "/Cliloc." + kvp.Key.ToString().ToLower());
 
-                if (File.Exists(stub))
+                if(File.Exists(stub))
                 {
                     kvp.Value.Load(new FileInfo(stub));
                 }
@@ -84,7 +92,7 @@ namespace OpenUO.Ultima.Adapters
 
         public ClilocInfo GetCliloc(ClientLocalizationLanguage lng, int index)
         {
-            if (_tables.ContainsKey(lng) && _tables[lng] != null)
+            if(_tables.ContainsKey(lng) && _tables[lng] != null)
             {
                 return _tables[lng].Lookup(index);
             }
@@ -92,9 +100,14 @@ namespace OpenUO.Ultima.Adapters
             return null;
         }
 
+        public Dictionary<ClientLocalizationLanguage, ClientLocalizations> Tables
+        {
+            get { return _tables; }
+        }
+
         public string GetRawString(ClientLocalizationLanguage lng, int index)
         {
-            if (_tables.ContainsKey(lng) && _tables[lng] != null && !_tables[lng].IsNullOrEmpty(index))
+            if(_tables.ContainsKey(lng) && _tables[lng] != null && !_tables[lng].IsNullOrEmpty(index))
             {
                 return _tables[lng][index].Text;
             }
@@ -104,9 +117,9 @@ namespace OpenUO.Ultima.Adapters
 
         public string GetString(ClientLocalizationLanguage lng, int index, string args)
         {
-            ClilocInfo info = GetCliloc(lng, index);
+            var info = GetCliloc(lng, index);
 
-            if (info == null)
+            if(info == null)
             {
                 return String.Empty;
             }
@@ -116,9 +129,9 @@ namespace OpenUO.Ultima.Adapters
 
         public string GetString(ClientLocalizationLanguage lng, int index, params string[] args)
         {
-            ClilocInfo info = GetCliloc(lng, index);
+            var info = GetCliloc(lng, index);
 
-            if (info == null)
+            if(info == null)
             {
                 return String.Empty;
             }

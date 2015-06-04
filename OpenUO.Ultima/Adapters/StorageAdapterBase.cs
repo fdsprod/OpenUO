@@ -18,12 +18,6 @@ namespace OpenUO.Ultima.Adapters
 {
     public abstract class StorageAdapterBase : IStorageAdapter
     {
-        public bool IsInitialized
-        {
-            get;
-            private set;
-        }
-
         public InstallLocation Install
         {
             get;
@@ -43,6 +37,12 @@ namespace OpenUO.Ultima.Adapters
         public void Dispose()
         {
             Dispose(true);
+        }
+
+        public bool IsInitialized
+        {
+            get;
+            private set;
         }
 
         protected virtual void Dispose(bool disposing)

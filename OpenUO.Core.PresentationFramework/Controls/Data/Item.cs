@@ -3,47 +3,46 @@ using System.ComponentModel;
 
 namespace OpenUO.Core.PresentationFramework.Data
 {
-	public abstract class Item : INotifyPropertyChanged, IDisposable
-	{
-		#region Notify Property Changed Members
+    public abstract class Item : INotifyPropertyChanged, IDisposable
+    {
+        public Item()
+        {
+            Disposed = false;
+        }
 
-		protected void NotifyPropertyChanged(string property)
-		{
-			if (PropertyChanged != null)
-			{
-				PropertyChanged(this, new PropertyChangedEventArgs(property));
-			}
-		}
+        public event PropertyChangedEventHandler PropertyChanged;
 
-		public event PropertyChangedEventHandler PropertyChanged;
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
 
-		#endregion
+        protected void NotifyPropertyChanged(string property)
+        {
+            if(PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(property));
+            }
+        }
 
-		#region IDisposable Members
+        protected bool Disposed
+        {
+            get;
+            private set;
+        }
 
-		private bool _disposed = false;
+        protected virtual void Dispose(bool disposing)
+        {
+            if(!Disposed)
+            {
+                Disposed = true;
+            }
+        }
 
-		protected bool Disposed
-		{
-			get { return _disposed; }
-		}
-
-		protected virtual void Dispose(bool disposing)
-		{
-			if (!Disposed)
-			{
-				_disposed = true;				
-			}			
-		}
-
-		public void Dispose()
-		{
-			Dispose(true);
-			GC.SuppressFinalize(this);
-		}
-
-		~Item() { Dispose(false); }
-
-		#endregion
-	}
+        ~Item()
+        {
+            Dispose(false);
+        }
+    }
 }

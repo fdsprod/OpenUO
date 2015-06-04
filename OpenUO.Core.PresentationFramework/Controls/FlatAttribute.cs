@@ -2,6 +2,8 @@
 
 namespace OpenUO.Core.PresentationFramework
 {
-	[AttributeUsage(AttributeTargets.Property, Inherited = false, AllowMultiple = false)]
-	public sealed class FlatAttribute : Attribute { }
+    [AttributeUsage(AttributeTargets.Property)]
+    public sealed class FlatAttribute : Attribute
+    {
+    }
 }

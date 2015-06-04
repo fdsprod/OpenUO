@@ -1,4 +1,5 @@
 ﻿#region License Header
+
 /***************************************************************************
  *
  *   This program is free software; you can redistribute it and/or modify
@@ -7,8 +8,8 @@
  *   (at your option) any later version.
  *
  ***************************************************************************/
- #endregion
 
+#endregion
 
 namespace OpenUO.Ultima.Network
 {
@@ -30,18 +31,19 @@ namespace OpenUO.Ultima.Network
         public LoginPacket(string username, string password)
             : base(0x80, "Account Login", 62)
         {
-            this.Stream.WriteAsciiFixed(username, 30);
-            this.Stream.WriteAsciiFixed(password, 30);
-            this.Stream.Write((byte)0x5D);
+            Stream.WriteAsciiFixed(username, 30);
+            Stream.WriteAsciiFixed(password, 30);
+            Stream.Write((byte)0x5D);
         }
     }
 
     public class SelectServerPacket : Packet
     {
-        public SelectServerPacket(short id) :
-            base(0xA0, "Select Server", 3)
+        public SelectServerPacket(short id)
+            :
+                base(0xA0, "Select Server", 3)
         {
-            Stream.Write((short)id);
+            Stream.Write(id);
         }
     }
 
@@ -61,14 +63,14 @@ namespace OpenUO.Ultima.Network
         public LoginCharacterPacket(string characterName, int slotIndex, int ipAddress)
             : base(0x5D, "Character Select", 0x49)
         {
-            Stream.Write((uint)0xEDEDEDED); 
+            Stream.Write(0xEDEDEDED);
             Stream.WriteAsciiFixed(characterName, 30);
             Stream.Write((short)0); // unknown
-            Stream.Write((int)0x00); //TODO: this is client flags, need to define and use.
-            Stream.Write((int)1); // unknown
-            Stream.Write((int)0); //  logincount
+            Stream.Write(0x00); //TODO: this is client flags, need to define and use.
+            Stream.Write(1); // unknown
+            Stream.Write(0); //  logincount
             Stream.WriteAsciiFixed("", 16);
-            Stream.Write(slotIndex); 
+            Stream.Write(slotIndex);
             Stream.Write(ipAddress);
         }
     }

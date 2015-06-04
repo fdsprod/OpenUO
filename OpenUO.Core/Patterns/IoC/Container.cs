@@ -81,18 +81,35 @@ namespace OpenUO.Core.Patterns
         private readonly Dictionary<TKey, TValue> _Dictionary = new Dictionary<TKey, TValue>();
         private readonly object _Padlock = new object();
 
+        public void Dispose()
+        {
+            lock(_Padlock)
+            {
+                var disposableItems = from item in _Dictionary.Values
+                    where item is IDisposable
+                    select item as IDisposable;
+
+                foreach(var item in disposableItems)
+                {
+                    item.Dispose();
+                }
+            }
+
+            GC.SuppressFinalize(this);
+        }
+
         public TValue this[TKey key]
         {
             set
             {
-                lock (_Padlock)
+                lock(_Padlock)
                 {
                     TValue current;
-                    if (_Dictionary.TryGetValue(key, out current))
+                    if(_Dictionary.TryGetValue(key, out current))
                     {
-                        IDisposable disposable = current as IDisposable;
+                        var disposable = current as IDisposable;
 
-                        if (disposable != null)
+                        if(disposable != null)
                         {
                             disposable.Dispose();
                         }
@@ -108,30 +125,9 @@ namespace OpenUO.Core.Patterns
             get { return _Dictionary.Keys; }
         }
 
-        #region IDisposable Members
-
-        public void Dispose()
-        {
-            lock (_Padlock)
-            {
-                IEnumerable<IDisposable> disposableItems = from item in _Dictionary.Values
-                                                           where item is IDisposable
-                                                           select item as IDisposable;
-
-                foreach (IDisposable item in disposableItems)
-                {
-                    item.Dispose();
-                }
-            }
-
-            GC.SuppressFinalize(this);
-        }
-
-        #endregion
-
         public bool TryGetValue(TKey key, out TValue value)
         {
-            lock (_Padlock)
+            lock(_Padlock)
             {
                 return _Dictionary.TryGetValue(key, out value);
             }
@@ -139,7 +135,7 @@ namespace OpenUO.Core.Patterns
 
         public bool Remove(TKey key)
         {
-            lock (_Padlock)
+            lock(_Padlock)
             {
                 return _Dictionary.Remove(key);
             }
@@ -147,7 +143,7 @@ namespace OpenUO.Core.Patterns
 
         public void Clear()
         {
-            lock (_Padlock)
+            lock(_Padlock)
             {
                 _Dictionary.Clear();
             }
@@ -168,17 +164,23 @@ namespace OpenUO.Core.Patterns
             {
                 assemblies = assembly.GetTypes();
             }
-            catch (FileNotFoundException)
+            catch(FileNotFoundException)
             {
-                assemblies = new Type[] {};
+                assemblies = new Type[]
+                             {
+                             };
             }
-            catch (NotSupportedException)
+            catch(NotSupportedException)
             {
-                assemblies = new Type[] {};
+                assemblies = new Type[]
+                             {
+                             };
             }
-            catch (ReflectionTypeLoadException)
+            catch(ReflectionTypeLoadException)
             {
-                assemblies = new Type[] {};
+                assemblies = new Type[]
+                             {
+                             };
             }
 
             return assemblies;
@@ -194,69 +196,9 @@ namespace OpenUO.Core.Patterns
             _genericMethodCache = new SafeDictionary<GenericMethodCacheKey, MethodInfo>();
         }
 
-        /// <summary>
-        ///     Gets a generic method from a type given the method name, binding flags, generic types and parameter types
-        /// </summary>
-        /// <param name="sourceType">Source type</param>
-        /// <param name="bindingFlags">Binding flags</param>
-        /// <param name="methodName">Name of the method</param>
-        /// <param name="genericTypes">Generic types to use to make the method generic</param>
-        /// <param name="parameterTypes">Method parameters</param>
-        /// <returns>MethodInfo or null if no matches found</returns>
-        /// <exception cref="System.Reflection.AmbiguousMatchException" />
-        /// <exception cref="System.ArgumentException" />
-        public static MethodInfo GetGenericMethod(
-            this Type sourceType, BindingFlags bindingFlags, string methodName, Type[] genericTypes, Type[] parameterTypes)
-        {
-            MethodInfo method;
-            GenericMethodCacheKey cacheKey = new GenericMethodCacheKey(sourceType, methodName, genericTypes, parameterTypes);
-
-            // Shouldn't need any additional locking
-            // we don't care if we do the method info generation
-            // more than once before it gets cached.
-            if (!_genericMethodCache.TryGetValue(cacheKey, out method))
-            {
-                method = GetMethod(sourceType, bindingFlags, methodName, genericTypes, parameterTypes);
-                _genericMethodCache[cacheKey] = method;
-            }
-
-            return method;
-        }
-
-        private static MethodInfo GetMethod(Type sourceType, BindingFlags bindingFlags, string methodName, Type[] genericTypes, Type[] parameterTypes)
-        {
-#if GETPARAMETERS_OPEN_GENERICS
-            List<MethodInfo> methods =
-                sourceType.GetMethods(bindingFlags).Where(
-                    mi => string.Equals(methodName, mi.Name, StringComparison.InvariantCulture)).Where(
-                        mi => mi.ContainsGenericParameters).Where(mi => mi.GetGenericArguments().Length == genericTypes.Length).
-                           Where(mi => mi.GetParameters().Length == parameterTypes.Length).Select(
-                               mi => mi.MakeGenericMethod(genericTypes)).Where(
-                                   mi => mi.GetParameters().Select(pi => pi.ParameterType).SequenceEqual(parameterTypes)).ToList();
-#else
-            var validMethods =  from method in sourceType.GetMethods(bindingFlags)
-                                where method.Name == methodName
-                                where method.IsGenericMethod
-                                where method.GetGenericArguments().Length == genericTypes.Length
-                                let genericMethod = method.MakeGenericMethod(genericTypes)
-                                where genericMethod.GetParameters().Count() == parameterTypes.Length
-                                where genericMethod.GetParameters().Select(pi => pi.ParameterType).SequenceEqual(parameterTypes)
-                                select genericMethod;
-
-            var methods = validMethods.ToList();
-#endif
-            if (methods.Count > 1)
-            {
-                throw new AmbiguousMatchException();
-            }
-
-            return methods.FirstOrDefault();
-        }
-
         private sealed class GenericMethodCacheKey
         {
             private readonly Type[] _genericTypes;
-
             private readonly int _hashCode;
             private readonly string _methodName;
             private readonly Type[] _parameterTypes;
@@ -273,43 +215,43 @@ namespace OpenUO.Core.Patterns
 
             public override bool Equals(object obj)
             {
-                GenericMethodCacheKey cacheKey = obj as GenericMethodCacheKey;
-                if (cacheKey == null)
+                var cacheKey = obj as GenericMethodCacheKey;
+                if(cacheKey == null)
                 {
                     return false;
                 }
 
-                if (_sourceType != cacheKey._sourceType)
+                if(_sourceType != cacheKey._sourceType)
                 {
                     return false;
                 }
 
-                if (!String.Equals(_methodName, cacheKey._methodName, StringComparison.InvariantCulture))
+                if(!String.Equals(_methodName, cacheKey._methodName, StringComparison.InvariantCulture))
                 {
                     return false;
                 }
 
-                if (_genericTypes.Length != cacheKey._genericTypes.Length)
+                if(_genericTypes.Length != cacheKey._genericTypes.Length)
                 {
                     return false;
                 }
 
-                if (_parameterTypes.Length != cacheKey._parameterTypes.Length)
+                if(_parameterTypes.Length != cacheKey._parameterTypes.Length)
                 {
                     return false;
                 }
 
-                for (int i = 0; i < _genericTypes.Length; ++i)
+                for(var i = 0; i < _genericTypes.Length; ++i)
                 {
-                    if (_genericTypes[i] != cacheKey._genericTypes[i])
+                    if(_genericTypes[i] != cacheKey._genericTypes[i])
                     {
                         return false;
                     }
                 }
 
-                for (int i = 0; i < _parameterTypes.Length; ++i)
+                for(var i = 0; i < _parameterTypes.Length; ++i)
                 {
-                    if (_parameterTypes[i] != cacheKey._parameterTypes[i])
+                    if(_parameterTypes[i] != cacheKey._parameterTypes[i])
                     {
                         return false;
                     }
@@ -327,16 +269,16 @@ namespace OpenUO.Core.Patterns
             {
                 unchecked
                 {
-                    int result = _sourceType.GetHashCode();
+                    var result = _sourceType.GetHashCode();
 
                     result = (result * 397) ^ _methodName.GetHashCode();
 
-                    for (int i = 0; i < _genericTypes.Length; ++i)
+                    for(var i = 0; i < _genericTypes.Length; ++i)
                     {
                         result = (result * 397) ^ _genericTypes[i].GetHashCode();
                     }
 
-                    for (int i = 0; i < _parameterTypes.Length; ++i)
+                    for(var i = 0; i < _parameterTypes.Length; ++i)
                     {
                         result = (result * 397) ^ _parameterTypes[i].GetHashCode();
                     }
@@ -344,6 +286,65 @@ namespace OpenUO.Core.Patterns
                     return result;
                 }
             }
+        }
+
+        /// <summary>
+        ///     Gets a generic method from a type given the method name, binding flags, generic types and parameter types
+        /// </summary>
+        /// <param name="sourceType">Source type</param>
+        /// <param name="bindingFlags">Binding flags</param>
+        /// <param name="methodName">Name of the method</param>
+        /// <param name="genericTypes">Generic types to use to make the method generic</param>
+        /// <param name="parameterTypes">Method parameters</param>
+        /// <returns>MethodInfo or null if no matches found</returns>
+        /// <exception cref="System.Reflection.AmbiguousMatchException" />
+        /// <exception cref="System.ArgumentException" />
+        public static MethodInfo GetGenericMethod(
+            this Type sourceType, BindingFlags bindingFlags, string methodName, Type[] genericTypes, Type[] parameterTypes)
+        {
+            MethodInfo method;
+            var cacheKey = new GenericMethodCacheKey(sourceType, methodName, genericTypes, parameterTypes);
+
+            // Shouldn't need any additional locking
+            // we don't care if we do the method info generation
+            // more than once before it gets cached.
+            if(!_genericMethodCache.TryGetValue(cacheKey, out method))
+            {
+                method = GetMethod(sourceType, bindingFlags, methodName, genericTypes, parameterTypes);
+                _genericMethodCache[cacheKey] = method;
+            }
+
+            return method;
+        }
+
+        private static MethodInfo GetMethod(Type sourceType, BindingFlags bindingFlags, string methodName, Type[] genericTypes, Type[] parameterTypes)
+        {
+#if GETPARAMETERS_OPEN_GENERICS
+            var methods =
+                sourceType.GetMethods(bindingFlags).Where(
+                    mi => string.Equals(methodName, mi.Name, StringComparison.InvariantCulture)).Where(
+                        mi => mi.ContainsGenericParameters).Where(mi => mi.GetGenericArguments().Length == genericTypes.Length).
+                    Where(mi => mi.GetParameters().Length == parameterTypes.Length).Select(
+                        mi => mi.MakeGenericMethod(genericTypes)).Where(
+                            mi => mi.GetParameters().Select(pi => pi.ParameterType).SequenceEqual(parameterTypes)).ToList();
+#else
+            var validMethods =  from method in sourceType.GetMethods(bindingFlags)
+                                where method.Name == methodName
+                                where method.IsGenericMethod
+                                where method.GetGenericArguments().Length == genericTypes.Length
+                                let genericMethod = method.MakeGenericMethod(genericTypes)
+                                where genericMethod.GetParameters().Count() == parameterTypes.Length
+                                where genericMethod.GetParameters().Select(pi => pi.ParameterType).SequenceEqual(parameterTypes)
+                                select genericMethod;
+
+            var methods = validMethods.ToList();
+#endif
+            if(methods.Count > 1)
+            {
+                throw new AmbiguousMatchException();
+            }
+
+            return methods.FirstOrDefault();
         }
     }
 
@@ -464,8 +465,8 @@ namespace OpenUO.Core.Patterns
 
         private static string GetTypesString(IEnumerable<Type> types)
         {
-            IEnumerable<string> typeNames = from type in types
-                                            select type.FullName;
+            var typeNames = from type in types
+                select type.FullName;
 
             return string.Join(",", typeNames.ToArray());
         }
@@ -536,23 +537,25 @@ namespace OpenUO.Core.Patterns
     {
         private static readonly ResolveOptions _Default = new ResolveOptions();
 
-        private static readonly ResolveOptions _FailUnregisteredAndNameNotFound = new ResolveOptions {
-            NamedResolutionFailureAction = NamedResolutionFailureActions.Fail,
-            UnregisteredResolutionAction = UnregisteredResolutionActions.Fail
-        };
+        private static readonly ResolveOptions _FailUnregisteredAndNameNotFound = new ResolveOptions
+                                                                                  {
+                                                                                      NamedResolutionFailureAction = NamedResolutionFailureActions.Fail,
+                                                                                      UnregisteredResolutionAction = UnregisteredResolutionActions.Fail
+                                                                                  };
 
-        private static readonly ResolveOptions _FailUnregisteredOnly = new ResolveOptions {
-            NamedResolutionFailureAction = NamedResolutionFailureActions.AttemptUnnamedResolution,
-            UnregisteredResolutionAction = UnregisteredResolutionActions.Fail
-        };
+        private static readonly ResolveOptions _FailUnregisteredOnly = new ResolveOptions
+                                                                       {
+                                                                           NamedResolutionFailureAction = NamedResolutionFailureActions.AttemptUnnamedResolution,
+                                                                           UnregisteredResolutionAction = UnregisteredResolutionActions.Fail
+                                                                       };
 
-        private static readonly ResolveOptions _FailNameNotFoundOnly = new ResolveOptions {
-            NamedResolutionFailureAction = NamedResolutionFailureActions.Fail,
-            UnregisteredResolutionAction = UnregisteredResolutionActions.AttemptResolve
-        };
+        private static readonly ResolveOptions _FailNameNotFoundOnly = new ResolveOptions
+                                                                       {
+                                                                           NamedResolutionFailureAction = NamedResolutionFailureActions.Fail,
+                                                                           UnregisteredResolutionAction = UnregisteredResolutionActions.AttemptResolve
+                                                                       };
 
         private NamedResolutionFailureActions _NamedResolutionFailureAction = NamedResolutionFailureActions.Fail;
-
         private UnregisteredResolutionActions _UnregisteredResolutionAction = UnregisteredResolutionActions.AttemptResolve;
 
         public UnregisteredResolutionActions UnregisteredResolutionAction
@@ -576,7 +579,8 @@ namespace OpenUO.Core.Patterns
         }
 
         /// <summary>
-        ///     Preconfigured option for attempting resolution of unregistered types and failing on named resolution if name not found
+        ///     Preconfigured option for attempting resolution of unregistered types and failing on named resolution if name not
+        ///     found
         /// </summary>
         public static ResolveOptions FailNameNotFoundOnly
         {
@@ -592,7 +596,8 @@ namespace OpenUO.Core.Patterns
         }
 
         /// <summary>
-        ///     Preconfigured option for failing on resolving unregistered types, but attempting unnamed resolution if name not found
+        ///     Preconfigured option for failing on resolving unregistered types, but attempting unnamed resolution if name not
+        ///     found
         /// </summary>
         public static ResolveOptions FailUnregisteredOnly
         {
@@ -604,226 +609,34 @@ namespace OpenUO.Core.Patterns
 
     public sealed class Container : IContainer
     {
-        #region "Fluent" API
+        private static readonly Container _Current = new Container();
+        private readonly object _autoRegisterLock = new object();
+        private readonly Dictionary<Type, IModule> _modules = new Dictionary<Type, IModule>();
+        private readonly Container _Parent;
+        private readonly SafeDictionary<TypeRegistration, ObjectFactoryBase> _RegisteredTypes;
+        private bool disposed;
 
-        /// <summary>
-        ///     Registration options for "fluent" API
-        /// </summary>
-        public sealed class RegisterOptions
+        static Container()
         {
-            private readonly Container _Container;
-            private readonly TypeRegistration _Registration;
-
-            public RegisterOptions(Container container, TypeRegistration registration)
-            {
-                _Container = container;
-                _Registration = registration;
-            }
-
-            /// <summary>
-            ///     Make registration a singleton (single instance) if possible
-            /// </summary>
-            /// <returns>RegisterOptions</returns>
-            /// <exception cref="IoCInstantiationTypeException"></exception>
-            public RegisterOptions AsSingleton()
-            {
-                ObjectFactoryBase currentFactory = _Container.GetCurrentFactory(_Registration);
-
-                if (currentFactory == null)
-                {
-                    throw new IoCRegistrationException(_Registration.Type, "singleton");
-                }
-
-                return _Container.AddUpdateRegistration(_Registration, currentFactory.SingletonVariant);
-            }
-
-            /// <summary>
-            ///     Make registration multi-instance if possible
-            /// </summary>
-            /// <returns>RegisterOptions</returns>
-            /// <exception cref="IoCInstantiationTypeException"></exception>
-            public RegisterOptions AsMultiInstance()
-            {
-                ObjectFactoryBase currentFactory = _Container.GetCurrentFactory(_Registration);
-
-                if (currentFactory == null)
-                {
-                    throw new IoCRegistrationException(_Registration.Type, "multi-instance");
-                }
-
-                return _Container.AddUpdateRegistration(_Registration, currentFactory.MultiInstanceVariant);
-            }
-
-            /// <summary>
-            ///     Make registration hold a weak reference if possible
-            /// </summary>
-            /// <returns>RegisterOptions</returns>
-            /// <exception cref="IoCInstantiationTypeException"></exception>
-            public RegisterOptions WithWeakReference()
-            {
-                ObjectFactoryBase currentFactory = _Container.GetCurrentFactory(_Registration);
-
-                if (currentFactory == null)
-                {
-                    throw new IoCRegistrationException(_Registration.Type, "weak reference");
-                }
-
-                return _Container.AddUpdateRegistration(_Registration, currentFactory.WeakReferenceVariant);
-            }
-
-            /// <summary>
-            ///     Make registration hold a strong reference if possible
-            /// </summary>
-            /// <returns>RegisterOptions</returns>
-            /// <exception cref="IoCInstantiationTypeException"></exception>
-            public RegisterOptions WithStrongReference()
-            {
-                ObjectFactoryBase currentFactory = _Container.GetCurrentFactory(_Registration);
-
-                if (currentFactory == null)
-                {
-                    throw new IoCRegistrationException(_Registration.Type, "strong reference");
-                }
-
-                return _Container.AddUpdateRegistration(_Registration, currentFactory.StrongReferenceVariant);
-            }
-
-#if EXPRESSIONS
-            public RegisterOptions UsingConstructor<RegisterType>(Expression<Func<RegisterType>> constructor)
-            {
-                LambdaExpression lambda = constructor as LambdaExpression;
-                if (lambda == null)
-                {
-                    throw new IoCConstructorResolutionException(typeof (RegisterType));
-                }
-
-                NewExpression newExpression = lambda.Body as NewExpression;
-                if (newExpression == null)
-                {
-                    throw new IoCConstructorResolutionException(typeof (RegisterType));
-                }
-
-                ConstructorInfo constructorInfo = newExpression.Constructor;
-                if (constructorInfo == null)
-                {
-                    throw new IoCConstructorResolutionException(typeof (RegisterType));
-                }
-
-                ObjectFactoryBase currentFactory = _Container.GetCurrentFactory(_Registration);
-                if (currentFactory == null)
-                {
-                    throw new IoCConstructorResolutionException(typeof (RegisterType));
-                }
-
-                currentFactory.SetConstructor(constructorInfo);
-
-                return this;
-            }
-#endif
-
-            /// <summary>
-            ///     Switches to a custom lifetime manager factory if possible.
-            ///     Usually used for RegisterOptions "To*" extension methods such as the ASP.Net per-request one.
-            /// </summary>
-            /// <param name="instance">RegisterOptions instance</param>
-            /// <param name="lifetimeProvider">Custom lifetime manager</param>
-            /// <param name="errorString">Error string to display if switch fails</param>
-            /// <returns>RegisterOptions</returns>
-            public static RegisterOptions ToCustomLifetimeManager(
-                RegisterOptions instance, IIoCObjectLifetimeProvider lifetimeProvider, string errorString)
-            {
-                if (instance == null)
-                {
-                    throw new ArgumentNullException("instance", "instance is null.");
-                }
-
-                if (lifetimeProvider == null)
-                {
-                    throw new ArgumentNullException("lifetimeProvider", "lifetimeProvider is null.");
-                }
-
-                if (String.IsNullOrEmpty(errorString))
-                {
-                    throw new ArgumentException("errorString is null or empty.", "errorString");
-                }
-
-                ObjectFactoryBase currentFactory = instance._Container.GetCurrentFactory(instance._Registration);
-
-                if (currentFactory == null)
-                {
-                    throw new IoCRegistrationException(instance._Registration.Type, errorString);
-                }
-
-                return instance._Container.AddUpdateRegistration(
-                    instance._Registration, currentFactory.GetCustomObjectLifetimeVariant(lifetimeProvider, errorString));
-            }
         }
 
-        /// <summary>
-        ///     Registration options for "fluent" API when registering multiple implementations
-        /// </summary>
-        public sealed class MultiRegisterOptions
+        public Container()
         {
-            private IEnumerable<RegisterOptions> _RegisterOptions;
+            _RegisteredTypes = new SafeDictionary<TypeRegistration, ObjectFactoryBase>();
 
-            /// <summary>
-            ///     Initializes a new instance of the MultiRegisterOptions class.
-            /// </summary>
-            /// <param name="registerOptions">Registration options</param>
-            public MultiRegisterOptions(IEnumerable<RegisterOptions> registerOptions)
-            {
-                _RegisterOptions = registerOptions;
-            }
-
-            /// <summary>
-            ///     Make registration a singleton (single instance) if possible
-            /// </summary>
-            /// <returns>RegisterOptions</returns>
-            /// <exception cref="IoCInstantiationTypeException"></exception>
-            public MultiRegisterOptions AsSingleton()
-            {
-                _RegisterOptions = ExecuteOnAllRegisterOptions(ro => ro.AsSingleton());
-                return this;
-            }
-
-            /// <summary>
-            ///     Make registration multi-instance if possible
-            /// </summary>
-            /// <returns>MultiRegisterOptions</returns>
-            /// <exception cref="IoCInstantiationTypeException"></exception>
-            public MultiRegisterOptions AsMultiInstance()
-            {
-                _RegisterOptions = ExecuteOnAllRegisterOptions(ro => ro.AsMultiInstance());
-                return this;
-            }
-
-            private IEnumerable<RegisterOptions> ExecuteOnAllRegisterOptions(Func<RegisterOptions, RegisterOptions> action)
-            {
-                List<RegisterOptions> newRegisterOptions = new List<RegisterOptions>();
-
-                foreach (RegisterOptions registerOption in _RegisterOptions)
-                {
-                    newRegisterOptions.Add(action(registerOption));
-                }
-
-                return newRegisterOptions;
-            }
+            RegisterDefaultTypes();
         }
 
-        #endregion
-
-        #region Public API
-
-        #region Child Containers
+        private Container(Container parent)
+            : this()
+        {
+            _Parent = parent;
+        }
 
         public Container GetChildContainer()
         {
             return new Container(this);
         }
-
-        #endregion
-
-        #region Registration
 
         /// <summary>
         ///     Attempt to automatically register all non-generic classes and interfaces in the current app domain.
@@ -858,7 +671,10 @@ namespace OpenUO.Core.Patterns
         /// <summary>
         ///     Attempt to automatically register all non-generic classes and interfaces in the current app domain.
         /// </summary>
-        /// <param name="ignoreDuplicateImplementations">Whether to ignore duplicate implementations of an interface/base class. False=throw an exception</param>
+        /// <param name="ignoreDuplicateImplementations">
+        ///     Whether to ignore duplicate implementations of an interface/base class.
+        ///     False=throw an exception
+        /// </param>
         /// <exception cref="IoCAutoRegistrationException" />
         public void AutoRegister(bool ignoreDuplicateImplementations)
         {
@@ -873,7 +689,10 @@ namespace OpenUO.Core.Patterns
         ///     Attempt to automatically register all non-generic classes and interfaces in the current app domain.
         ///     Types will only be registered if they pass the supplied registration predicate.
         /// </summary>
-        /// <param name="ignoreDuplicateImplementations">Whether to ignore duplicate implementations of an interface/base class. False=throw an exception</param>
+        /// <param name="ignoreDuplicateImplementations">
+        ///     Whether to ignore duplicate implementations of an interface/base class.
+        ///     False=throw an exception
+        /// </param>
         /// <param name="registrationPredicate">Predicate to determine if a particular type should be registered</param>
         /// <exception cref="IoCAutoRegistrationException" />
         public void AutoRegister(bool ignoreDuplicateImplementations, Func<Type, bool> registrationPredicate)
@@ -914,7 +733,10 @@ namespace OpenUO.Core.Patterns
         ///     Attempt to automatically register all non-generic classes and interfaces in the specified assemblies
         /// </summary>
         /// <param name="assemblies">Assemblies to process</param>
-        /// <param name="ignoreDuplicateImplementations">Whether to ignore duplicate implementations of an interface/base class. False=throw an exception</param>
+        /// <param name="ignoreDuplicateImplementations">
+        ///     Whether to ignore duplicate implementations of an interface/base class.
+        ///     False=throw an exception
+        /// </param>
         /// <exception cref="IoCAutoRegistrationException" />
         public void AutoRegister(IEnumerable<Assembly> assemblies, bool ignoreDuplicateImplementations)
         {
@@ -926,7 +748,10 @@ namespace OpenUO.Core.Patterns
         ///     Types will only be registered if they pass the supplied registration predicate.
         /// </summary>
         /// <param name="assemblies">Assemblies to process</param>
-        /// <param name="ignoreDuplicateImplementations">Whether to ignore duplicate implementations of an interface/base class. False=throw an exception</param>
+        /// <param name="ignoreDuplicateImplementations">
+        ///     Whether to ignore duplicate implementations of an interface/base class.
+        ///     False=throw an exception
+        /// </param>
         /// <param name="registrationPredicate">Predicate to determine if a particular type should be registered</param>
         /// <exception cref="IoCAutoRegistrationException" />
         public void AutoRegister(IEnumerable<Assembly> assemblies, bool ignoreDuplicateImplementations, Func<Type, bool> registrationPredicate)
@@ -1057,7 +882,7 @@ namespace OpenUO.Core.Patterns
         public RegisterOptions Register<RegisterType>()
             where RegisterType : class
         {
-            return Register(typeof (RegisterType));
+            return Register(typeof(RegisterType));
         }
 
         /// <summary>
@@ -1069,7 +894,7 @@ namespace OpenUO.Core.Patterns
         public RegisterOptions Register<RegisterType>(string name)
             where RegisterType : class
         {
-            return Register(typeof (RegisterType), name);
+            return Register(typeof(RegisterType), name);
         }
 
         /// <summary>
@@ -1082,7 +907,7 @@ namespace OpenUO.Core.Patterns
             where RegisterType : class
             where RegisterImplementation : class, RegisterType
         {
-            return Register(typeof (RegisterType), typeof (RegisterImplementation));
+            return Register(typeof(RegisterType), typeof(RegisterImplementation));
         }
 
         /// <summary>
@@ -1096,7 +921,7 @@ namespace OpenUO.Core.Patterns
             where RegisterType : class
             where RegisterImplementation : class, RegisterType
         {
-            return Register(typeof (RegisterType), typeof (RegisterImplementation), name);
+            return Register(typeof(RegisterType), typeof(RegisterImplementation), name);
         }
 
         /// <summary>
@@ -1108,7 +933,7 @@ namespace OpenUO.Core.Patterns
         public RegisterOptions Register<RegisterType>(RegisterType instance)
             where RegisterType : class
         {
-            return Register(typeof (RegisterType), instance);
+            return Register(typeof(RegisterType), instance);
         }
 
         /// <summary>
@@ -1121,7 +946,7 @@ namespace OpenUO.Core.Patterns
         public RegisterOptions Register<RegisterType>(RegisterType instance, string name)
             where RegisterType : class
         {
-            return Register(typeof (RegisterType), instance, name);
+            return Register(typeof(RegisterType), instance, name);
         }
 
         /// <summary>
@@ -1135,7 +960,7 @@ namespace OpenUO.Core.Patterns
             where RegisterType : class
             where RegisterImplementation : class, RegisterType
         {
-            return Register(typeof (RegisterType), typeof (RegisterImplementation), instance);
+            return Register(typeof(RegisterType), typeof(RegisterImplementation), instance);
         }
 
         /// <summary>
@@ -1150,7 +975,7 @@ namespace OpenUO.Core.Patterns
             where RegisterType : class
             where RegisterImplementation : class, RegisterType
         {
-            return Register(typeof (RegisterType), typeof (RegisterImplementation), instance, name);
+            return Register(typeof(RegisterType), typeof(RegisterImplementation), instance, name);
         }
 
         /// <summary>
@@ -1162,12 +987,12 @@ namespace OpenUO.Core.Patterns
         public RegisterOptions Register<RegisterType>(Func<Container, NamedParameterOverloads, RegisterType> factory)
             where RegisterType : class
         {
-            if (factory == null)
+            if(factory == null)
             {
                 throw new ArgumentNullException("factory");
             }
 
-            return Register(typeof (RegisterType), (c, o) => factory(c, o));
+            return Register(typeof(RegisterType), (c, o) => factory(c, o));
         }
 
         /// <summary>
@@ -1180,12 +1005,12 @@ namespace OpenUO.Core.Patterns
         public RegisterOptions Register<RegisterType>(Func<Container, NamedParameterOverloads, RegisterType> factory, string name)
             where RegisterType : class
         {
-            if (factory == null)
+            if(factory == null)
             {
                 throw new ArgumentNullException("factory");
             }
 
-            return Register(typeof (RegisterType), (c, o) => factory(c, o), name);
+            return Register(typeof(RegisterType), (c, o) => factory(c, o), name);
         }
 
         /// <summary>
@@ -1197,7 +1022,7 @@ namespace OpenUO.Core.Patterns
         /// <returns>MultiRegisterOptions for the fluent API</returns>
         public MultiRegisterOptions RegisterMultiple<RegisterType>(IEnumerable<Type> implementationTypes)
         {
-            return RegisterMultiple(typeof (RegisterType), implementationTypes);
+            return RegisterMultiple(typeof(RegisterType), implementationTypes);
         }
 
         /// <summary>
@@ -1209,38 +1034,34 @@ namespace OpenUO.Core.Patterns
         /// <returns>MultiRegisterOptions for the fluent API</returns>
         public MultiRegisterOptions RegisterMultiple(Type registrationType, IEnumerable<Type> implementationTypes)
         {
-            if (implementationTypes == null)
+            if(implementationTypes == null)
             {
                 throw new ArgumentNullException("types", "types is null.");
             }
 
-            foreach (Type type in implementationTypes)
+            foreach(var type in implementationTypes)
             {
-                if (!registrationType.IsAssignableFrom(type))
+                if(!registrationType.IsAssignableFrom(type))
                 {
                     throw new ArgumentException(
                         String.Format("types: The type {0} is not assignable from {1}", registrationType.FullName, type.FullName));
                 }
             }
 
-            if (implementationTypes.Count() != implementationTypes.Distinct().Count())
+            if(implementationTypes.Count() != implementationTypes.Distinct().Count())
             {
                 throw new ArgumentException("types: The same implementation type cannot be specificed multiple times");
             }
 
-            List<RegisterOptions> registerOptions = new List<RegisterOptions>();
+            var registerOptions = new List<RegisterOptions>();
 
-            foreach (Type type in implementationTypes)
+            foreach(var type in implementationTypes)
             {
                 registerOptions.Add(Register(registrationType, type, type.FullName));
             }
 
             return new MultiRegisterOptions(registerOptions);
         }
-
-        #endregion
-
-        #region Resolution
 
         /// <summary>
         ///     Attempts to resolve a type using default options.
@@ -1267,8 +1088,10 @@ namespace OpenUO.Core.Patterns
 
         /// <summary>
         ///     Attempts to resolve a type using default options and the supplied name.
-        ///     Parameters are used in conjunction with normal container resolution to find the most suitable constructor (if one exists).
-        ///     All user supplied parameters must exist in at least one resolvable constructor of RegisterType or resolution will fail.
+        ///     Parameters are used in conjunction with normal container resolution to find the most suitable constructor (if one
+        ///     exists).
+        ///     All user supplied parameters must exist in at least one resolvable constructor of RegisterType or resolution will
+        ///     fail.
         /// </summary>
         /// <param name="resolveType">Type to resolve</param>
         /// <param name="name">Name of registration</param>
@@ -1281,8 +1104,10 @@ namespace OpenUO.Core.Patterns
 
         /// <summary>
         ///     Attempts to resolve a type using supplied options and  name.
-        ///     Parameters are used in conjunction with normal container resolution to find the most suitable constructor (if one exists).
-        ///     All user supplied parameters must exist in at least one resolvable constructor of RegisterType or resolution will fail.
+        ///     Parameters are used in conjunction with normal container resolution to find the most suitable constructor (if one
+        ///     exists).
+        ///     All user supplied parameters must exist in at least one resolvable constructor of RegisterType or resolution will
+        ///     fail.
         /// </summary>
         /// <param name="resolveType">Type to resolve</param>
         /// <param name="name">Name of registration</param>
@@ -1296,8 +1121,10 @@ namespace OpenUO.Core.Patterns
 
         /// <summary>
         ///     Attempts to resolve a type using default options and the supplied constructor parameters.
-        ///     Parameters are used in conjunction with normal container resolution to find the most suitable constructor (if one exists).
-        ///     All user supplied parameters must exist in at least one resolvable constructor of RegisterType or resolution will fail.
+        ///     Parameters are used in conjunction with normal container resolution to find the most suitable constructor (if one
+        ///     exists).
+        ///     All user supplied parameters must exist in at least one resolvable constructor of RegisterType or resolution will
+        ///     fail.
         /// </summary>
         /// <param name="resolveType">Type to resolve</param>
         /// <param name="parameters">User specified constructor parameters</param>
@@ -1310,8 +1137,10 @@ namespace OpenUO.Core.Patterns
 
         /// <summary>
         ///     Attempts to resolve a type using specified options and the supplied constructor parameters.
-        ///     Parameters are used in conjunction with normal container resolution to find the most suitable constructor (if one exists).
-        ///     All user supplied parameters must exist in at least one resolvable constructor of RegisterType or resolution will fail.
+        ///     Parameters are used in conjunction with normal container resolution to find the most suitable constructor (if one
+        ///     exists).
+        ///     All user supplied parameters must exist in at least one resolvable constructor of RegisterType or resolution will
+        ///     fail.
         /// </summary>
         /// <param name="resolveType">Type to resolve</param>
         /// <param name="parameters">User specified constructor parameters</param>
@@ -1325,8 +1154,10 @@ namespace OpenUO.Core.Patterns
 
         /// <summary>
         ///     Attempts to resolve a type using default options and the supplied constructor parameters and name.
-        ///     Parameters are used in conjunction with normal container resolution to find the most suitable constructor (if one exists).
-        ///     All user supplied parameters must exist in at least one resolvable constructor of RegisterType or resolution will fail.
+        ///     Parameters are used in conjunction with normal container resolution to find the most suitable constructor (if one
+        ///     exists).
+        ///     All user supplied parameters must exist in at least one resolvable constructor of RegisterType or resolution will
+        ///     fail.
         /// </summary>
         /// <param name="resolveType">Type to resolve</param>
         /// <param name="parameters">User specified constructor parameters</param>
@@ -1340,8 +1171,10 @@ namespace OpenUO.Core.Patterns
 
         /// <summary>
         ///     Attempts to resolve a named type using specified options and the supplied constructor parameters.
-        ///     Parameters are used in conjunction with normal container resolution to find the most suitable constructor (if one exists).
-        ///     All user supplied parameters must exist in at least one resolvable constructor of RegisterType or resolution will fail.
+        ///     Parameters are used in conjunction with normal container resolution to find the most suitable constructor (if one
+        ///     exists).
+        ///     All user supplied parameters must exist in at least one resolvable constructor of RegisterType or resolution will
+        ///     fail.
         /// </summary>
         /// <param name="resolveType">Type to resolve</param>
         /// <param name="name">Name of registration</param>
@@ -1363,7 +1196,7 @@ namespace OpenUO.Core.Patterns
         public ResolveType Resolve<ResolveType>()
             where ResolveType : class
         {
-            return (ResolveType)Resolve(typeof (ResolveType));
+            return (ResolveType)Resolve(typeof(ResolveType));
         }
 
         /// <summary>
@@ -1376,13 +1209,15 @@ namespace OpenUO.Core.Patterns
         public ResolveType Resolve<ResolveType>(ResolveOptions options)
             where ResolveType : class
         {
-            return (ResolveType)Resolve(typeof (ResolveType), options);
+            return (ResolveType)Resolve(typeof(ResolveType), options);
         }
 
         /// <summary>
         ///     Attempts to resolve a type using default options and the supplied name.
-        ///     Parameters are used in conjunction with normal container resolution to find the most suitable constructor (if one exists).
-        ///     All user supplied parameters must exist in at least one resolvable constructor of RegisterType or resolution will fail.
+        ///     Parameters are used in conjunction with normal container resolution to find the most suitable constructor (if one
+        ///     exists).
+        ///     All user supplied parameters must exist in at least one resolvable constructor of RegisterType or resolution will
+        ///     fail.
         /// </summary>
         /// <typeparam name="ResolveType">Type to resolve</typeparam>
         /// <param name="name">Name of registration</param>
@@ -1391,13 +1226,15 @@ namespace OpenUO.Core.Patterns
         public ResolveType Resolve<ResolveType>(string name)
             where ResolveType : class
         {
-            return (ResolveType)Resolve(typeof (ResolveType), name);
+            return (ResolveType)Resolve(typeof(ResolveType), name);
         }
 
         /// <summary>
         ///     Attempts to resolve a type using supplied options and  name.
-        ///     Parameters are used in conjunction with normal container resolution to find the most suitable constructor (if one exists).
-        ///     All user supplied parameters must exist in at least one resolvable constructor of RegisterType or resolution will fail.
+        ///     Parameters are used in conjunction with normal container resolution to find the most suitable constructor (if one
+        ///     exists).
+        ///     All user supplied parameters must exist in at least one resolvable constructor of RegisterType or resolution will
+        ///     fail.
         /// </summary>
         /// <typeparam name="ResolveType">Type to resolve</typeparam>
         /// <param name="name">Name of registration</param>
@@ -1407,13 +1244,15 @@ namespace OpenUO.Core.Patterns
         public ResolveType Resolve<ResolveType>(string name, ResolveOptions options)
             where ResolveType : class
         {
-            return (ResolveType)Resolve(typeof (ResolveType), name, options);
+            return (ResolveType)Resolve(typeof(ResolveType), name, options);
         }
 
         /// <summary>
         ///     Attempts to resolve a type using default options and the supplied constructor parameters.
-        ///     Parameters are used in conjunction with normal container resolution to find the most suitable constructor (if one exists).
-        ///     All user supplied parameters must exist in at least one resolvable constructor of RegisterType or resolution will fail.
+        ///     Parameters are used in conjunction with normal container resolution to find the most suitable constructor (if one
+        ///     exists).
+        ///     All user supplied parameters must exist in at least one resolvable constructor of RegisterType or resolution will
+        ///     fail.
         /// </summary>
         /// <typeparam name="ResolveType">Type to resolve</typeparam>
         /// <param name="parameters">User specified constructor parameters</param>
@@ -1422,13 +1261,15 @@ namespace OpenUO.Core.Patterns
         public ResolveType Resolve<ResolveType>(NamedParameterOverloads parameters)
             where ResolveType : class
         {
-            return (ResolveType)Resolve(typeof (ResolveType), parameters);
+            return (ResolveType)Resolve(typeof(ResolveType), parameters);
         }
 
         /// <summary>
         ///     Attempts to resolve a type using specified options and the supplied constructor parameters.
-        ///     Parameters are used in conjunction with normal container resolution to find the most suitable constructor (if one exists).
-        ///     All user supplied parameters must exist in at least one resolvable constructor of RegisterType or resolution will fail.
+        ///     Parameters are used in conjunction with normal container resolution to find the most suitable constructor (if one
+        ///     exists).
+        ///     All user supplied parameters must exist in at least one resolvable constructor of RegisterType or resolution will
+        ///     fail.
         /// </summary>
         /// <typeparam name="ResolveType">Type to resolve</typeparam>
         /// <param name="parameters">User specified constructor parameters</param>
@@ -1438,13 +1279,15 @@ namespace OpenUO.Core.Patterns
         public ResolveType Resolve<ResolveType>(NamedParameterOverloads parameters, ResolveOptions options)
             where ResolveType : class
         {
-            return (ResolveType)Resolve(typeof (ResolveType), parameters, options);
+            return (ResolveType)Resolve(typeof(ResolveType), parameters, options);
         }
 
         /// <summary>
         ///     Attempts to resolve a type using default options and the supplied constructor parameters and name.
-        ///     Parameters are used in conjunction with normal container resolution to find the most suitable constructor (if one exists).
-        ///     All user supplied parameters must exist in at least one resolvable constructor of RegisterType or resolution will fail.
+        ///     Parameters are used in conjunction with normal container resolution to find the most suitable constructor (if one
+        ///     exists).
+        ///     All user supplied parameters must exist in at least one resolvable constructor of RegisterType or resolution will
+        ///     fail.
         /// </summary>
         /// <typeparam name="ResolveType">Type to resolve</typeparam>
         /// <param name="parameters">User specified constructor parameters</param>
@@ -1454,13 +1297,15 @@ namespace OpenUO.Core.Patterns
         public ResolveType Resolve<ResolveType>(string name, NamedParameterOverloads parameters)
             where ResolveType : class
         {
-            return (ResolveType)Resolve(typeof (ResolveType), name, parameters);
+            return (ResolveType)Resolve(typeof(ResolveType), name, parameters);
         }
 
         /// <summary>
         ///     Attempts to resolve a named type using specified options and the supplied constructor parameters.
-        ///     Parameters are used in conjunction with normal container resolution to find the most suitable constructor (if one exists).
-        ///     All user supplied parameters must exist in at least one resolvable constructor of RegisterType or resolution will fail.
+        ///     Parameters are used in conjunction with normal container resolution to find the most suitable constructor (if one
+        ///     exists).
+        ///     All user supplied parameters must exist in at least one resolvable constructor of RegisterType or resolution will
+        ///     fail.
         /// </summary>
         /// <typeparam name="ResolveType">Type to resolve</typeparam>
         /// <param name="name">Name of registration</param>
@@ -1471,7 +1316,7 @@ namespace OpenUO.Core.Patterns
         public ResolveType Resolve<ResolveType>(string name, NamedParameterOverloads parameters, ResolveOptions options)
             where ResolveType : class
         {
-            return (ResolveType)Resolve(typeof (ResolveType), name, parameters, options);
+            return (ResolveType)Resolve(typeof(ResolveType), name, parameters, options);
         }
 
         /// <summary>
@@ -1484,17 +1329,6 @@ namespace OpenUO.Core.Patterns
         public bool CanResolve(Type resolveType)
         {
             return CanResolveInternal(new TypeRegistration(resolveType), NamedParameterOverloads.Default, ResolveOptions.Default);
-        }
-
-        /// <summary>
-        ///     Attempts to predict whether a given named type can be resolved with default options.
-        ///     Note: Resolution may still fail if user defined factory registations fail to construct objects when called.
-        /// </summary>
-        /// <param name="resolveType">Type to resolve</param>
-        /// <returns>Bool indicating whether the type can be resolved</returns>
-        private bool CanResolve(Type resolveType, string name)
-        {
-            return CanResolveInternal(new TypeRegistration(resolveType, name), NamedParameterOverloads.Default, ResolveOptions.Default);
         }
 
         /// <summary>
@@ -1524,9 +1358,12 @@ namespace OpenUO.Core.Patterns
         }
 
         /// <summary>
-        ///     Attempts to predict whether a given type can be resolved with the supplied constructor parameters and default options.
-        ///     Parameters are used in conjunction with normal container resolution to find the most suitable constructor (if one exists).
-        ///     All user supplied parameters must exist in at least one resolvable constructor of RegisterType or resolution will fail.
+        ///     Attempts to predict whether a given type can be resolved with the supplied constructor parameters and default
+        ///     options.
+        ///     Parameters are used in conjunction with normal container resolution to find the most suitable constructor (if one
+        ///     exists).
+        ///     All user supplied parameters must exist in at least one resolvable constructor of RegisterType or resolution will
+        ///     fail.
         ///     Note: Resolution may still fail if user defined factory registations fail to construct objects when called.
         /// </summary>
         /// <param name="resolveType">Type to resolve</param>
@@ -1538,9 +1375,12 @@ namespace OpenUO.Core.Patterns
         }
 
         /// <summary>
-        ///     Attempts to predict whether a given named type can be resolved with the supplied constructor parameters and default options.
-        ///     Parameters are used in conjunction with normal container resolution to find the most suitable constructor (if one exists).
-        ///     All user supplied parameters must exist in at least one resolvable constructor of RegisterType or resolution will fail.
+        ///     Attempts to predict whether a given named type can be resolved with the supplied constructor parameters and default
+        ///     options.
+        ///     Parameters are used in conjunction with normal container resolution to find the most suitable constructor (if one
+        ///     exists).
+        ///     All user supplied parameters must exist in at least one resolvable constructor of RegisterType or resolution will
+        ///     fail.
         ///     Note: Resolution may still fail if user defined factory registations fail to construct objects when called.
         /// </summary>
         /// <param name="resolveType">Type to resolve</param>
@@ -1554,8 +1394,10 @@ namespace OpenUO.Core.Patterns
 
         /// <summary>
         ///     Attempts to predict whether a given type can be resolved with the supplied constructor parameters options.
-        ///     Parameters are used in conjunction with normal container resolution to find the most suitable constructor (if one exists).
-        ///     All user supplied parameters must exist in at least one resolvable constructor of RegisterType or resolution will fail.
+        ///     Parameters are used in conjunction with normal container resolution to find the most suitable constructor (if one
+        ///     exists).
+        ///     All user supplied parameters must exist in at least one resolvable constructor of RegisterType or resolution will
+        ///     fail.
         ///     Note: Resolution may still fail if user defined factory registations fail to construct objects when called.
         /// </summary>
         /// <param name="resolveType">Type to resolve</param>
@@ -1569,8 +1411,10 @@ namespace OpenUO.Core.Patterns
 
         /// <summary>
         ///     Attempts to predict whether a given named type can be resolved with the supplied constructor parameters options.
-        ///     Parameters are used in conjunction with normal container resolution to find the most suitable constructor (if one exists).
-        ///     All user supplied parameters must exist in at least one resolvable constructor of RegisterType or resolution will fail.
+        ///     Parameters are used in conjunction with normal container resolution to find the most suitable constructor (if one
+        ///     exists).
+        ///     All user supplied parameters must exist in at least one resolvable constructor of RegisterType or resolution will
+        ///     fail.
         ///     Note: Resolution may still fail if user defined factory registations fail to construct objects when called.
         /// </summary>
         /// <param name="resolveType">Type to resolve</param>
@@ -1593,7 +1437,7 @@ namespace OpenUO.Core.Patterns
         public bool CanResolve<ResolveType>()
             where ResolveType : class
         {
-            return CanResolve(typeof (ResolveType));
+            return CanResolve(typeof(ResolveType));
         }
 
         /// <summary>
@@ -1605,7 +1449,7 @@ namespace OpenUO.Core.Patterns
         public bool CanResolve<ResolveType>(string name)
             where ResolveType : class
         {
-            return CanResolve(typeof (ResolveType), name);
+            return CanResolve(typeof(ResolveType), name);
         }
 
         /// <summary>
@@ -1619,7 +1463,7 @@ namespace OpenUO.Core.Patterns
         public bool CanResolve<ResolveType>(ResolveOptions options)
             where ResolveType : class
         {
-            return CanResolve(typeof (ResolveType), options);
+            return CanResolve(typeof(ResolveType), options);
         }
 
         /// <summary>
@@ -1633,13 +1477,16 @@ namespace OpenUO.Core.Patterns
         public bool CanResolve<ResolveType>(string name, ResolveOptions options)
             where ResolveType : class
         {
-            return CanResolve(typeof (ResolveType), name, options);
+            return CanResolve(typeof(ResolveType), name, options);
         }
 
         /// <summary>
-        ///     Attempts to predict whether a given type can be resolved with the supplied constructor parameters and default options.
-        ///     Parameters are used in conjunction with normal container resolution to find the most suitable constructor (if one exists).
-        ///     All user supplied parameters must exist in at least one resolvable constructor of RegisterType or resolution will fail.
+        ///     Attempts to predict whether a given type can be resolved with the supplied constructor parameters and default
+        ///     options.
+        ///     Parameters are used in conjunction with normal container resolution to find the most suitable constructor (if one
+        ///     exists).
+        ///     All user supplied parameters must exist in at least one resolvable constructor of RegisterType or resolution will
+        ///     fail.
         ///     Note: Resolution may still fail if user defined factory registations fail to construct objects when called.
         /// </summary>
         /// <typeparam name="ResolveType">Type to resolve</typeparam>
@@ -1648,13 +1495,16 @@ namespace OpenUO.Core.Patterns
         public bool CanResolve<ResolveType>(NamedParameterOverloads parameters)
             where ResolveType : class
         {
-            return CanResolve(typeof (ResolveType), parameters);
+            return CanResolve(typeof(ResolveType), parameters);
         }
 
         /// <summary>
-        ///     Attempts to predict whether a given named type can be resolved with the supplied constructor parameters and default options.
-        ///     Parameters are used in conjunction with normal container resolution to find the most suitable constructor (if one exists).
-        ///     All user supplied parameters must exist in at least one resolvable constructor of RegisterType or resolution will fail.
+        ///     Attempts to predict whether a given named type can be resolved with the supplied constructor parameters and default
+        ///     options.
+        ///     Parameters are used in conjunction with normal container resolution to find the most suitable constructor (if one
+        ///     exists).
+        ///     All user supplied parameters must exist in at least one resolvable constructor of RegisterType or resolution will
+        ///     fail.
         ///     Note: Resolution may still fail if user defined factory registations fail to construct objects when called.
         /// </summary>
         /// <typeparam name="ResolveType">Type to resolve</typeparam>
@@ -1664,13 +1514,15 @@ namespace OpenUO.Core.Patterns
         public bool CanResolve<ResolveType>(string name, NamedParameterOverloads parameters)
             where ResolveType : class
         {
-            return CanResolve(typeof (ResolveType), name, parameters);
+            return CanResolve(typeof(ResolveType), name, parameters);
         }
 
         /// <summary>
         ///     Attempts to predict whether a given type can be resolved with the supplied constructor parameters options.
-        ///     Parameters are used in conjunction with normal container resolution to find the most suitable constructor (if one exists).
-        ///     All user supplied parameters must exist in at least one resolvable constructor of RegisterType or resolution will fail.
+        ///     Parameters are used in conjunction with normal container resolution to find the most suitable constructor (if one
+        ///     exists).
+        ///     All user supplied parameters must exist in at least one resolvable constructor of RegisterType or resolution will
+        ///     fail.
         ///     Note: Resolution may still fail if user defined factory registations fail to construct objects when called.
         /// </summary>
         /// <typeparam name="ResolveType">Type to resolve</typeparam>
@@ -1680,13 +1532,15 @@ namespace OpenUO.Core.Patterns
         public bool CanResolve<ResolveType>(NamedParameterOverloads parameters, ResolveOptions options)
             where ResolveType : class
         {
-            return CanResolve(typeof (ResolveType), parameters, options);
+            return CanResolve(typeof(ResolveType), parameters, options);
         }
 
         /// <summary>
         ///     Attempts to predict whether a given named type can be resolved with the supplied constructor parameters options.
-        ///     Parameters are used in conjunction with normal container resolution to find the most suitable constructor (if one exists).
-        ///     All user supplied parameters must exist in at least one resolvable constructor of RegisterType or resolution will fail.
+        ///     Parameters are used in conjunction with normal container resolution to find the most suitable constructor (if one
+        ///     exists).
+        ///     All user supplied parameters must exist in at least one resolvable constructor of RegisterType or resolution will
+        ///     fail.
         ///     Note: Resolution may still fail if user defined factory registations fail to construct objects when called.
         /// </summary>
         /// <typeparam name="ResolveType">Type to resolve</typeparam>
@@ -1697,7 +1551,7 @@ namespace OpenUO.Core.Patterns
         public bool CanResolve<ResolveType>(string name, NamedParameterOverloads parameters, ResolveOptions options)
             where ResolveType : class
         {
-            return CanResolve(typeof (ResolveType), name, parameters, options);
+            return CanResolve(typeof(ResolveType), name, parameters, options);
         }
 
         /// <summary>
@@ -1713,7 +1567,7 @@ namespace OpenUO.Core.Patterns
                 resolvedType = Resolve(resolveType);
                 return true;
             }
-            catch (IoCResolutionException)
+            catch(IoCResolutionException)
             {
                 resolvedType = null;
                 return false;
@@ -1734,7 +1588,7 @@ namespace OpenUO.Core.Patterns
                 resolvedType = Resolve(resolveType, options);
                 return true;
             }
-            catch (IoCResolutionException)
+            catch(IoCResolutionException)
             {
                 resolvedType = null;
                 return false;
@@ -1755,7 +1609,7 @@ namespace OpenUO.Core.Patterns
                 resolvedType = Resolve(resolveType, name);
                 return true;
             }
-            catch (IoCResolutionException)
+            catch(IoCResolutionException)
             {
                 resolvedType = null;
                 return false;
@@ -1777,7 +1631,7 @@ namespace OpenUO.Core.Patterns
                 resolvedType = Resolve(resolveType, name, options);
                 return true;
             }
-            catch (IoCResolutionException)
+            catch(IoCResolutionException)
             {
                 resolvedType = null;
                 return false;
@@ -1798,7 +1652,7 @@ namespace OpenUO.Core.Patterns
                 resolvedType = Resolve(resolveType, parameters);
                 return true;
             }
-            catch (IoCResolutionException)
+            catch(IoCResolutionException)
             {
                 resolvedType = null;
                 return false;
@@ -1820,7 +1674,7 @@ namespace OpenUO.Core.Patterns
                 resolvedType = Resolve(resolveType, name, parameters);
                 return true;
             }
-            catch (IoCResolutionException)
+            catch(IoCResolutionException)
             {
                 resolvedType = null;
                 return false;
@@ -1843,7 +1697,7 @@ namespace OpenUO.Core.Patterns
                 resolvedType = Resolve(resolveType, parameters, options);
                 return true;
             }
-            catch (IoCResolutionException)
+            catch(IoCResolutionException)
             {
                 resolvedType = null;
                 return false;
@@ -1866,7 +1720,7 @@ namespace OpenUO.Core.Patterns
                 resolvedType = Resolve(resolveType, name, parameters, options);
                 return true;
             }
-            catch (IoCResolutionException)
+            catch(IoCResolutionException)
             {
                 resolvedType = null;
                 return false;
@@ -1887,7 +1741,7 @@ namespace OpenUO.Core.Patterns
                 resolvedType = Resolve<ResolveType>();
                 return true;
             }
-            catch (IoCResolutionException)
+            catch(IoCResolutionException)
             {
                 resolvedType = default(ResolveType);
                 return false;
@@ -1909,7 +1763,7 @@ namespace OpenUO.Core.Patterns
                 resolvedType = Resolve<ResolveType>(options);
                 return true;
             }
-            catch (IoCResolutionException)
+            catch(IoCResolutionException)
             {
                 resolvedType = default(ResolveType);
                 return false;
@@ -1931,7 +1785,7 @@ namespace OpenUO.Core.Patterns
                 resolvedType = Resolve<ResolveType>(name);
                 return true;
             }
-            catch (IoCResolutionException)
+            catch(IoCResolutionException)
             {
                 resolvedType = default(ResolveType);
                 return false;
@@ -1954,7 +1808,7 @@ namespace OpenUO.Core.Patterns
                 resolvedType = Resolve<ResolveType>(name, options);
                 return true;
             }
-            catch (IoCResolutionException)
+            catch(IoCResolutionException)
             {
                 resolvedType = default(ResolveType);
                 return false;
@@ -1976,7 +1830,7 @@ namespace OpenUO.Core.Patterns
                 resolvedType = Resolve<ResolveType>(parameters);
                 return true;
             }
-            catch (IoCResolutionException)
+            catch(IoCResolutionException)
             {
                 resolvedType = default(ResolveType);
                 return false;
@@ -1999,7 +1853,7 @@ namespace OpenUO.Core.Patterns
                 resolvedType = Resolve<ResolveType>(name, parameters);
                 return true;
             }
-            catch (IoCResolutionException)
+            catch(IoCResolutionException)
             {
                 resolvedType = default(ResolveType);
                 return false;
@@ -2023,7 +1877,7 @@ namespace OpenUO.Core.Patterns
                 resolvedType = Resolve<ResolveType>(parameters, options);
                 return true;
             }
-            catch (IoCResolutionException)
+            catch(IoCResolutionException)
             {
                 resolvedType = default(ResolveType);
                 return false;
@@ -2047,7 +1901,7 @@ namespace OpenUO.Core.Patterns
                 resolvedType = Resolve<ResolveType>(name, parameters, options);
                 return true;
             }
-            catch (IoCResolutionException)
+            catch(IoCResolutionException)
             {
                 resolvedType = default(ResolveType);
                 return false;
@@ -2084,7 +1938,7 @@ namespace OpenUO.Core.Patterns
         public IEnumerable<ResolveType> ResolveAll<ResolveType>(bool includeUnnamed)
             where ResolveType : class
         {
-            return ResolveAll(typeof (ResolveType), includeUnnamed).Cast<ResolveType>();
+            return ResolveAll(typeof(ResolveType), includeUnnamed).Cast<ResolveType>();
         }
 
         /// <summary>
@@ -2118,11 +1972,235 @@ namespace OpenUO.Core.Patterns
             BuildUpInternal(input, resolveOptions);
         }
 
-        #endregion
+        public void Dispose()
+        {
+            if(!disposed)
+            {
+                disposed = true;
 
-        #endregion
+                _RegisteredTypes.Dispose();
 
-        #region Object Factories
+                GC.SuppressFinalize(this);
+            }
+        }
+
+        public void RegisterModule<TModule>()
+            where TModule : class, IModule
+        {
+            if(_modules.ContainsKey(typeof(TModule)))
+            {
+                throw new Exception("Unable to load module " + typeof(TModule).Name + " because it is already registered.");
+            }
+
+            Register<TModule>();
+            var module = Resolve<TModule>();
+            module.OnLoad(this);
+            _modules.Add(typeof(TModule), module);
+        }
+
+        /// <summary>
+        ///     Registration options for "fluent" API
+        /// </summary>
+        public sealed class RegisterOptions
+        {
+            private readonly Container _Container;
+            private readonly TypeRegistration _Registration;
+
+            public RegisterOptions(Container container, TypeRegistration registration)
+            {
+                _Container = container;
+                _Registration = registration;
+            }
+
+            /// <summary>
+            ///     Make registration a singleton (single instance) if possible
+            /// </summary>
+            /// <returns>RegisterOptions</returns>
+            /// <exception cref="IoCInstantiationTypeException"></exception>
+            public RegisterOptions AsSingleton()
+            {
+                var currentFactory = _Container.GetCurrentFactory(_Registration);
+
+                if(currentFactory == null)
+                {
+                    throw new IoCRegistrationException(_Registration.Type, "singleton");
+                }
+
+                return _Container.AddUpdateRegistration(_Registration, currentFactory.SingletonVariant);
+            }
+
+            /// <summary>
+            ///     Make registration multi-instance if possible
+            /// </summary>
+            /// <returns>RegisterOptions</returns>
+            /// <exception cref="IoCInstantiationTypeException"></exception>
+            public RegisterOptions AsMultiInstance()
+            {
+                var currentFactory = _Container.GetCurrentFactory(_Registration);
+
+                if(currentFactory == null)
+                {
+                    throw new IoCRegistrationException(_Registration.Type, "multi-instance");
+                }
+
+                return _Container.AddUpdateRegistration(_Registration, currentFactory.MultiInstanceVariant);
+            }
+
+            /// <summary>
+            ///     Make registration hold a weak reference if possible
+            /// </summary>
+            /// <returns>RegisterOptions</returns>
+            /// <exception cref="IoCInstantiationTypeException"></exception>
+            public RegisterOptions WithWeakReference()
+            {
+                var currentFactory = _Container.GetCurrentFactory(_Registration);
+
+                if(currentFactory == null)
+                {
+                    throw new IoCRegistrationException(_Registration.Type, "weak reference");
+                }
+
+                return _Container.AddUpdateRegistration(_Registration, currentFactory.WeakReferenceVariant);
+            }
+
+            /// <summary>
+            ///     Make registration hold a strong reference if possible
+            /// </summary>
+            /// <returns>RegisterOptions</returns>
+            /// <exception cref="IoCInstantiationTypeException"></exception>
+            public RegisterOptions WithStrongReference()
+            {
+                var currentFactory = _Container.GetCurrentFactory(_Registration);
+
+                if(currentFactory == null)
+                {
+                    throw new IoCRegistrationException(_Registration.Type, "strong reference");
+                }
+
+                return _Container.AddUpdateRegistration(_Registration, currentFactory.StrongReferenceVariant);
+            }
+
+#if EXPRESSIONS
+            public RegisterOptions UsingConstructor<RegisterType>(Expression<Func<RegisterType>> constructor)
+            {
+                LambdaExpression lambda = constructor;
+                if(lambda == null)
+                {
+                    throw new IoCConstructorResolutionException(typeof(RegisterType));
+                }
+
+                var newExpression = lambda.Body as NewExpression;
+                if(newExpression == null)
+                {
+                    throw new IoCConstructorResolutionException(typeof(RegisterType));
+                }
+
+                var constructorInfo = newExpression.Constructor;
+                if(constructorInfo == null)
+                {
+                    throw new IoCConstructorResolutionException(typeof(RegisterType));
+                }
+
+                var currentFactory = _Container.GetCurrentFactory(_Registration);
+                if(currentFactory == null)
+                {
+                    throw new IoCConstructorResolutionException(typeof(RegisterType));
+                }
+
+                currentFactory.SetConstructor(constructorInfo);
+
+                return this;
+            }
+#endif
+
+            /// <summary>
+            ///     Switches to a custom lifetime manager factory if possible.
+            ///     Usually used for RegisterOptions "To*" extension methods such as the ASP.Net per-request one.
+            /// </summary>
+            /// <param name="instance">RegisterOptions instance</param>
+            /// <param name="lifetimeProvider">Custom lifetime manager</param>
+            /// <param name="errorString">Error string to display if switch fails</param>
+            /// <returns>RegisterOptions</returns>
+            public static RegisterOptions ToCustomLifetimeManager(
+                RegisterOptions instance, IIoCObjectLifetimeProvider lifetimeProvider, string errorString)
+            {
+                if(instance == null)
+                {
+                    throw new ArgumentNullException("instance", "instance is null.");
+                }
+
+                if(lifetimeProvider == null)
+                {
+                    throw new ArgumentNullException("lifetimeProvider", "lifetimeProvider is null.");
+                }
+
+                if(String.IsNullOrEmpty(errorString))
+                {
+                    throw new ArgumentException("errorString is null or empty.", "errorString");
+                }
+
+                var currentFactory = instance._Container.GetCurrentFactory(instance._Registration);
+
+                if(currentFactory == null)
+                {
+                    throw new IoCRegistrationException(instance._Registration.Type, errorString);
+                }
+
+                return instance._Container.AddUpdateRegistration(
+                    instance._Registration, currentFactory.GetCustomObjectLifetimeVariant(lifetimeProvider, errorString));
+            }
+        }
+
+        /// <summary>
+        ///     Registration options for "fluent" API when registering multiple implementations
+        /// </summary>
+        public sealed class MultiRegisterOptions
+        {
+            private IEnumerable<RegisterOptions> _RegisterOptions;
+
+            /// <summary>
+            ///     Initializes a new instance of the MultiRegisterOptions class.
+            /// </summary>
+            /// <param name="registerOptions">Registration options</param>
+            public MultiRegisterOptions(IEnumerable<RegisterOptions> registerOptions)
+            {
+                _RegisterOptions = registerOptions;
+            }
+
+            /// <summary>
+            ///     Make registration a singleton (single instance) if possible
+            /// </summary>
+            /// <returns>RegisterOptions</returns>
+            /// <exception cref="IoCInstantiationTypeException"></exception>
+            public MultiRegisterOptions AsSingleton()
+            {
+                _RegisterOptions = ExecuteOnAllRegisterOptions(ro => ro.AsSingleton());
+                return this;
+            }
+
+            /// <summary>
+            ///     Make registration multi-instance if possible
+            /// </summary>
+            /// <returns>MultiRegisterOptions</returns>
+            /// <exception cref="IoCInstantiationTypeException"></exception>
+            public MultiRegisterOptions AsMultiInstance()
+            {
+                _RegisterOptions = ExecuteOnAllRegisterOptions(ro => ro.AsMultiInstance());
+                return this;
+            }
+
+            private IEnumerable<RegisterOptions> ExecuteOnAllRegisterOptions(Func<RegisterOptions, RegisterOptions> action)
+            {
+                var newRegisterOptions = new List<RegisterOptions>();
+
+                foreach(var registerOption in _RegisterOptions)
+                {
+                    newRegisterOptions.Add(action(registerOption));
+                }
+
+                return newRegisterOptions;
+            }
+        }
 
         /// <summary>
         ///     Provides custom lifetime management for ASP.Net per-request lifetimes etc.
@@ -2232,12 +2310,12 @@ namespace OpenUO.Core.Patterns
 
             public MultiInstanceFactory(Type registerType, Type registerImplementation)
             {
-                if (registerImplementation.IsAbstract || registerImplementation.IsInterface)
+                if(registerImplementation.IsAbstract || registerImplementation.IsInterface)
                 {
                     throw new IoCRegistrationTypeException(registerImplementation, "MultiInstanceFactory");
                 }
 
-                if (!IsValidAssignment(registerType, registerImplementation))
+                if(!IsValidAssignment(registerType, registerImplementation))
                 {
                     throw new IoCRegistrationTypeException(registerImplementation, "MultiInstanceFactory");
                 }
@@ -2267,7 +2345,7 @@ namespace OpenUO.Core.Patterns
                 {
                     return container.ConstructType(requestedType, registerImplementation, Constructor, parameters, options);
                 }
-                catch (IoCResolutionException ex)
+                catch(IoCResolutionException ex)
                 {
                     throw new IoCResolutionException(registerType, ex);
                 }
@@ -2289,7 +2367,7 @@ namespace OpenUO.Core.Patterns
 
             public DelegateFactory(Type registerType, Func<Container, NamedParameterOverloads, object> factory)
             {
-                if (factory == null)
+                if(factory == null)
                 {
                     throw new ArgumentNullException("factory");
                 }
@@ -2325,7 +2403,7 @@ namespace OpenUO.Core.Patterns
                 {
                     return _factory.Invoke(container, parameters);
                 }
-                catch (Exception ex)
+                catch(Exception ex)
                 {
                     throw new IoCResolutionException(registerType, ex);
                 }
@@ -2348,7 +2426,7 @@ namespace OpenUO.Core.Patterns
 
             public WeakDelegateFactory(Type registerType, Func<Container, NamedParameterOverloads, object> factory)
             {
-                if (factory == null)
+                if(factory == null)
                 {
                     throw new ArgumentNullException("factory");
                 }
@@ -2372,9 +2450,9 @@ namespace OpenUO.Core.Patterns
             {
                 get
                 {
-                    Func<Container, NamedParameterOverloads, object> factory = _factory.Target as Func<Container, NamedParameterOverloads, object>;
+                    var factory = _factory.Target as Func<Container, NamedParameterOverloads, object>;
 
-                    if (factory == null)
+                    if(factory == null)
                     {
                         throw new IoCWeakReferenceException(registerType);
                     }
@@ -2390,9 +2468,9 @@ namespace OpenUO.Core.Patterns
 
             public override object GetObject(Type requestedType, Container container, NamedParameterOverloads parameters, ResolveOptions options)
             {
-                Func<Container, NamedParameterOverloads, object> factory = _factory.Target as Func<Container, NamedParameterOverloads, object>;
+                var factory = _factory.Target as Func<Container, NamedParameterOverloads, object>;
 
-                if (factory == null)
+                if(factory == null)
                 {
                     throw new IoCWeakReferenceException(registerType);
                 }
@@ -2401,7 +2479,7 @@ namespace OpenUO.Core.Patterns
                 {
                     return factory.Invoke(container, parameters);
                 }
-                catch (Exception ex)
+                catch(Exception ex)
                 {
                     throw new IoCResolutionException(registerType, ex);
                 }
@@ -2424,7 +2502,7 @@ namespace OpenUO.Core.Patterns
 
             public InstanceFactory(Type registerType, Type registerImplementation, object instance)
             {
-                if (!IsValidAssignment(registerType, registerImplementation))
+                if(!IsValidAssignment(registerType, registerImplementation))
                 {
                     throw new IoCRegistrationTypeException(registerImplementation, "InstanceFactory");
                 }
@@ -2432,6 +2510,16 @@ namespace OpenUO.Core.Patterns
                 this.registerType = registerType;
                 this.registerImplementation = registerImplementation;
                 _instance = instance;
+            }
+
+            public void Dispose()
+            {
+                var disposable = _instance as IDisposable;
+
+                if(disposable != null)
+                {
+                    disposable.Dispose();
+                }
             }
 
             public override bool AssumeConstruction
@@ -2459,16 +2547,6 @@ namespace OpenUO.Core.Patterns
                 get { return this; }
             }
 
-            public void Dispose()
-            {
-                IDisposable disposable = _instance as IDisposable;
-
-                if (disposable != null)
-                {
-                    disposable.Dispose();
-                }
-            }
-
             public override object GetObject(Type requestedType, Container container, NamedParameterOverloads parameters, ResolveOptions options)
             {
                 return _instance;
@@ -2492,7 +2570,7 @@ namespace OpenUO.Core.Patterns
 
             public WeakInstanceFactory(Type registerType, Type registerImplementation, object instance)
             {
-                if (!IsValidAssignment(registerType, registerImplementation))
+                if(!IsValidAssignment(registerType, registerImplementation))
                 {
                     throw new IoCRegistrationTypeException(registerImplementation, "WeakInstanceFactory");
                 }
@@ -2500,6 +2578,16 @@ namespace OpenUO.Core.Patterns
                 this.registerType = registerType;
                 this.registerImplementation = registerImplementation;
                 _instance = new WeakReference(instance);
+            }
+
+            public void Dispose()
+            {
+                var disposable = _instance.Target as IDisposable;
+
+                if(disposable != null)
+                {
+                    disposable.Dispose();
+                }
             }
 
             public override Type CreatesType
@@ -2521,9 +2609,9 @@ namespace OpenUO.Core.Patterns
             {
                 get
                 {
-                    object instance = _instance.Target;
+                    var instance = _instance.Target;
 
-                    if (instance == null)
+                    if(instance == null)
                     {
                         throw new IoCWeakReferenceException(registerType);
                     }
@@ -2532,21 +2620,11 @@ namespace OpenUO.Core.Patterns
                 }
             }
 
-            public void Dispose()
-            {
-                IDisposable disposable = _instance.Target as IDisposable;
-
-                if (disposable != null)
-                {
-                    disposable.Dispose();
-                }
-            }
-
             public override object GetObject(Type requestedType, Container container, NamedParameterOverloads parameters, ResolveOptions options)
             {
-                object instance = _instance.Target;
+                var instance = _instance.Target;
 
-                if (instance == null)
+                if(instance == null)
                 {
                     throw new IoCWeakReferenceException(registerType);
                 }
@@ -2565,25 +2643,40 @@ namespace OpenUO.Core.Patterns
         /// </summary>
         private class SingletonFactory : ObjectFactoryBase, IDisposable
         {
-            private readonly object SingletonLock = new object();
             private readonly Type registerImplementation;
             private readonly Type registerType;
+            private readonly object SingletonLock = new object();
             private object _Current;
 
             public SingletonFactory(Type registerType, Type registerImplementation)
             {
-                if (registerImplementation.IsAbstract || registerImplementation.IsInterface)
+                if(registerImplementation.IsAbstract || registerImplementation.IsInterface)
                 {
                     throw new IoCRegistrationTypeException(registerImplementation, "SingletonFactory");
                 }
 
-                if (!IsValidAssignment(registerType, registerImplementation))
+                if(!IsValidAssignment(registerType, registerImplementation))
                 {
                     throw new IoCRegistrationTypeException(registerImplementation, "SingletonFactory");
                 }
 
                 this.registerType = registerType;
                 this.registerImplementation = registerImplementation;
+            }
+
+            public void Dispose()
+            {
+                if(_Current == null)
+                {
+                    return;
+                }
+
+                var disposable = _Current as IDisposable;
+
+                if(disposable != null)
+                {
+                    disposable.Dispose();
+                }
             }
 
             public override Type CreatesType
@@ -2601,30 +2694,15 @@ namespace OpenUO.Core.Patterns
                 get { return new MultiInstanceFactory(registerType, registerImplementation); }
             }
 
-            public void Dispose()
-            {
-                if (_Current == null)
-                {
-                    return;
-                }
-
-                IDisposable disposable = _Current as IDisposable;
-
-                if (disposable != null)
-                {
-                    disposable.Dispose();
-                }
-            }
-
             public override object GetObject(Type requestedType, Container container, NamedParameterOverloads parameters, ResolveOptions options)
             {
-                if (parameters.Count != 0)
+                if(parameters.Count != 0)
                 {
                     throw new ArgumentException("Cannot specify parameters for singleton types");
                 }
 
-                lock (SingletonLock)
-                    if (_Current == null)
+                lock(SingletonLock)
+                    if(_Current == null)
                     {
                         _Current = container.ConstructType(requestedType, registerImplementation, Constructor, options);
                     }
@@ -2652,25 +2730,25 @@ namespace OpenUO.Core.Patterns
         /// </summary>
         private class CustomObjectLifetimeFactory : ObjectFactoryBase, IDisposable
         {
-            private readonly object SingletonLock = new object();
             private readonly IIoCObjectLifetimeProvider _LifetimeProvider;
             private readonly Type registerImplementation;
             private readonly Type registerType;
+            private readonly object SingletonLock = new object();
 
             public CustomObjectLifetimeFactory(
                 Type registerType, Type registerImplementation, IIoCObjectLifetimeProvider lifetimeProvider, string errorMessage)
             {
-                if (lifetimeProvider == null)
+                if(lifetimeProvider == null)
                 {
                     throw new ArgumentNullException("lifetimeProvider", "lifetimeProvider is null.");
                 }
 
-                if (!IsValidAssignment(registerType, registerImplementation))
+                if(!IsValidAssignment(registerType, registerImplementation))
                 {
                     throw new IoCRegistrationTypeException(registerImplementation, "SingletonFactory");
                 }
 
-                if (registerImplementation.IsAbstract || registerImplementation.IsInterface)
+                if(registerImplementation.IsAbstract || registerImplementation.IsInterface)
                 {
                     throw new IoCRegistrationTypeException(registerImplementation, errorMessage);
                 }
@@ -2678,6 +2756,11 @@ namespace OpenUO.Core.Patterns
                 this.registerType = registerType;
                 this.registerImplementation = registerImplementation;
                 _LifetimeProvider = lifetimeProvider;
+            }
+
+            public void Dispose()
+            {
+                _LifetimeProvider.ReleaseObject();
             }
 
             public override Type CreatesType
@@ -2703,19 +2786,14 @@ namespace OpenUO.Core.Patterns
                 }
             }
 
-            public void Dispose()
-            {
-                _LifetimeProvider.ReleaseObject();
-            }
-
             public override object GetObject(Type requestedType, Container container, NamedParameterOverloads parameters, ResolveOptions options)
             {
                 object current;
 
-                lock (SingletonLock)
+                lock(SingletonLock)
                 {
                     current = _LifetimeProvider.GetObject();
-                    if (current == null)
+                    if(current == null)
                     {
                         current = container.ConstructType(requestedType, registerImplementation, Constructor, options);
                         _LifetimeProvider.SetObject(current);
@@ -2740,28 +2818,6 @@ namespace OpenUO.Core.Patterns
                 return this;
             }
         }
-
-        #endregion
-
-        #region Singleton Container
-
-        private static readonly Container _Current = new Container();
-
-        static Container()
-        {
-        }
-
-        /// <summary>
-        ///     Lazy created Singleton instance of the container for simple scenarios
-        /// </summary>
-        public static Container Current
-        {
-            get { return _Current; }
-        }
-
-        #endregion
-
-        #region Type Registrations
 
         public sealed class TypeRegistration
         {
@@ -2794,19 +2850,19 @@ namespace OpenUO.Core.Patterns
 
             public override bool Equals(object obj)
             {
-                TypeRegistration typeRegistration = obj as TypeRegistration;
+                var typeRegistration = obj as TypeRegistration;
 
-                if (typeRegistration == null)
+                if(typeRegistration == null)
                 {
                     return false;
                 }
 
-                if (Type != typeRegistration.Type)
+                if(Type != typeRegistration.Type)
                 {
                     return false;
                 }
 
-                if (String.Compare(Name, typeRegistration.Name, StringComparison.Ordinal) != 0)
+                if(String.Compare(Name, typeRegistration.Name, StringComparison.Ordinal) != 0)
                 {
                     return false;
                 }
@@ -2820,83 +2876,75 @@ namespace OpenUO.Core.Patterns
             }
         }
 
-        private readonly SafeDictionary<TypeRegistration, ObjectFactoryBase> _RegisteredTypes;
-
-        #endregion
-
-        #region Constructors
-
-        public Container()
+        /// <summary>
+        ///     Attempts to predict whether a given named type can be resolved with default options.
+        ///     Note: Resolution may still fail if user defined factory registations fail to construct objects when called.
+        /// </summary>
+        /// <param name="resolveType">Type to resolve</param>
+        /// <returns>Bool indicating whether the type can be resolved</returns>
+        private bool CanResolve(Type resolveType, string name)
         {
-            _RegisteredTypes = new SafeDictionary<TypeRegistration, ObjectFactoryBase>();
-
-            RegisterDefaultTypes();
+            return CanResolveInternal(new TypeRegistration(resolveType, name), NamedParameterOverloads.Default, ResolveOptions.Default);
         }
 
-        private readonly Container _Parent;
-
-        private Container(Container parent)
-            : this()
+        /// <summary>
+        ///     Lazy created Singleton instance of the container for simple scenarios
+        /// </summary>
+        public static Container Current
         {
-            _Parent = parent;
+            get { return _Current; }
         }
-
-        #endregion
-
-        #region Internal Methods
-
-        private readonly object _autoRegisterLock = new object();
 
         private void AutoRegisterInternal(
             IEnumerable<Assembly> assemblies, bool ignoreDuplicateImplementations, Func<Type, bool> registrationPredicate)
         {
-            lock (_autoRegisterLock)
+            lock(_autoRegisterLock)
             {
-                List<Type> types = assemblies.SelectMany(a => a.SafeGetTypes()).Where(t => !IsIgnoredType(t, registrationPredicate)).ToList();
+                var types = assemblies.SelectMany(a => a.SafeGetTypes()).Where(t => !IsIgnoredType(t, registrationPredicate)).ToList();
 
                 IEnumerable<Type> concreteTypes = from type in types
-                                                  where
-                                                      type.IsClass && (type.IsAbstract == false) &&
-                                                      (type != GetType() && (type.DeclaringType != GetType()) && (!type.IsGenericTypeDefinition))
-                                                  select type;
+                    where
+                        type.IsClass && (type.IsAbstract == false) &&
+                        (type != GetType() && (type.DeclaringType != GetType()) && (!type.IsGenericTypeDefinition))
+                    select type;
 
-                foreach (Type type in concreteTypes)
+                foreach(var type in concreteTypes)
                 {
                     try
                     {
                         RegisterInternal(type, string.Empty, GetDefaultObjectFactory(type, type));
                     }
-                    catch (MethodAccessException)
+                    catch(MethodAccessException)
                     {
                         // Ignore methods we can't access - added for Silverlight
                     }
                 }
 
                 IEnumerable<Type> abstractInterfaceTypes = from type in types
-                                                           where
-                                                               ((type.IsInterface || type.IsAbstract) && (type.DeclaringType != GetType()) &&
-                                                                (!type.IsGenericTypeDefinition))
-                                                           select type;
+                    where
+                        ((type.IsInterface || type.IsAbstract) && (type.DeclaringType != GetType()) &&
+                         (!type.IsGenericTypeDefinition))
+                    select type;
 
-                foreach (Type type in abstractInterfaceTypes)
+                foreach(var type in abstractInterfaceTypes)
                 {
-                    IEnumerable<Type> implementations = from implementationType in concreteTypes
-                                                        where implementationType.GetInterfaces().Contains(type) || implementationType.BaseType == type
-                                                        select implementationType;
+                    var implementations = from implementationType in concreteTypes
+                        where implementationType.GetInterfaces().Contains(type) || implementationType.BaseType == type
+                        select implementationType;
 
-                    if (!ignoreDuplicateImplementations && implementations.Count() > 1)
+                    if(!ignoreDuplicateImplementations && implementations.Count() > 1)
                     {
                         throw new IoCAutoRegistrationException(type, implementations);
                     }
 
-                    Type firstImplementation = implementations.FirstOrDefault();
-                    if (firstImplementation != null)
+                    var firstImplementation = implementations.FirstOrDefault();
+                    if(firstImplementation != null)
                     {
                         try
                         {
                             RegisterInternal(type, string.Empty, GetDefaultObjectFactory(type, firstImplementation));
                         }
-                        catch (MethodAccessException)
+                        catch(MethodAccessException)
                         {
                             // Ignore methods we can't access - added for Silverlight
                         }
@@ -2908,21 +2956,22 @@ namespace OpenUO.Core.Patterns
         private bool IsIgnoredAssembly(Assembly assembly)
         {
             // TODO - find a better way to remove "system" assemblies from the auto registration
-            List<Func<Assembly, bool>> ignoreChecks = new List<Func<Assembly, bool>> {
-                asm => asm.FullName.StartsWith("Microsoft.", StringComparison.InvariantCulture),
-                asm => asm.FullName.StartsWith("System.", StringComparison.InvariantCulture),
-                asm => asm.FullName.StartsWith("System,", StringComparison.InvariantCulture),
-                asm => asm.FullName.StartsWith("CR_ExtUnitTest", StringComparison.InvariantCulture),
-                asm => asm.FullName.StartsWith("mscorlib,", StringComparison.InvariantCulture),
-                asm => asm.FullName.StartsWith("CR_VSTest", StringComparison.InvariantCulture),
-                asm => asm.FullName.StartsWith("DevExpress.CodeRush", StringComparison.InvariantCulture),
-                asm => asm.FullName.StartsWith("IronPython", StringComparison.InvariantCulture),
-                asm => asm.FullName.StartsWith("IronRuby", StringComparison.InvariantCulture),
-            };
+            var ignoreChecks = new List<Func<Assembly, bool>>
+                               {
+                                   asm => asm.FullName.StartsWith("Microsoft.", StringComparison.InvariantCulture),
+                                   asm => asm.FullName.StartsWith("System.", StringComparison.InvariantCulture),
+                                   asm => asm.FullName.StartsWith("System,", StringComparison.InvariantCulture),
+                                   asm => asm.FullName.StartsWith("CR_ExtUnitTest", StringComparison.InvariantCulture),
+                                   asm => asm.FullName.StartsWith("mscorlib,", StringComparison.InvariantCulture),
+                                   asm => asm.FullName.StartsWith("CR_VSTest", StringComparison.InvariantCulture),
+                                   asm => asm.FullName.StartsWith("DevExpress.CodeRush", StringComparison.InvariantCulture),
+                                   asm => asm.FullName.StartsWith("IronPython", StringComparison.InvariantCulture),
+                                   asm => asm.FullName.StartsWith("IronRuby", StringComparison.InvariantCulture)
+                               };
 
-            foreach (var check in ignoreChecks)
+            foreach(var check in ignoreChecks)
             {
-                if (check(assembly))
+                if(check(assembly))
                 {
                     return true;
                 }
@@ -2934,24 +2983,25 @@ namespace OpenUO.Core.Patterns
         private bool IsIgnoredType(Type type, Func<Type, bool> registrationPredicate)
         {
             // TODO - find a better way to remove "system" types from the auto registration
-            List<Func<Type, bool>> ignoreChecks = new List<Func<Type, bool>> {
-                t => t.FullName.StartsWith("System.", StringComparison.InvariantCulture),
-                t => t.FullName.StartsWith("Microsoft.", StringComparison.InvariantCulture),
-                t => t.IsPrimitive,
+            var ignoreChecks = new List<Func<Type, bool>>
+                               {
+                                   t => t.FullName.StartsWith("System.", StringComparison.InvariantCulture),
+                                   t => t.FullName.StartsWith("Microsoft.", StringComparison.InvariantCulture),
+                                   t => t.IsPrimitive,
 #if !UNBOUND_GENERICS_GETCONSTRUCTORS
                 t => t.IsGenericTypeDefinition,
 #endif
-                t => (t.GetConstructors(BindingFlags.Instance | BindingFlags.Public).Length == 0) && !(t.IsInterface || t.IsAbstract),
-            };
+                                   t => (t.GetConstructors(BindingFlags.Instance | BindingFlags.Public).Length == 0) && !(t.IsInterface || t.IsAbstract)
+                               };
 
-            if (registrationPredicate != null)
+            if(registrationPredicate != null)
             {
                 ignoreChecks.Add(t => !registrationPredicate(t));
             }
 
-            foreach (var check in ignoreChecks)
+            foreach(var check in ignoreChecks)
             {
-                if (check(type))
+                if(check(type))
                 {
                     return true;
                 }
@@ -2982,7 +3032,7 @@ namespace OpenUO.Core.Patterns
 
         private RegisterOptions RegisterInternal(Type registerType, string name, ObjectFactoryBase factory)
         {
-            TypeRegistration typeRegistration = new TypeRegistration(registerType, name);
+            var typeRegistration = new TypeRegistration(registerType, name);
 
             return AddUpdateRegistration(typeRegistration, factory);
         }
@@ -3001,7 +3051,7 @@ namespace OpenUO.Core.Patterns
 
         private ObjectFactoryBase GetDefaultObjectFactory(Type registerType, Type registerImplementation)
         {
-            if (registerType.IsInterface || registerType.IsAbstract)
+            if(registerType.IsInterface || registerType.IsAbstract)
             {
                 return new SingletonFactory(registerType, registerImplementation);
             }
@@ -3011,45 +3061,42 @@ namespace OpenUO.Core.Patterns
 
         private bool CanResolveInternal(TypeRegistration registration, NamedParameterOverloads parameters, ResolveOptions options)
         {
-            if (parameters == null)
+            if(parameters == null)
             {
                 throw new ArgumentNullException("parameters");
             }
 
-            Type checkType = registration.Type;
-            string name = registration.Name;
+            var checkType = registration.Type;
+            var name = registration.Name;
 
             ObjectFactoryBase factory;
-            if (_RegisteredTypes.TryGetValue(new TypeRegistration(checkType, name), out factory))
+            if(_RegisteredTypes.TryGetValue(new TypeRegistration(checkType, name), out factory))
             {
-                if (factory.AssumeConstruction)
+                if(factory.AssumeConstruction)
                 {
                     return true;
                 }
 
-                if (factory.Constructor == null)
+                if(factory.Constructor == null)
                 {
                     return (GetBestConstructor(factory.CreatesType, parameters, options) != null) ? true : false;
                 }
-                else
-                {
-                    return CanConstruct(factory.Constructor, parameters, options);
-                }
+                return CanConstruct(factory.Constructor, parameters, options);
             }
 
             // Fail if requesting named resolution and settings set to fail if unresolved
             // Or bubble up if we have a parent
-            if (!String.IsNullOrEmpty(name) && options.NamedResolutionFailureAction == NamedResolutionFailureActions.Fail)
+            if(!String.IsNullOrEmpty(name) && options.NamedResolutionFailureAction == NamedResolutionFailureActions.Fail)
             {
                 return (_Parent != null) ? _Parent.CanResolveInternal(registration, parameters, options) : false;
             }
 
             // Attemped unnamed fallback container resolution if relevant and requested
-            if (!String.IsNullOrEmpty(name) && options.NamedResolutionFailureAction == NamedResolutionFailureActions.AttemptUnnamedResolution)
+            if(!String.IsNullOrEmpty(name) && options.NamedResolutionFailureAction == NamedResolutionFailureActions.AttemptUnnamedResolution)
             {
-                if (_RegisteredTypes.TryGetValue(new TypeRegistration(checkType), out factory))
+                if(_RegisteredTypes.TryGetValue(new TypeRegistration(checkType), out factory))
                 {
-                    if (factory.AssumeConstruction)
+                    if(factory.AssumeConstruction)
                     {
                         return true;
                     }
@@ -3059,29 +3106,29 @@ namespace OpenUO.Core.Patterns
             }
 
             // Check if type is an automatic lazy factory request
-            if (IsAutomaticLazyFactoryRequest(checkType))
+            if(IsAutomaticLazyFactoryRequest(checkType))
             {
                 return true;
             }
 
             // Check if type is an IEnumerable<ResolveType>
-            if (IsIEnumerableRequest(registration.Type))
+            if(IsIEnumerableRequest(registration.Type))
             {
                 return true;
             }
 
             // Attempt unregistered construction if possible and requested
             // If we cant', bubble if we have a parent
-            if ((options.UnregisteredResolutionAction == UnregisteredResolutionActions.AttemptResolve) ||
-                (checkType.IsGenericType && options.UnregisteredResolutionAction == UnregisteredResolutionActions.GenericsOnly))
+            if((options.UnregisteredResolutionAction == UnregisteredResolutionActions.AttemptResolve) ||
+               (checkType.IsGenericType && options.UnregisteredResolutionAction == UnregisteredResolutionActions.GenericsOnly))
             {
                 return (GetBestConstructor(checkType, parameters, options) != null)
-                           ? true
-                           : (_Parent != null) ? _Parent.CanResolveInternal(registration, parameters, options) : false;
+                    ? true
+                    : (_Parent != null) ? _Parent.CanResolveInternal(registration, parameters, options) : false;
             }
 
             // Bubble resolution up the container tree if we have a parent
-            if (_Parent != null)
+            if(_Parent != null)
             {
                 return _Parent.CanResolveInternal(registration, parameters, options);
             }
@@ -3091,14 +3138,14 @@ namespace OpenUO.Core.Patterns
 
         private bool IsIEnumerableRequest(Type type)
         {
-            if (!type.IsGenericType)
+            if(!type.IsGenericType)
             {
                 return false;
             }
 
-            Type genericType = type.GetGenericTypeDefinition();
+            var genericType = type.GetGenericTypeDefinition();
 
-            if (genericType == typeof (IEnumerable<>))
+            if(genericType == typeof(IEnumerable<>))
             {
                 return true;
             }
@@ -3108,28 +3155,28 @@ namespace OpenUO.Core.Patterns
 
         private bool IsAutomaticLazyFactoryRequest(Type type)
         {
-            if (!type.IsGenericType)
+            if(!type.IsGenericType)
             {
                 return false;
             }
 
-            Type genericType = type.GetGenericTypeDefinition();
+            var genericType = type.GetGenericTypeDefinition();
 
             // Just a func
-            if (genericType == typeof (Func<>))
+            if(genericType == typeof(Func<>))
             {
                 return true;
             }
 
             // 2 parameter func with string as first parameter (name)
-            if ((genericType == typeof (Func<,>) && type.GetGenericArguments()[0] == typeof (string)))
+            if((genericType == typeof(Func<,>) && type.GetGenericArguments()[0] == typeof(string)))
             {
                 return true;
             }
 
             // 3 parameter func with string as first parameter (name) and IDictionary<string, object> as second (parameters)
-            if ((genericType == typeof (Func<,,>) && type.GetGenericArguments()[0] == typeof (string) &&
-                 type.GetGenericArguments()[1] == typeof (IDictionary<String, object>)))
+            if((genericType == typeof(Func<,,>) && type.GetGenericArguments()[0] == typeof(string) &&
+                type.GetGenericArguments()[1] == typeof(IDictionary<String, object>)))
             {
                 return true;
             }
@@ -3139,13 +3186,13 @@ namespace OpenUO.Core.Patterns
 
         private ObjectFactoryBase GetParentObjectFactory(TypeRegistration registration)
         {
-            if (_Parent == null)
+            if(_Parent == null)
             {
                 return null;
             }
 
             ObjectFactoryBase factory;
-            if (_Parent._RegisteredTypes.TryGetValue(registration, out factory))
+            if(_Parent._RegisteredTypes.TryGetValue(registration, out factory))
             {
                 return factory.GetFactoryForChildContainer(registration.Type, _Parent, this);
             }
@@ -3158,17 +3205,17 @@ namespace OpenUO.Core.Patterns
             ObjectFactoryBase factory;
 
             // Attempt container resolution
-            if (_RegisteredTypes.TryGetValue(registration, out factory))
+            if(_RegisteredTypes.TryGetValue(registration, out factory))
             {
                 try
                 {
                     return factory.GetObject(registration.Type, this, parameters, options);
                 }
-                catch (IoCResolutionException)
+                catch(IoCResolutionException)
                 {
                     throw;
                 }
-                catch (Exception ex)
+                catch(Exception ex)
                 {
                     throw new IoCResolutionException(registration.Type, ex);
                 }
@@ -3176,23 +3223,23 @@ namespace OpenUO.Core.Patterns
 
 #if RESOLVE_OPEN_GENERICS
             // Attempt container resolution of open generic
-            if (registration.Type.IsGenericType)
+            if(registration.Type.IsGenericType)
             {
-                TypeRegistration openTypeRegistration = new TypeRegistration(
+                var openTypeRegistration = new TypeRegistration(
                     registration.Type.GetGenericTypeDefinition(),
                     registration.Name);
 
-                if (_RegisteredTypes.TryGetValue(openTypeRegistration, out factory))
+                if(_RegisteredTypes.TryGetValue(openTypeRegistration, out factory))
                 {
                     try
                     {
                         return factory.GetObject(registration.Type, this, parameters, options);
                     }
-                    catch (IoCResolutionException)
+                    catch(IoCResolutionException)
                     {
                         throw;
                     }
-                    catch (Exception ex)
+                    catch(Exception ex)
                     {
                         throw new IoCResolutionException(registration.Type, ex);
                     }
@@ -3201,44 +3248,44 @@ namespace OpenUO.Core.Patterns
 #endif
 
             // Attempt to get a factory from parent if we can
-            ObjectFactoryBase bubbledObjectFactory = GetParentObjectFactory(registration);
-            if (bubbledObjectFactory != null)
+            var bubbledObjectFactory = GetParentObjectFactory(registration);
+            if(bubbledObjectFactory != null)
             {
                 try
                 {
                     return bubbledObjectFactory.GetObject(registration.Type, this, parameters, options);
                 }
-                catch (IoCResolutionException)
+                catch(IoCResolutionException)
                 {
                     throw;
                 }
-                catch (Exception ex)
+                catch(Exception ex)
                 {
                     throw new IoCResolutionException(registration.Type, ex);
                 }
             }
 
             // Fail if requesting named resolution and settings set to fail if unresolved
-            if (!String.IsNullOrEmpty(registration.Name) && options.NamedResolutionFailureAction == NamedResolutionFailureActions.Fail)
+            if(!String.IsNullOrEmpty(registration.Name) && options.NamedResolutionFailureAction == NamedResolutionFailureActions.Fail)
             {
                 throw new IoCResolutionException(registration.Type);
             }
 
             // Attemped unnamed fallback container resolution if relevant and requested
-            if (!String.IsNullOrEmpty(registration.Name) &&
-                options.NamedResolutionFailureAction == NamedResolutionFailureActions.AttemptUnnamedResolution)
+            if(!String.IsNullOrEmpty(registration.Name) &&
+               options.NamedResolutionFailureAction == NamedResolutionFailureActions.AttemptUnnamedResolution)
             {
-                if (_RegisteredTypes.TryGetValue(new TypeRegistration(registration.Type, string.Empty), out factory))
+                if(_RegisteredTypes.TryGetValue(new TypeRegistration(registration.Type, string.Empty), out factory))
                 {
                     try
                     {
                         return factory.GetObject(registration.Type, this, parameters, options);
                     }
-                    catch (IoCResolutionException)
+                    catch(IoCResolutionException)
                     {
                         throw;
                     }
-                    catch (Exception ex)
+                    catch(Exception ex)
                     {
                         throw new IoCResolutionException(registration.Type, ex);
                     }
@@ -3247,21 +3294,21 @@ namespace OpenUO.Core.Patterns
 
 #if EXPRESSIONS
             // Attempt to construct an automatic lazy factory if possible
-            if (IsAutomaticLazyFactoryRequest(registration.Type))
+            if(IsAutomaticLazyFactoryRequest(registration.Type))
             {
                 return GetLazyAutomaticFactoryRequest(registration.Type);
             }
 #endif
-            if (IsIEnumerableRequest(registration.Type))
+            if(IsIEnumerableRequest(registration.Type))
             {
                 return GetIEnumerableRequest(registration.Type);
             }
 
             // Attempt unregistered construction if possible and requested
-            if ((options.UnregisteredResolutionAction == UnregisteredResolutionActions.AttemptResolve) ||
-                (registration.Type.IsGenericType && options.UnregisteredResolutionAction == UnregisteredResolutionActions.GenericsOnly))
+            if((options.UnregisteredResolutionAction == UnregisteredResolutionActions.AttemptResolve) ||
+               (registration.Type.IsGenericType && options.UnregisteredResolutionAction == UnregisteredResolutionActions.GenericsOnly))
             {
-                if (!registration.Type.IsAbstract && !registration.Type.IsInterface)
+                if(!registration.Type.IsAbstract && !registration.Type.IsInterface)
                 {
                     return ConstructType(null, registration.Type, parameters, options);
                 }
@@ -3274,64 +3321,75 @@ namespace OpenUO.Core.Patterns
 #if EXPRESSIONS
         private object GetLazyAutomaticFactoryRequest(Type type)
         {
-            if (!type.IsGenericType)
+            if(!type.IsGenericType)
             {
                 return null;
             }
 
-            Type genericType = type.GetGenericTypeDefinition();
-            Type[] genericArguments = type.GetGenericArguments();
+            var genericType = type.GetGenericTypeDefinition();
+            var genericArguments = type.GetGenericArguments();
 
             // Just a func
-            if (genericType == typeof (Func<>))
+            if(genericType == typeof(Func<>))
             {
-                Type returnType = genericArguments[0];
+                var returnType = genericArguments[0];
 
-                MethodInfo resolveMethod = typeof (Container).GetMethod("Resolve", new Type[] {});
+                var resolveMethod = typeof(Container).GetMethod("Resolve", new Type[]
+                                                                           {
+                                                                           });
                 resolveMethod = resolveMethod.MakeGenericMethod(returnType);
 
-                MethodCallExpression resolveCall = Expression.Call(Expression.Constant(this), resolveMethod);
+                var resolveCall = Expression.Call(Expression.Constant(this), resolveMethod);
 
-                Delegate resolveLambda = Expression.Lambda(resolveCall).Compile();
+                var resolveLambda = Expression.Lambda(resolveCall).Compile();
 
                 return resolveLambda;
             }
 
             // 2 parameter func with string as first parameter (name)
-            if ((genericType == typeof (Func<,>)) && (genericArguments[0] == typeof (string)))
+            if((genericType == typeof(Func<,>)) && (genericArguments[0] == typeof(string)))
             {
-                Type returnType = genericArguments[1];
+                var returnType = genericArguments[1];
 
-                MethodInfo resolveMethod = typeof (Container).GetMethod("Resolve", new[] {typeof (String)});
+                var resolveMethod = typeof(Container).GetMethod("Resolve", new[]
+                                                                           {
+                                                                               typeof(String)
+                                                                           });
                 resolveMethod = resolveMethod.MakeGenericMethod(returnType);
 
-                ParameterExpression[] resolveParameters = new[] {Expression.Parameter(typeof (String), "name")};
-                MethodCallExpression resolveCall = Expression.Call(Expression.Constant(this), resolveMethod, resolveParameters);
+                ParameterExpression[] resolveParameters =
+                {
+                    Expression.Parameter(typeof(String), "name")
+                };
+                var resolveCall = Expression.Call(Expression.Constant(this), resolveMethod, resolveParameters);
 
-                Delegate resolveLambda = Expression.Lambda(resolveCall, resolveParameters).Compile();
+                var resolveLambda = Expression.Lambda(resolveCall, resolveParameters).Compile();
 
                 return resolveLambda;
             }
 
             // 3 parameter func with string as first parameter (name) and IDictionary<string, object> as second (parameters)
-            if ((genericType == typeof (Func<,,>) && type.GetGenericArguments()[0] == typeof (string) &&
-                 type.GetGenericArguments()[1] == typeof (IDictionary<string, object>)))
+            if((genericType == typeof(Func<,,>) && type.GetGenericArguments()[0] == typeof(string) &&
+                type.GetGenericArguments()[1] == typeof(IDictionary<string, object>)))
             {
-                Type returnType = genericArguments[2];
+                var returnType = genericArguments[2];
 
-                ParameterExpression name = Expression.Parameter(typeof (string), "name");
-                ParameterExpression parameters = Expression.Parameter(typeof (IDictionary<string, object>), "parameters");
+                var name = Expression.Parameter(typeof(string), "name");
+                var parameters = Expression.Parameter(typeof(IDictionary<string, object>), "parameters");
 
-                MethodInfo resolveMethod = typeof (Container).GetMethod("Resolve", new[] {typeof (String), typeof (NamedParameterOverloads)});
+                var resolveMethod = typeof(Container).GetMethod("Resolve", new[]
+                                                                           {
+                                                                               typeof(String), typeof(NamedParameterOverloads)
+                                                                           });
                 resolveMethod = resolveMethod.MakeGenericMethod(returnType);
 
-                MethodCallExpression resolveCall = Expression.Call(
+                var resolveCall = Expression.Call(
                     Expression.Constant(this),
                     resolveMethod,
                     name,
-                    Expression.Call(typeof (NamedParameterOverloads), "FromIDictionary", null, parameters));
+                    Expression.Call(typeof(NamedParameterOverloads), "FromIDictionary", null, parameters));
 
-                Delegate resolveLambda = Expression.Lambda(resolveCall, name, parameters).Compile();
+                var resolveLambda = Expression.Lambda(resolveCall, name, parameters).Compile();
 
                 return resolveLambda;
             }
@@ -3342,35 +3400,41 @@ namespace OpenUO.Core.Patterns
 
         private object GetIEnumerableRequest(Type type)
         {
-            MethodInfo genericResolveAllMethod = GetType()
-                .GetGenericMethod(BindingFlags.Public | BindingFlags.Instance, "ResolveAll", type.GetGenericArguments(), new[] {typeof (bool)});
+            var genericResolveAllMethod = GetType()
+                .GetGenericMethod(BindingFlags.Public | BindingFlags.Instance, "ResolveAll", type.GetGenericArguments(), new[]
+                                                                                                                         {
+                                                                                                                             typeof(bool)
+                                                                                                                         });
 
-            return genericResolveAllMethod.Invoke(this, new object[] {false});
+            return genericResolveAllMethod.Invoke(this, new object[]
+                                                        {
+                                                            false
+                                                        });
         }
 
         private bool CanConstruct(ConstructorInfo ctor, NamedParameterOverloads parameters, ResolveOptions options)
         {
-            if (parameters == null)
+            if(parameters == null)
             {
                 throw new ArgumentNullException("parameters");
             }
 
-            foreach (ParameterInfo parameter in ctor.GetParameters())
+            foreach(var parameter in ctor.GetParameters())
             {
-                if (string.IsNullOrEmpty(parameter.Name))
+                if(string.IsNullOrEmpty(parameter.Name))
                 {
                     return false;
                 }
 
-                bool isParameterOverload = parameters.ContainsKey(parameter.Name);
+                var isParameterOverload = parameters.ContainsKey(parameter.Name);
 
-                if (parameter.ParameterType.IsPrimitive && !isParameterOverload)
+                if(parameter.ParameterType.IsPrimitive && !isParameterOverload)
                 {
                     return false;
                 }
 
-                if (!isParameterOverload &&
-                    !CanResolveInternal(new TypeRegistration(parameter.ParameterType), NamedParameterOverloads.Default, options))
+                if(!isParameterOverload &&
+                   !CanResolveInternal(new TypeRegistration(parameter.ParameterType), NamedParameterOverloads.Default, options))
                 {
                     return false;
                 }
@@ -3381,19 +3445,19 @@ namespace OpenUO.Core.Patterns
 
         private ConstructorInfo GetBestConstructor(Type type, NamedParameterOverloads parameters, ResolveOptions options)
         {
-            if (parameters == null)
+            if(parameters == null)
             {
                 throw new ArgumentNullException("parameters");
             }
 
-            if (type.IsValueType)
+            if(type.IsValueType)
             {
                 return null;
             }
 
             // Get constructors in reverse order based on the number of parameters
             // i.e. be as "greedy" as possible so we satify the most amount of dependencies possible
-            IEnumerable<ConstructorInfo> ctors = GetTypeConstructors(type);
+            var ctors = GetTypeConstructors(type);
 
             return ctors.FirstOrDefault(ctor => CanConstruct(ctor, parameters, options));
         }
@@ -3421,12 +3485,12 @@ namespace OpenUO.Core.Patterns
         private object ConstructType(
             Type requestedType, Type implementationType, ConstructorInfo constructor, NamedParameterOverloads parameters, ResolveOptions options)
         {
-            Type typeToConstruct = implementationType;
+            var typeToConstruct = implementationType;
 
 #if RESOLVE_OPEN_GENERICS
-            if (implementationType.IsGenericTypeDefinition)
+            if(implementationType.IsGenericTypeDefinition)
             {
-                if (requestedType == null || !requestedType.IsGenericType || !requestedType.GetGenericArguments().Any())
+                if(requestedType == null || !requestedType.IsGenericType || !requestedType.GetGenericArguments().Any())
                 {
                     throw new IoCResolutionException(typeToConstruct);
                 }
@@ -3435,7 +3499,7 @@ namespace OpenUO.Core.Patterns
             }
 #endif
 
-            if (constructor == null)
+            if(constructor == null)
             {
                 // Try and get the best constructor that we can construct
                 // if we can't construct any then get the constructor
@@ -3444,35 +3508,35 @@ namespace OpenUO.Core.Patterns
                 constructor = GetBestConstructor(typeToConstruct, parameters, options) ?? GetTypeConstructors(typeToConstruct).LastOrDefault();
             }
 
-            if (constructor == null)
+            if(constructor == null)
             {
                 throw new IoCResolutionException(typeToConstruct);
             }
 
-            ParameterInfo[] ctorParams = constructor.GetParameters();
-            object[] args = new object[ctorParams.Count()];
+            var ctorParams = constructor.GetParameters();
+            var args = new object[ctorParams.Count()];
 
-            for (int parameterIndex = 0; parameterIndex < ctorParams.Count(); parameterIndex++)
+            for(var parameterIndex = 0; parameterIndex < ctorParams.Count(); parameterIndex++)
             {
-                ParameterInfo currentParam = ctorParams[parameterIndex];
+                var currentParam = ctorParams[parameterIndex];
 
                 try
                 {
                     args[parameterIndex] = parameters.ContainsKey(currentParam.Name)
-                                               ? parameters[currentParam.Name]
-                                               : ResolveInternal(
-                                                   new TypeRegistration(currentParam.ParameterType),
-                                                   NamedParameterOverloads.Default,
-                                                   options);
+                        ? parameters[currentParam.Name]
+                        : ResolveInternal(
+                            new TypeRegistration(currentParam.ParameterType),
+                            NamedParameterOverloads.Default,
+                            options);
                 }
-                catch (IoCResolutionException ex)
+                catch(IoCResolutionException ex)
                 {
                     // If a constructor parameter can't be resolved
                     // it will throw, so wrap it and throw that this can't
                     // be resolved.
                     throw new IoCResolutionException(typeToConstruct, ex);
                 }
-                catch (Exception ex)
+                catch(Exception ex)
                 {
                     throw new IoCResolutionException(typeToConstruct, ex);
                 }
@@ -3482,7 +3546,7 @@ namespace OpenUO.Core.Patterns
             {
                 return constructor.Invoke(args);
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
                 throw new IoCResolutionException(typeToConstruct, ex);
             }
@@ -3490,22 +3554,22 @@ namespace OpenUO.Core.Patterns
 
         private void BuildUpInternal(object input, ResolveOptions resolveOptions)
         {
-            IEnumerable<PropertyInfo> properties = from property in input.GetType().GetProperties()
-                                                   where
-                                                       (property.GetGetMethod() != null) && (property.GetSetMethod() != null) &&
-                                                       !property.PropertyType.IsValueType
-                                                   select property;
+            var properties = from property in input.GetType().GetProperties()
+                where
+                    (property.GetGetMethod() != null) && (property.GetSetMethod() != null) &&
+                    !property.PropertyType.IsValueType
+                select property;
 
-            foreach (PropertyInfo property in properties)
+            foreach(var property in properties)
             {
-                if (property.GetValue(input, null) == null)
+                if(property.GetValue(input, null) == null)
                 {
                     try
                     {
                         property.SetValue(
                             input, ResolveInternal(new TypeRegistration(property.PropertyType), NamedParameterOverloads.Default, resolveOptions), null);
                     }
-                    catch (IoCResolutionException)
+                    catch(IoCResolutionException)
                     {
                         // Catch any resolution errors and ignore them
                     }
@@ -3515,22 +3579,24 @@ namespace OpenUO.Core.Patterns
 
         private IEnumerable<TypeRegistration> GetParentRegistrationsForType(Type resolveType)
         {
-            if (_Parent == null)
+            if(_Parent == null)
             {
-                return new TypeRegistration[] {};
+                return new TypeRegistration[]
+                       {
+                       };
             }
 
-            IEnumerable<TypeRegistration> registrations = _Parent._RegisteredTypes.Keys.Where(tr => tr.Type == resolveType);
+            var registrations = _Parent._RegisteredTypes.Keys.Where(tr => tr.Type == resolveType);
 
             return registrations.Concat(_Parent.GetParentRegistrationsForType(resolveType));
         }
 
         private IEnumerable<object> ResolveAllInternal(Type resolveType, bool includeUnnamed)
         {
-            IEnumerable<TypeRegistration> registrations =
+            var registrations =
                 _RegisteredTypes.Keys.Where(tr => tr.Type == resolveType).Concat(GetParentRegistrationsForType(resolveType));
 
-            if (!includeUnnamed)
+            if(!includeUnnamed)
             {
                 registrations = registrations.Where(tr => tr.Name != string.Empty);
             }
@@ -3540,65 +3606,29 @@ namespace OpenUO.Core.Patterns
 
         private static bool IsValidAssignment(Type registerType, Type registerImplementation)
         {
-            if (!registerType.IsGenericTypeDefinition)
+            if(!registerType.IsGenericTypeDefinition)
             {
-                if (!registerType.IsAssignableFrom(registerImplementation))
+                if(!registerType.IsAssignableFrom(registerImplementation))
                 {
                     return false;
                 }
             }
             else
             {
-                if (registerType.IsInterface)
+                if(registerType.IsInterface)
                 {
-                    if (!registerImplementation.FindInterfaces((t, o) => t.Name == registerType.Name, null).Any())
+                    if(!registerImplementation.FindInterfaces((t, o) => t.Name == registerType.Name, null).Any())
                     {
                         return false;
                     }
                 }
-                else if (registerType.IsAbstract && registerImplementation.BaseType != registerType)
+                else if(registerType.IsAbstract && registerImplementation.BaseType != registerType)
                 {
                     return false;
                 }
             }
 
             return true;
-        }
-
-        #endregion
-
-        #region IDisposable Members
-
-        private bool disposed;
-
-        public void Dispose()
-        {
-            if (!disposed)
-            {
-                disposed = true;
-
-                _RegisteredTypes.Dispose();
-
-                GC.SuppressFinalize(this);
-            }
-        }
-
-        #endregion
-
-        private readonly Dictionary<Type, IModule> _modules = new Dictionary<Type, IModule>();
-
-        public void RegisterModule<TModule>()
-            where TModule : class, IModule
-        {
-            if (_modules.ContainsKey(typeof (TModule)))
-            {
-                throw new Exception("Unable to load module " + typeof (TModule).Name + " because it is already registered.");
-            }
-
-            Register<TModule>();
-            TModule module = Resolve<TModule>();
-            module.OnLoad(this);
-            _modules.Add(typeof (TModule), module);
         }
     }
 

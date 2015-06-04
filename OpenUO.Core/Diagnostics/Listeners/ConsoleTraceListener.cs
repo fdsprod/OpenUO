@@ -26,9 +26,9 @@ namespace OpenUO.Core.Diagnostics
     {
         protected override void OnTraceReceived(TraceMessage message)
         {
-            ConsoleColor color = ConsoleColor.Gray;
+            var color = ConsoleColor.Gray;
 
-            switch (message.Type)
+            switch(message.Type)
             {
                 case TraceLevels.Info:
                     color = ConsoleColor.White;

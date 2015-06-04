@@ -1,31 +1,22 @@
-﻿
-namespace OpenUO.Core.PresentationFramework.Data
+﻿namespace OpenUO.Core.PresentationFramework.Data
 {
-	public class PropertyCategory : PropertyCollection
-	{
-		#region Initialization
+    public class PropertyCategory : PropertyCollection
+    {
+        private readonly string _categoryName;
 
-		public PropertyCategory()
-		{
-			this._categoryName = "Misc";
-		}
+        public PropertyCategory()
+        {
+            _categoryName = "Misc";
+        }
 
-		public PropertyCategory(string categoryName)
-		{
-			this._categoryName = categoryName;
-		}
+        public PropertyCategory(string categoryName)
+        {
+            _categoryName = categoryName;
+        }
 
-		public string Category
-		{
-			get { return _categoryName; }
-		}
-
-		#endregion
-
-		#region Fields
-
-		private readonly string _categoryName; 
-
-		#endregion
-	}
+        public string Category
+        {
+            get { return _categoryName; }
+        }
+    }
 }

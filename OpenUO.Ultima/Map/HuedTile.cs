@@ -25,9 +25,16 @@ namespace OpenUO.Ultima
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct HuedTile
     {
-        internal short _id;
         internal short _hue;
+        internal short _id;
         internal sbyte _z;
+
+        public HuedTile(short id, short hue, sbyte z)
+        {
+            _id = id;
+            _hue = hue;
+            _z = z;
+        }
 
         public int Id
         {
@@ -43,13 +50,6 @@ namespace OpenUO.Ultima
         {
             get { return _z; }
             set { _z = (sbyte)value; }
-        }
-
-        public HuedTile(short id, short hue, sbyte z)
-        {
-            _id = id;
-            _hue = hue;
-            _z = z;
         }
 
         internal void Set(short id, short hue, sbyte z)

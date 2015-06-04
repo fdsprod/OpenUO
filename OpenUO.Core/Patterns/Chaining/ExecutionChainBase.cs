@@ -31,16 +31,10 @@ namespace OpenUO.Core.Patterns
         private readonly object _syncRoot = new object();
         private IChainStep<T> _head;
         private bool _isExecuting;
-        private bool _isFrozen;
 
         protected ExecutionChainBase()
         {
             _steps = new Dictionary<string, IChainStep<T>>();
-        }
-
-        public bool IsFrozen
-        {
-            get { return _isFrozen; }
         }
 
         public string Name
@@ -50,14 +44,14 @@ namespace OpenUO.Core.Patterns
 
         public void Freeze()
         {
-            _isFrozen = true;
+            IsFrozen = true;
         }
 
         public void Execute(T state)
         {
             try
             {
-                lock (_syncRoot)
+                lock(_syncRoot)
                 {
                     Guard.Assert(!_isExecuting, string.Format("Chain {0} was executed while already executing.", Name));
 
@@ -66,7 +60,7 @@ namespace OpenUO.Core.Patterns
 
                 IChainStep<T> head;
 
-                if (_isFrozen && _head != null)
+                if(IsFrozen && _head != null)
                 {
                     head = _head;
                 }
@@ -74,34 +68,34 @@ namespace OpenUO.Core.Patterns
                 {
                     head = ComputeChainSequence();
 
-                    if (_isFrozen)
+                    if(IsFrozen)
                     {
                         _head = head;
                     }
                 }
 
-                if (head != null)
+                if(head != null)
                 {
                     head.Execute(state);
                 }
             }
             finally
             {
-                lock (_syncRoot)
+                lock(_syncRoot)
                     _isExecuting = false;
             }
         }
 
         public IChain<T> RegisterStep<TStep>(TStep step) where TStep : class, IChainStep<T>
         {
-            lock (_syncRoot)
+            lock(_syncRoot)
             {
-                if (_isExecuting)
+                if(_isExecuting)
                 {
                     throw new Exception("Cannot add chainsteps while the chain is executing.");
                 }
 
-                if (_isFrozen)
+                if(IsFrozen)
                 {
                     throw new Exception("Chainsteps must be registered before the chain is frozen.");
                 }
@@ -115,14 +109,14 @@ namespace OpenUO.Core.Patterns
 
         public IChain<T> RegisterStep<TStep>() where TStep : class, IChainStep<T>
         {
-            lock (_syncRoot)
+            lock(_syncRoot)
             {
-                if (_isExecuting)
+                if(_isExecuting)
                 {
                     throw new Exception("Cannot add chainsteps while the chain is executing.");
                 }
 
-                if (_isFrozen)
+                if(IsFrozen)
                 {
                     throw new Exception("Chainsteps must be registered before the chain is frozen.");
                 }
@@ -135,21 +129,27 @@ namespace OpenUO.Core.Patterns
             return this;
         }
 
+        public bool IsFrozen
+        {
+            get;
+            private set;
+        }
+
         public bool UnregisterStep<TStep>() where TStep : class, IChainStep<T>
         {
-            lock (_syncRoot)
+            lock(_syncRoot)
             {
-                if (_isExecuting)
+                if(_isExecuting)
                 {
                     throw new Exception("Cannot remove chainsteps while the chain is executing.");
                 }
 
-                if (_isFrozen)
+                if(IsFrozen)
                 {
                     throw new Exception("Cannot unregister a chainstep after the chain has been frozen.");
                 }
 
-                IChainStep<T> remove = _steps.Values.Where(step => step.GetType() == typeof (TStep)).FirstOrDefault();
+                var remove = _steps.Values.Where(step => step.GetType() == typeof(TStep)).FirstOrDefault();
                 return _steps.Remove(remove.Name);
             }
         }
@@ -158,20 +158,20 @@ namespace OpenUO.Core.Patterns
 
         private IChainStep<T> ComputeChainSequence()
         {
-            DirectedAcyclicGraph<IChainStep<T>> graph = new DirectedAcyclicGraph<IChainStep<T>>();
+            var graph = new DirectedAcyclicGraph<IChainStep<T>>();
 
-            foreach (var step in _steps.Values)
+            foreach(var step in _steps.Values)
             {
                 graph.AddNode(new GraphNode<IChainStep<T>>(step.Name, step));
             }
 
-            foreach (var step in _steps.Values)
+            foreach(var step in _steps.Values)
             {
-                GraphNode<IChainStep<T>> node = graph.GetNode(step.Name);
+                var node = graph.GetNode(step.Name);
 
-                foreach (ChainDependency dependency in step.Dependencies)
+                foreach(var dependency in step.Dependencies)
                 {
-                    if (dependency.MustExist)
+                    if(dependency.MustExist)
                     {
                         Guard.Assert(
                             _steps.ContainsKey(dependency.Name),
@@ -182,24 +182,24 @@ namespace OpenUO.Core.Patterns
                                 dependency.Name));
                     }
 
-                    GraphNode<IChainStep<T>> dependentNode = graph.GetNode(dependency.Name);
+                    var dependentNode = graph.GetNode(dependency.Name);
                     node.AddDependent(dependentNode);
                 }
             }
 
-            IChainStep<T>[] ordered = graph.ComputeDependencyOrderedList().Select(node => node.Item).ToArray();
+            var ordered = graph.ComputeDependencyOrderedList().Select(node => node.Item).ToArray();
 
-            if (ordered.Length == 0)
+            if(ordered.Length == 0)
             {
                 return null;
             }
 
-            if (ordered.Length == 1)
+            if(ordered.Length == 1)
             {
                 return ordered[0];
             }
 
-            for (int i = 0; i < ordered.Length - 1; i++)
+            for(var i = 0; i < ordered.Length - 1; i++)
             {
                 ordered[i + 1].Successor = ordered[i];
             }

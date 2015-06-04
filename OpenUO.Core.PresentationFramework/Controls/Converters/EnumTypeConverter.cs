@@ -3,20 +3,16 @@ using System.Windows.Data;
 
 namespace OpenUO.Core.PresentationFramework.Converters
 {
-	public class EnumTypeConverter : IValueConverter
-	{
-		#region IValueConverter Members
+    public class EnumTypeConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            return Enum.GetValues(value.GetType());
+        }
 
-		public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
-		{
-			return Enum.GetValues(value.GetType());
-		}
-
-		public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
-		{
-			throw new NotSupportedException();
-		}
-
-		#endregion
-	}
+        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            throw new NotSupportedException();
+        }
+    }
 }

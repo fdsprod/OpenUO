@@ -36,10 +36,10 @@ namespace OpenUO.Ultima.UnitTests
         {
             get
             {
-                if (!_configuredKernelForTest)
+                if(!_configuredKernelForTest)
                 {
                     _container = new Container();
-                    _container.RegisterModule<UltimaSDKImageSourceModule>();
+                    _container.RegisterModule<OpenUOImageSourceModule>();
                     _configuredKernelForTest = true;
                 }
 
@@ -50,8 +50,8 @@ namespace OpenUO.Ultima.UnitTests
         [TestMethod]
         public void TestAnimationWriteableBitmapAdapter()
         {
-            AnimationFactory factory = new AnimationFactory(Install, Container);
-            Frame<ImageSource>[] frames = factory.GetAnimation<ImageSource>(1, 0, 0, 0, true);
+            var factory = new AnimationFactory(Install, Container);
+            var frames = factory.GetAnimation<ImageSource>(1, 0, 0, 0, true);
 
             Guard.AssertIsNotNull(frames, "Animation 1 was not found.");
             Guard.AssertIsNotLessThan("Frames for animation 1, direction 0 were not found.", 1, frames.Length);
@@ -60,8 +60,8 @@ namespace OpenUO.Ultima.UnitTests
         [TestMethod]
         public void TestTexmapsWriteableBitmapAdapter()
         {
-            TexmapFactory factory = new TexmapFactory(Install, Container);
-            ImageSource texmap = factory.GetTexmap<ImageSource>(1);
+            var factory = new TexmapFactory(Install, Container);
+            var texmap = factory.GetTexmap<ImageSource>(1);
 
             Guard.AssertIsNotNull(texmap, "Texmap 0 was not found.");
         }
@@ -69,8 +69,8 @@ namespace OpenUO.Ultima.UnitTests
         [TestMethod]
         public void TestGumpWriteableBitmapAdapter()
         {
-            GumpFactory factory = new GumpFactory(Install, Container);
-            ImageSource gump = factory.GetGump<ImageSource>(0);
+            var factory = new GumpFactory(Install, Container);
+            var gump = factory.GetGump<ImageSource>(0);
 
             Guard.AssertIsNotNull(gump, "Gump 0 was not found.");
         }
@@ -78,10 +78,10 @@ namespace OpenUO.Ultima.UnitTests
         [TestMethod]
         public void TestArtworkWriteableBitmapAdapter()
         {
-            ArtworkFactory factory = new ArtworkFactory(Install, Container);
+            var factory = new ArtworkFactory(Install, Container);
 
-            ImageSource land = factory.GetLand<ImageSource>(0);
-            ImageSource @static = factory.GetStatic<ImageSource>(0);
+            var land = factory.GetLand<ImageSource>(0);
+            var @static = factory.GetStatic<ImageSource>(0);
 
             Guard.AssertIsNotNull(land, "Land tile 0 was not found.");
             Guard.AssertIsNotNull(@static, "Static 0 was not found.");
@@ -90,8 +90,8 @@ namespace OpenUO.Ultima.UnitTests
         [TestMethod]
         public void TestAsciiFontWriteableBitmapAdapter()
         {
-            ASCIIFontFactory factory = new ASCIIFontFactory(Install, Container);
-            ImageSource text = factory.GetText<ImageSource>(0, "This is a test", 0);
+            var factory = new ASCIIFontFactory(Install, Container);
+            var text = factory.GetText<ImageSource>(0, "This is a test", 0);
 
             Guard.AssertIsNotNull(text, "ASCII Font was not created.");
         }
@@ -99,8 +99,8 @@ namespace OpenUO.Ultima.UnitTests
         [TestMethod]
         public void TestUnicodeFontWriteableBitmapAdapter()
         {
-            UnicodeFontFactory factory = new UnicodeFontFactory(Install, Container);
-            ImageSource text = factory.GetText<ImageSource>(0, "This is a test", 0);
+            var factory = new UnicodeFontFactory(Install, Container);
+            var text = factory.GetText<ImageSource>(0, "This is a test", 0);
 
             Guard.AssertIsNotNull(text, "Unicode Font was not created.");
         }

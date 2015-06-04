@@ -28,29 +28,29 @@ namespace OpenUO.Ultima
 
         public Hues(InstallLocation install)
         {
-            string path = install.GetPath("hues.mul");
-            int index = 0;
+            var path = install.GetPath("hues.mul");
+            var index = 0;
 
             _hues = new Hue[3000];
 
-            if (path != null)
+            if(path != null)
             {
-                using (FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read))
+                using(var fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read))
                 {
-                    BinaryReader bin = new BinaryReader(fs);
+                    var bin = new BinaryReader(fs);
 
-                    int blockCount = (int)fs.Length / 708;
+                    var blockCount = (int)fs.Length / 708;
 
-                    if (blockCount > 375)
+                    if(blockCount > 375)
                     {
                         blockCount = 375;
                     }
 
-                    for (int i = 0; i < blockCount; ++i)
+                    for(var i = 0; i < blockCount; ++i)
                     {
                         bin.ReadInt32();
 
-                        for (int j = 0; j < 8; ++j, ++index)
+                        for(var j = 0; j < 8; ++j, ++index)
                         {
                             _hues[index] = new Hue(index, bin);
                         }
@@ -58,7 +58,7 @@ namespace OpenUO.Ultima
                 }
             }
 
-            for (; index < 3000; ++index)
+            for(; index < 3000; ++index)
             {
                 _hues[index] = new Hue(index);
             }
@@ -73,7 +73,7 @@ namespace OpenUO.Ultima
         {
             index &= 0x3FFF;
 
-            if (index >= 0 && index < 3000)
+            if(index >= 0 && index < 3000)
             {
                 return _hues[index];
             }

@@ -1,4 +1,5 @@
 ﻿#region File Header
+
 /********************************************************
  * 
  *  $Id: StringLengthToVisibilityConverter.cs 111 2010-10-12 06:58:17Z jeff $
@@ -15,6 +16,7 @@
  *  All rights reserved. 
  *  
  ********************************************************/
+
 #endregion
 
 using System;
@@ -28,19 +30,19 @@ namespace OpenUO.Core.PresentationFramework.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value == null)
+            if(value == null)
             {
                 return false;
             }
 
-            bool includeWhiteSpace = false;
+            var includeWhiteSpace = false;
 
-            if (parameter is bool)
+            if(parameter is bool)
             {
                 includeWhiteSpace = (bool)parameter;
             }
 
-            if (includeWhiteSpace)
+            if(includeWhiteSpace)
             {
                 return string.IsNullOrWhiteSpace(value.ToString()) ? Visibility.Collapsed : Visibility.Visible;
             }
@@ -53,5 +55,4 @@ namespace OpenUO.Core.PresentationFramework.Converters
             throw new NotImplementedException();
         }
     }
-
 }

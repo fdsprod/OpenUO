@@ -33,37 +33,37 @@ namespace OpenUO.Ultima
         {
             _entries = new Dictionary<int, BodyTableEntry>();
 
-            if (string.IsNullOrEmpty(filePath))
+            if(string.IsNullOrEmpty(filePath))
             {
                 return;
             }
 
-            StreamReader def = new StreamReader(filePath);
+            var def = new StreamReader(filePath);
 
             string line;
-            int lineNumber = 0;
+            var lineNumber = 0;
 
-            while ((line = def.ReadLine()) != null)
+            while((line = def.ReadLine()) != null)
             {
                 lineNumber++;
 
-                if ((line = line.Trim()).Length == 0 || line.StartsWith("#"))
+                if((line = line.Trim()).Length == 0 || line.StartsWith("#"))
                 {
                     continue;
                 }
 
                 try
                 {
-                    int index1 = line.IndexOf(" {");
-                    int index2 = line.IndexOf("} ");
+                    var index1 = line.IndexOf(" {");
+                    var index2 = line.IndexOf("} ");
 
-                    string newIdString = line.Substring(0, index1);
-                    string oldIdString = line.Substring(index1 + 2, index2 - index1 - 2);
-                    string newHueString = line.Substring(index2 + 2);
+                    var newIdString = line.Substring(0, index1);
+                    var oldIdString = line.Substring(index1 + 2, index2 - index1 - 2);
+                    var newHueString = line.Substring(index2 + 2);
 
-                    int indexOf = oldIdString.IndexOf(',');
+                    var indexOf = oldIdString.IndexOf(',');
 
-                    if (indexOf > -1)
+                    if(indexOf > -1)
                     {
                         oldIdString = oldIdString.Substring(0, indexOf).Trim();
                     }
@@ -72,19 +72,19 @@ namespace OpenUO.Ultima
                     int oldId;
                     int newHue;
 
-                    if (!int.TryParse(newIdString, out newId))
+                    if(!int.TryParse(newIdString, out newId))
                     {
                         Tracer.Warn("New ID '{0}' at line number {1} is not a valid integer", newIdString, lineNumber);
                         continue;
                     }
 
-                    if (!int.TryParse(oldIdString, out oldId))
+                    if(!int.TryParse(oldIdString, out oldId))
                     {
                         Tracer.Warn("Old ID '{0}' at line number {1} is not a valid integer", oldIdString, lineNumber);
                         continue;
                     }
 
-                    if (!int.TryParse(newHueString, out newHue))
+                    if(!int.TryParse(newHueString, out newHue))
                     {
                         Tracer.Warn("Hue ID '{0}' at line number {1} is not a valid integer", newHueString, lineNumber);
                         continue;
@@ -92,7 +92,7 @@ namespace OpenUO.Ultima
 
                     _entries[newId] = new BodyTableEntry(oldId, newId, newHue);
                 }
-                catch (Exception e)
+                catch(Exception e)
                 {
                     Tracer.Error(e);
                 }

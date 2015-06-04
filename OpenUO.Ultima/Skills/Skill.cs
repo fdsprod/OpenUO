@@ -24,22 +24,19 @@ namespace OpenUO.Ultima
 {
     public class Skill
     {
-        private SkillCategory _category;
-        private SkillData _data;
-        private bool _hasUseButton;
         private int _index = -1;
         private string _name = string.Empty;
-        private byte _unknown;
 
         public Skill(SkillData data)
         {
-            _data = data;
+            Data = data;
             ResetFromData();
         }
 
         public SkillData Data
         {
-            get { return _data; }
+            get;
+            private set;
         }
 
         public int Index
@@ -49,8 +46,8 @@ namespace OpenUO.Ultima
 
         public bool HasUseButton
         {
-            get { return _hasUseButton; }
-            set { _hasUseButton = value; }
+            get;
+            set;
         }
 
         public string Name
@@ -61,13 +58,14 @@ namespace OpenUO.Ultima
 
         public SkillCategory Category
         {
-            get { return _category; }
-            set { _category = value; }
+            get;
+            set;
         }
 
         public byte Unknown
         {
-            get { return _unknown; }
+            get;
+            private set;
         }
 
         public int ID
@@ -77,26 +75,26 @@ namespace OpenUO.Ultima
 
         public void ResetFromData()
         {
-            _index = _data.Index;
-            _hasUseButton = _data.UseButton;
-            _name = _data.Name;
-            _category = _data.Category;
-            _unknown = _data.Unknown;
+            _index = Data.Index;
+            HasUseButton = Data.UseButton;
+            _name = Data.Name;
+            Category = Data.Category;
+            Unknown = Data.Unknown;
         }
 
         public void ResetFromData(SkillData data)
         {
-            _data = data;
-            _index = _data.Index;
-            _hasUseButton = _data.UseButton;
-            _name = _data.Name;
-            _category = _data.Category;
-            _unknown = _data.Unknown;
+            Data = data;
+            _index = Data.Index;
+            HasUseButton = Data.UseButton;
+            _name = Data.Name;
+            Category = Data.Category;
+            Unknown = Data.Unknown;
         }
 
         public override string ToString()
         {
-            return String.Format("{0} ({1:X4}) {2} {3} Category: {4}", _index, _index, _hasUseButton ? "[x]" : "[ ]", _name, _category.Name);
+            return String.Format("{0} ({1:X4}) {2} {3} Category: {4}", _index, _index, HasUseButton ? "[x]" : "[ ]", _name, Category.Name);
         }
     }
 }

@@ -74,9 +74,9 @@ namespace OpenUO.Ultima
         {
             bin.BaseStream.Seek(Offset, SeekOrigin.Begin);
 
-            byte[] data = new byte[Length];
+            var data = new byte[Length];
 
-            for (long i = 0; i < data.Length; i++)
+            for(long i = 0; i < data.Length; i++)
             {
                 data[i] = bin.ReadByte();
             }
@@ -91,20 +91,20 @@ namespace OpenUO.Ultima
         {
             try
             {
-                if (Info != null)
+                if(Info != null)
                 {
-                    if (!forceUpdate)
+                    if(!forceUpdate)
                     {
                         return Info;
                     }
                 }
 
-                using (BinaryReader reader = new BinaryReader(file.OpenRead(), Encoding.UTF8))
+                using(var reader = new BinaryReader(file.OpenRead(), Encoding.UTF8))
                 {
                     Lookup(reader);
                 }
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 Tracer.Error(e);
             }

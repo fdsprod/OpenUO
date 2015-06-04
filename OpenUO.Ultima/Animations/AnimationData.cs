@@ -18,12 +18,13 @@ namespace OpenUO.Ultima
 {
     public struct AnimationData
     {
-        public static readonly AnimationData Empty = new AnimationData {
-            FrameData = new sbyte[0],
-            FrameStart = 0,
-            FrameInterval = 0,
-            FrameCount = 0
-        };
+        public static readonly AnimationData Empty = new AnimationData
+                                                     {
+                                                         FrameData = new sbyte[0],
+                                                         FrameStart = 0,
+                                                         FrameInterval = 0,
+                                                         FrameCount = 0
+                                                     };
 
         public byte FrameCount;
         public sbyte[] FrameData;

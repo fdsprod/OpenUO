@@ -20,7 +20,7 @@ namespace OpenUO.Core
     {
         public static void Fill<T>(this T[] array) where T : new()
         {
-            for (int i = 0; i < array.Length; i++)
+            for(var i = 0; i < array.Length; i++)
             {
                 array[i] = new T();
             }
@@ -28,9 +28,9 @@ namespace OpenUO.Core
 
         public static void Fill<T>(this T[,] array) where T : new()
         {
-            for (int x = 0; x < array.GetLength(0); x++)
+            for(var x = 0; x < array.GetLength(0); x++)
             {
-                for (int y = 0; y < array.GetLength(1); y++)
+                for(var y = 0; y < array.GetLength(1); y++)
                 {
                     array[x, y] = new T();
                 }

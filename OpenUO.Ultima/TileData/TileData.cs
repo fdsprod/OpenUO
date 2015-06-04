@@ -32,24 +32,24 @@ namespace OpenUO.Ultima
 
         public TileData(InstallLocation install)
         {
-            string filePath = install.GetPath("tiledata.mul");
+            var filePath = install.GetPath("tiledata.mul");
 
-            if (!string.IsNullOrEmpty(filePath))
+            if(!string.IsNullOrEmpty(filePath))
             {
-                using (FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read))
+                using(var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read))
                 {
-                    BinaryReader bin = new BinaryReader(fs);
+                    var bin = new BinaryReader(fs);
 
                     m_LandData = new LandData[0x4000];
 
-                    for (int i = 0; i < 0x4000; ++i)
+                    for(var i = 0; i < 0x4000; ++i)
                     {
-                        if ((i & 0x1F) == 0)
+                        if((i & 0x1F) == 0)
                         {
                             bin.ReadInt32(); // header
                         }
 
-                        TileFlag flags = (TileFlag)bin.ReadInt32();
+                        var flags = (TileFlag)bin.ReadInt32();
                         bin.ReadInt16(); // skip 2 bytes -- textureID
 
                         m_LandData[i] = new LandData(ReadNameString(bin), flags);
@@ -58,14 +58,14 @@ namespace OpenUO.Ultima
                     m_ItemData = new ItemData[0x4000];
                     m_HeightTable = new int[0x4000];
 
-                    for (int i = 0; i < 0x4000; ++i)
+                    for(var i = 0; i < 0x4000; ++i)
                     {
-                        if ((i & 0x1F) == 0)
+                        if((i & 0x1F) == 0)
                         {
                             bin.ReadInt32(); // header
                         }
 
-                        TileFlag flags = (TileFlag)bin.ReadInt32();
+                        var flags = (TileFlag)bin.ReadInt32();
                         int weight = bin.ReadByte();
                         int quality = bin.ReadByte();
                         bin.ReadInt16();
@@ -116,7 +116,7 @@ namespace OpenUO.Ultima
             int count;
 
             // This is very hackish... 
-            for (count = 0; count < 20 && m_StringBuffer[count] != 0; ++count)
+            for(count = 0; count < 20 && m_StringBuffer[count] != 0; ++count)
             {
             }
 

@@ -43,18 +43,18 @@ namespace OpenUO.Ultima
 
         public int GetWidth(string text)
         {
-            if (text == null || text.Length == 0)
+            if(text == null || text.Length == 0)
             {
                 return 0;
             }
 
-            int width = 0;
+            var width = 0;
 
-            for (int i = 0; i < text.Length; ++i)
+            for(var i = 0; i < text.Length; ++i)
             {
-                int c = text[i] % 0x10000;
+                var c = text[i] % 0x10000;
 
-                if (c == 32)
+                if(c == 32)
                 {
                     width += 5;
                 }
@@ -68,16 +68,16 @@ namespace OpenUO.Ultima
 
         public int GetHeight(string text)
         {
-            if (text == null || text.Length == 0)
+            if(text == null || text.Length == 0)
             {
                 return 0;
             }
 
-            int height = 0;
+            var height = 0;
 
-            for (int i = 0; i < text.Length; ++i)
+            for(var i = 0; i < text.Length; ++i)
             {
-                int c = text[i] % 0x10000;
+                var c = text[i] % 0x10000;
                 height = Math.Max(height, Chars[c].Height + Chars[c].YOffset);
             }
 

@@ -49,7 +49,7 @@ namespace OpenUO.Ultima.Windows.Forms.Controls
             get { return _gumpFactory; }
             set
             {
-                if (_gumpFactory != value)
+                if(_gumpFactory != value)
                 {
                     _gumpFactory = value;
                     _scrollBar.Maximum = _gumpFactory.GetLength<Bitmap>();
@@ -75,45 +75,51 @@ namespace OpenUO.Ultima.Windows.Forms.Controls
         {
             base.OnPaint(e);
 
-            int centerX = (Width - 1) / 2;
-            int centerY = (Height - 1) / 2;
+            var centerX = (Width - 1) / 2;
+            var centerY = (Height - 1) / 2;
 
-            if (_gumpFactory != null)
+            if(_gumpFactory != null)
             {
-                Bitmap image = _gumpFactory.GetGump<Bitmap>(_scrollBar.Value);
+                var image = _gumpFactory.GetGump<Bitmap>(_scrollBar.Value);
 
-                if (image != null)
+                if(image != null)
                 {
-                    int widthOver2 = image.Width / 2;
-                    int heightOver2 = image.Height / 2;
+                    var widthOver2 = image.Width / 2;
+                    var heightOver2 = image.Height / 2;
 
                     e.Graphics.DrawImage(image, new Rectangle(centerX - widthOver2, centerY - heightOver2, image.Width, image.Height));
                 }
             }
 
-            if (_gumpFactory == null)
+            if(_gumpFactory == null)
             {
-                TextRenderingHint textRenderingHint = e.Graphics.TextRenderingHint;
+                var textRenderingHint = e.Graphics.TextRenderingHint;
                 e.Graphics.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
 
-                using (Brush backBrush = new SolidBrush(Color.Red))
-                using (Brush foreBrush = new SolidBrush(Color.Maroon))
-                using (StringFormat format = new StringFormat())
+                using(Brush backBrush = new SolidBrush(Color.Red))
                 {
-                    format.LineAlignment = StringAlignment.Center;
-                    format.Alignment = StringAlignment.Center;
+                    using(Brush foreBrush = new SolidBrush(Color.Maroon))
+                    {
+                        using(var format = new StringFormat())
+                        {
+                            format.LineAlignment = StringAlignment.Center;
+                            format.Alignment = StringAlignment.Center;
 
-                    e.Graphics.DrawString("GumpControl.Factory is not set.", Font, backBrush, new RectangleF(0, 0, Width, Height), format);
-                    e.Graphics.DrawString("GumpControl.Factory is not set.", Font, foreBrush, new RectangleF(1, 1, Width, Height), format);
+                            e.Graphics.DrawString("GumpControl.Factory is not set.", Font, backBrush, new RectangleF(0, 0, Width, Height), format);
+                            e.Graphics.DrawString("GumpControl.Factory is not set.", Font, foreBrush, new RectangleF(1, 1, Width, Height), format);
+                        }
+                    }
                 }
 
                 e.Graphics.TextRenderingHint = textRenderingHint;
             }
 
-            using (Brush borderBrush = new SolidBrush(Color.LightSteelBlue))
-            using (Pen borderPen = new Pen(borderBrush))
+            using(Brush borderBrush = new SolidBrush(Color.LightSteelBlue))
             {
-                e.Graphics.DrawRectangle(borderPen, new Rectangle(0, 0, Width - 1, Height - 1));
+                using(var borderPen = new Pen(borderBrush))
+                {
+                    e.Graphics.DrawRectangle(borderPen, new Rectangle(0, 0, Width - 1, Height - 1));
+                }
             }
         }
     }

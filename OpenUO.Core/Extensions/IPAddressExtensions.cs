@@ -29,14 +29,14 @@ namespace OpenUO.Core
 
         public static IPAddress Intern(this IPAddress ipAddress)
         {
-            if (_ipAddressTable == null)
+            if(_ipAddressTable == null)
             {
                 _ipAddressTable = new Dictionary<IPAddress, IPAddress>();
             }
 
             IPAddress interned;
 
-            if (!_ipAddressTable.TryGetValue(ipAddress, out interned))
+            if(!_ipAddressTable.TryGetValue(ipAddress, out interned))
             {
                 interned = ipAddress;
                 _ipAddressTable[ipAddress] = interned;

@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Windows.Data;
 using System.ComponentModel;
+using System.Windows.Data;
 
 namespace OpenUO.Core.PresentationFramework.Converters
 {
@@ -12,9 +9,11 @@ namespace OpenUO.Core.PresentationFramework.Converters
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
             if(value == null || !(value is Enum))
+            {
                 return null;
+            }
 
-            Enum en = (Enum)value;
+            var en = (Enum)value;
 
             return en.GetAttribute<DescriptionAttribute>().Description;
         }

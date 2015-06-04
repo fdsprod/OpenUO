@@ -33,7 +33,7 @@ namespace OpenUO.Ultima.Windows.Forms.Adapters
         {
             get
             {
-                if (!IsInitialized)
+                if(!IsInitialized)
                 {
                     Initialize();
                 }
@@ -46,7 +46,7 @@ namespace OpenUO.Ultima.Windows.Forms.Adapters
         {
             base.Initialize();
 
-            InstallLocation install = Install;
+            var install = Install;
 
             _fileIndex = install.CreateFileIndex("texidx.mul", "texmaps.mul");
         }
@@ -54,28 +54,28 @@ namespace OpenUO.Ultima.Windows.Forms.Adapters
         public unsafe Bitmap GetTexmap(int index)
         {
             int length, extra;
-            Stream stream = _fileIndex.Seek(index, out length, out extra);
+            var stream = _fileIndex.Seek(index, out length, out extra);
 
-            if (stream == null)
+            if(stream == null)
             {
                 return null;
             }
 
-            int size = extra == 0 ? 64 : 128;
+            var size = extra == 0 ? 64 : 128;
 
-            Bitmap bmp = new Bitmap(size, size, PixelFormat.Format16bppArgb1555);
-            BitmapData bd = bmp.LockBits(new Rectangle(0, 0, size, size), ImageLockMode.WriteOnly, PixelFormat.Format16bppArgb1555);
-            BinaryReader bin = new BinaryReader(stream);
+            var bmp = new Bitmap(size, size, PixelFormat.Format16bppArgb1555);
+            var bd = bmp.LockBits(new Rectangle(0, 0, size, size), ImageLockMode.WriteOnly, PixelFormat.Format16bppArgb1555);
+            var bin = new BinaryReader(stream);
 
-            ushort* line = (ushort*)bd.Scan0;
-            int delta = bd.Stride >> 1;
+            var line = (ushort*)bd.Scan0;
+            var delta = bd.Stride >> 1;
 
-            for (int y = 0; y < size; ++y, line += delta)
+            for(var y = 0; y < size; ++y, line += delta)
             {
-                ushort* cur = line;
-                ushort* end = cur + size;
+                var cur = line;
+                var end = cur + size;
 
-                while (cur < end)
+                while(cur < end)
                 {
                     *cur++ = (ushort)(bin.ReadUInt16() ^ 0x8000);
                 }
@@ -90,7 +90,7 @@ namespace OpenUO.Ultima.Windows.Forms.Adapters
         {
             base.Dispose(disposing);
 
-            if (_fileIndex != null)
+            if(_fileIndex != null)
             {
                 _fileIndex.Close();
                 _fileIndex = null;

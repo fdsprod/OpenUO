@@ -32,9 +32,9 @@ namespace OpenUO.Ultima.UnitTests
         {
             get
             {
-                if (!_configuredInstallForTest)
+                if(!_configuredInstallForTest)
                 {
-                    using (SelectInstallForm form = new SelectInstallForm("CoreAdapterTests"))
+                    using(var form = new SelectInstallForm("CoreAdapterTests"))
                     {
                         form.ShowDialog();
                         _install = form.SelectedInstall;

@@ -28,7 +28,7 @@ namespace OpenUO.Core
         public static bool TryConvert<TConvertFrom, UConvertTo>(TConvertFrom convertFrom, out UConvertTo convertTo)
         {
             object to;
-            bool converted = TryConvert(typeof (TConvertFrom), convertFrom, typeof (UConvertTo), out to);
+            var converted = TryConvert(typeof(TConvertFrom), convertFrom, typeof(UConvertTo), out to);
 
             convertTo = (UConvertTo)to;
 
@@ -38,23 +38,23 @@ namespace OpenUO.Core
         public static bool TryConvert(Type convertFrom, object from, Type convertTo, out object to)
         {
             to = null;
-            bool converted = false;
+            var converted = false;
 
-            if (convertFrom == convertTo)
+            if(convertFrom == convertTo)
             {
                 to = from;
                 return true;
             }
 
-            if (from != null && convertTo.IsEnum)
+            if(from != null && convertTo.IsEnum)
             {
                 to = Enum.Parse(convertTo, from.ToString(), true);
                 return true;
             }
 
-            TypeConverter converter = TypeDescriptor.GetConverter(convertFrom);
+            var converter = TypeDescriptor.GetConverter(convertFrom);
 
-            if (converter.CanConvertTo(convertTo))
+            if(converter.CanConvertTo(convertTo))
             {
                 to = converter.ConvertTo(from, convertTo);
                 converted = true;
@@ -63,7 +63,7 @@ namespace OpenUO.Core
             {
                 converter = TypeDescriptor.GetConverter(convertTo);
 
-                if (converter.CanConvertFrom(convertFrom))
+                if(converter.CanConvertFrom(convertFrom))
                 {
                     to = converter.ConvertFrom(from);
                     converted = true;

@@ -34,7 +34,7 @@ namespace OpenUO.Ultima.PresentationFramework.Adapters
         {
             get
             {
-                if (!IsInitialized)
+                if(!IsInitialized)
                 {
                     Initialize();
                 }
@@ -47,7 +47,7 @@ namespace OpenUO.Ultima.PresentationFramework.Adapters
         {
             base.Initialize();
 
-            InstallLocation install = Install;
+            var install = Install;
 
             _fileIndex =
                 install.IsUOPFormat
@@ -58,45 +58,45 @@ namespace OpenUO.Ultima.PresentationFramework.Adapters
         public unsafe ImageSource GetGump(int index)
         {
             int length, extra;
-            Stream stream = _fileIndex.Seek(index, out length, out extra);
+            var stream = _fileIndex.Seek(index, out length, out extra);
 
-            if (stream == null)
+            if(stream == null)
             {
                 return null;
             }
 
-            BinaryReader bin = new BinaryReader(stream);
+            var bin = new BinaryReader(stream);
 
-            int width = (extra >> 16) & 0xFFFF;
-            int height = extra & 0xFFFF;
+            var width = (extra >> 16) & 0xFFFF;
+            var height = extra & 0xFFFF;
 
-            WriteableBitmap bmp = new WriteableBitmap(width, height, 96, 96, PixelFormats.Bgr555, null);
+            var bmp = new WriteableBitmap(width, height, 96, 96, PixelFormats.Bgr555, null);
             bmp.Lock();
 
-            int[] lookups = new int[height];
-            int start = (int)bin.BaseStream.Position;
+            var lookups = new int[height];
+            var start = (int)bin.BaseStream.Position;
 
-            for (int i = 0; i < height; ++i)
+            for(var i = 0; i < height; ++i)
             {
                 lookups[i] = start + (bin.ReadInt32() * 4);
             }
 
-            ushort* line = (ushort*)bmp.BackBuffer;
-            ushort delta = (ushort)(bmp.BackBufferStride >> 1);
+            var line = (ushort*)bmp.BackBuffer;
+            var delta = (ushort)(bmp.BackBufferStride >> 1);
 
-            for (int y = 0; y < height; ++y, line += delta)
+            for(var y = 0; y < height; ++y, line += delta)
             {
                 bin.BaseStream.Seek(lookups[y], SeekOrigin.Begin);
 
-                ushort* cur = line;
-                ushort* end = line + bmp.PixelWidth;
+                var cur = line;
+                var end = line + bmp.PixelWidth;
 
-                while (cur < end)
+                while(cur < end)
                 {
-                    ushort color = bin.ReadUInt16();
-                    ushort* next = cur + bin.ReadUInt16();
+                    var color = bin.ReadUInt16();
+                    var next = cur + bin.ReadUInt16();
 
-                    if (color == 0)
+                    if(color == 0)
                     {
                         cur = next;
                     }
@@ -104,7 +104,7 @@ namespace OpenUO.Ultima.PresentationFramework.Adapters
                     {
                         color ^= 0x8000;
 
-                        while (cur < next)
+                        while(cur < next)
                         {
                             *cur++ = color;
                         }
@@ -122,7 +122,7 @@ namespace OpenUO.Ultima.PresentationFramework.Adapters
         {
             base.Dispose(disposing);
 
-            if (_fileIndex != null)
+            if(_fileIndex != null)
             {
                 _fileIndex.Close();
                 _fileIndex = null;

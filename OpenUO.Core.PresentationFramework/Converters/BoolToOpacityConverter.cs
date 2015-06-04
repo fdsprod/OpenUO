@@ -1,4 +1,5 @@
 ﻿#region File Header
+
 /********************************************************
  * 
  *  $Id: BoolToOpacityConverter.cs 111 2010-10-12 06:58:17Z jeff $
@@ -15,6 +16,7 @@
  *  All rights reserved. 
  *  
  ********************************************************/
+
 #endregion
 
 using System;
@@ -29,7 +31,7 @@ namespace OpenUO.Core.PresentationFramework.Converters
         {
             try
             {
-                if ((bool)value)
+                if((bool)value)
                 {
                     return 1;
                 }

@@ -28,7 +28,6 @@ namespace OpenUO.Core.Diagnostics
     public static class Tracer
     {
         private static readonly object _syncRoot = new object();
-
         public static TraceReveivedHandler TraceReceived;
 
         public static TraceLevels TraceLevel
@@ -89,16 +88,16 @@ namespace OpenUO.Core.Diagnostics
 
         public static void Trace(TraceLevels type, string message, params object[] args)
         {
-            lock (_syncRoot)
+            lock(_syncRoot)
             {
-                if (TraceReceived != null)
+                if(TraceReceived != null)
                 {
-                    if (args.Length > 0)
+                    if(args.Length > 0)
                     {
                         message = string.Format(message, args);
                     }
 
-                    TraceMessage traceMessage =
+                    var traceMessage =
                         new TraceMessage(
                             type,
                             DateTime.UtcNow,

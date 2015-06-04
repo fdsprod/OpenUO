@@ -36,37 +36,9 @@ namespace OpenUO.Core.Collections
             InternalCache = new Dictionary<TKey, CacheItem<TValue>>(capacity);
         }
 
-        public virtual TValue this[TKey index]
-        {
-            get
-            {
-                TValue item = default(TValue);
-                CacheItem<TValue> cacheItem;
-
-                if (InternalCache.TryGetValue(index, out cacheItem))
-                {
-                    item = cacheItem.Value;
-                }
-
-                return item;
-            }
-            set
-            {
-                CacheItem<TValue> cacheItem;
-
-                if (!InternalCache.TryGetValue(index, out cacheItem))
-                {
-                    cacheItem = new CacheItem<TValue>(value, TimeToExpire);
-                    InternalCache.Add(index, cacheItem);
-                }
-
-                cacheItem.Value = value;
-            }
-        }
-
         public virtual void Dispose()
         {
-            foreach (var cacheItem in InternalCache.Values)
+            foreach(var cacheItem in InternalCache.Values)
             {
                 OnItemDisposing(cacheItem);
                 cacheItem.Dispose();
@@ -85,26 +57,6 @@ namespace OpenUO.Core.Collections
             return InternalCache.GetEnumerator();
         }
 
-        public void Clean()
-        {
-            TKey[] keys = InternalCache.Keys.ToArray();
-
-            for (int i = 0; i < keys.Length; i++)
-            {
-                TKey key = keys[i];
-                CacheItem<TValue> cacheItem = InternalCache[key];
-
-                if (cacheItem.IsExpired)
-                {
-                    InternalCache.Remove(key);
-                }
-            }
-        }
-
-        protected virtual void OnItemDisposing(CacheItem<TValue> cacheItem)
-        {
-        }
-
         protected class CacheItem<TValueType> : IDisposable
         {
             private readonly TimeSpan _timeToExpire;
@@ -116,6 +68,16 @@ namespace OpenUO.Core.Collections
                 _value = value;
                 _lastAccess = DateTime.Now;
                 _timeToExpire = timeToExpire;
+            }
+
+            public void Dispose()
+            {
+                var disposable = _value as IDisposable;
+
+                if(disposable != null)
+                {
+                    disposable.Dispose();
+                }
             }
 
             public TValueType Value
@@ -136,16 +98,54 @@ namespace OpenUO.Core.Collections
             {
                 get { return DateTime.Now >= _lastAccess + _timeToExpire; }
             }
+        }
 
-            public void Dispose()
+        public virtual TValue this[TKey index]
+        {
+            get
             {
-                IDisposable disposable = _value as IDisposable;
+                var item = default(TValue);
+                CacheItem<TValue> cacheItem;
 
-                if (disposable != null)
+                if(InternalCache.TryGetValue(index, out cacheItem))
                 {
-                    disposable.Dispose();
+                    item = cacheItem.Value;
+                }
+
+                return item;
+            }
+            set
+            {
+                CacheItem<TValue> cacheItem;
+
+                if(!InternalCache.TryGetValue(index, out cacheItem))
+                {
+                    cacheItem = new CacheItem<TValue>(value, TimeToExpire);
+                    InternalCache.Add(index, cacheItem);
+                }
+
+                cacheItem.Value = value;
+            }
+        }
+
+        public void Clean()
+        {
+            var keys = InternalCache.Keys.ToArray();
+
+            for(var i = 0; i < keys.Length; i++)
+            {
+                var key = keys[i];
+                var cacheItem = InternalCache[key];
+
+                if(cacheItem.IsExpired)
+                {
+                    InternalCache.Remove(key);
                 }
             }
+        }
+
+        protected virtual void OnItemDisposing(CacheItem<TValue> cacheItem)
+        {
         }
     }
 }

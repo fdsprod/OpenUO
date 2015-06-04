@@ -31,7 +31,8 @@ namespace OpenUO.Core.IO
         private const int TerminalCodeLength = 4;
         private const int DefiniteOverflow = ((BufferSize * 8) - TerminalCodeLength) / MinimalCodeLength;
 
-        private static readonly int[] _huffmanTable = new [] {
+        private static readonly int[] _huffmanTable =
+        {
             0x2, 0x000, 0x5, 0x01F, 0x6, 0x022, 0x7, 0x034, 0x7, 0x075, 0x6, 0x028, 0x6, 0x03B, 0x7, 0x032,
             0x8, 0x0E0, 0x8, 0x062, 0x7, 0x056, 0x8, 0x079, 0x9, 0x19D, 0x8, 0x097, 0x6, 0x02A, 0x7, 0x057,
             0x8, 0x071, 0x8, 0x05B, 0x9, 0x1CC, 0x8, 0x0A7, 0x7, 0x025, 0x7, 0x04F, 0x8, 0x066, 0x8, 0x07D,
@@ -72,50 +73,50 @@ namespace OpenUO.Core.IO
 
         public static unsafe byte[] Compress(byte[] input, int offset, int count, ref int length)
         {
-            if (input == null)
+            if(input == null)
             {
                 throw new ArgumentNullException("input");
             }
 
-            if (offset < 0 || offset >= input.Length)
+            if(offset < 0 || offset >= input.Length)
             {
                 throw new ArgumentOutOfRangeException("offset");
             }
 
-            if (count < 0 || count > input.Length)
+            if(count < 0 || count > input.Length)
             {
                 throw new ArgumentOutOfRangeException("count");
             }
 
-            if ((input.Length - offset) < count)
+            if((input.Length - offset) < count)
             {
                 throw new ArgumentException();
             }
 
             length = 0;
 
-            if (count > DefiniteOverflow)
+            if(count > DefiniteOverflow)
             {
                 return null;
             }
 
-            lock (_syncRoot)
+            lock(_syncRoot)
             {
-                int bitCount = 0;
-                int bitValue = 0;
+                var bitCount = 0;
+                var bitValue = 0;
 
-                fixed (int* pTable = _huffmanTable)
+                fixed(int* pTable = _huffmanTable)
                 {
-                    fixed (byte* pInputBuffer = input)
+                    fixed(byte* pInputBuffer = input)
                     {
                         byte* pInput = pInputBuffer + offset, pInputEnd = pInput + count;
 
-                        fixed (byte* pOutputBuffer = _outputBuffer)
+                        fixed(byte* pOutputBuffer = _outputBuffer)
                         {
                             byte* pOutput = pOutputBuffer, pOutputEnd = pOutput + BufferSize;
                             int* pEntry;
 
-                            while (pInput < pInputEnd)
+                            while(pInput < pInputEnd)
                             {
                                 pEntry = &pTable[*pInput++ << 1];
 
@@ -124,11 +125,11 @@ namespace OpenUO.Core.IO
                                 bitValue <<= pEntry[CountIndex];
                                 bitValue |= pEntry[ValueIndex];
 
-                                while (bitCount >= 8)
+                                while(bitCount >= 8)
                                 {
                                     bitCount -= 8;
 
-                                    if (pOutput < pOutputEnd)
+                                    if(pOutput < pOutputEnd)
                                     {
                                         *pOutput++ = (byte)(bitValue >> bitCount);
                                     }
@@ -148,17 +149,17 @@ namespace OpenUO.Core.IO
                             bitValue |= pEntry[ValueIndex];
 
                             // align on byte boundary
-                            if ((bitCount & 7) != 0)
+                            if((bitCount & 7) != 0)
                             {
                                 bitValue <<= (8 - (bitCount & 7));
                                 bitCount += (8 - (bitCount & 7));
                             }
 
-                            while (bitCount >= 8)
+                            while(bitCount >= 8)
                             {
                                 bitCount -= 8;
 
-                                if (pOutput < pOutputEnd)
+                                if(pOutput < pOutputEnd)
                                 {
                                     *pOutput++ = (byte)(bitValue >> bitCount);
                                 }

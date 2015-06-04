@@ -1,4 +1,5 @@
 #region License Header
+
 /***************************************************************************
  *
  *   This program is free software; you can redistribute it and/or modify
@@ -7,7 +8,8 @@
  *   (at your option) any later version.
  *
  ***************************************************************************/
- #endregion
+
+#endregion
 
 using System;
 using System.Collections.Generic;
@@ -21,77 +23,8 @@ namespace OpenUO.Ultima.Network
     {
         private static readonly Stack<PacketWriter> _pool = new Stack<PacketWriter>();
         private static readonly byte[] _buffer = new byte[8];
-
-        public static PacketWriter CreateInstance()
-        {
-            return CreateInstance(32);
-        }
-
-        public static PacketWriter CreateInstance(int capacity)
-        {
-            PacketWriter pw = null;
-
-            lock (_pool)
-            {
-                if (_pool.Count > 0)
-                {
-                    pw = _pool.Pop();
-
-                    if (pw != null)
-                    {
-                        pw._capacity = capacity;
-                        pw._stream.SetLength(0);
-                    }
-                }
-            }
-
-            return pw ?? new PacketWriter(capacity);
-        }
-
-        public static void ReleaseInstance(PacketWriter pw)
-        {
-            lock (_pool)
-            {
-                if (!_pool.Contains(pw))
-                {
-                    _pool.Push(pw);
-                }
-                else
-                {
-                    try
-                    {
-                        using (StreamWriter op = new StreamWriter("neterr.log"))
-                        {
-                            op.WriteLine("{0}\tInstance pool contains writer", DateTime.Now);
-                        }
-                    }
-                    catch
-                    {
-                        Console.WriteLine("net error");
-                    }
-                }
-            }
-        }
-
         private readonly MemoryStream _stream;
-
         private int _capacity;
-
-        public long Length
-        {
-            get { return _stream.Length; }
-        }
-
-        public long Position
-        {
-            get { return _stream.Position; }
-            set { _stream.Position = value; }
-        }
-
-        public MemoryStream UnderlyingStream
-        {
-            get { return _stream; }
-        }
 
         public PacketWriter()
             : this(32)
@@ -108,6 +41,73 @@ namespace OpenUO.Ultima.Network
         {
             _stream = new MemoryStream(buffer);
             _capacity = buffer.Length;
+        }
+
+        public static PacketWriter CreateInstance()
+        {
+            return CreateInstance(32);
+        }
+
+        public static PacketWriter CreateInstance(int capacity)
+        {
+            PacketWriter pw = null;
+
+            lock(_pool)
+            {
+                if(_pool.Count > 0)
+                {
+                    pw = _pool.Pop();
+
+                    if(pw != null)
+                    {
+                        pw._capacity = capacity;
+                        pw._stream.SetLength(0);
+                    }
+                }
+            }
+
+            return pw ?? new PacketWriter(capacity);
+        }
+
+        public static void ReleaseInstance(PacketWriter pw)
+        {
+            lock(_pool)
+            {
+                if(!_pool.Contains(pw))
+                {
+                    _pool.Push(pw);
+                }
+                else
+                {
+                    try
+                    {
+                        using(var op = new StreamWriter("neterr.log"))
+                        {
+                            op.WriteLine("{0}\tInstance pool contains writer", DateTime.Now);
+                        }
+                    }
+                    catch
+                    {
+                        Console.WriteLine("net error");
+                    }
+                }
+            }
+        }
+
+        public long Length
+        {
+            get { return _stream.Length; }
+        }
+
+        public long Position
+        {
+            get { return _stream.Position; }
+            set { _stream.Position = value; }
+        }
+
+        public MemoryStream UnderlyingStream
+        {
+            get { return _stream; }
         }
 
         public void Write(bool value)
@@ -191,7 +191,7 @@ namespace OpenUO.Ultima.Network
 
         public void Write(float value)
         {
-            uint num = (uint)value;
+            var num = (uint)value;
             _buffer[0] = (byte)(num >> 24);
             _buffer[1] = (byte)(num >> 16);
             _buffer[2] = (byte)(num >> 8);
@@ -202,7 +202,7 @@ namespace OpenUO.Ultima.Network
 
         public void Write(double value)
         {
-            uint num = (uint)value;
+            var num = (uint)value;
             _buffer[0] = (byte)(num >> 56);
             _buffer[1] = (byte)(num >> 48);
             _buffer[2] = (byte)(num >> 40);
@@ -222,18 +222,20 @@ namespace OpenUO.Ultima.Network
 
         public void WriteAsciiFixed(string value, int size)
         {
-            if (value == null)
+            if(value == null)
             {
                 Debug.WriteLine("Network: Attempted to WriteAsciiFixed() with null value");
                 value = String.Empty;
             }
 
-            int length = value.Length;
+            var length = value.Length;
 
             _stream.SetLength(_stream.Length + size);
 
-            if (length >= size)
+            if(length >= size)
+            {
                 _stream.Position += Encoding.ASCII.GetBytes(value, 0, size, _stream.GetBuffer(), (int)_stream.Position);
+            }
             else
             {
                 Encoding.ASCII.GetBytes(value, 0, length, _stream.GetBuffer(), (int)_stream.Position);
@@ -243,13 +245,13 @@ namespace OpenUO.Ultima.Network
 
         public void WriteAsciiNull(string value)
         {
-            if (value == null)
+            if(value == null)
             {
                 Debug.WriteLine("Network: Attempted to WriteAsciiNull() with null value");
                 value = String.Empty;
             }
 
-            int length = value.Length;
+            var length = value.Length;
 
             _stream.SetLength(_stream.Length + length + 1);
 
@@ -259,13 +261,13 @@ namespace OpenUO.Ultima.Network
 
         public void WriteLittleUniNull(string value)
         {
-            if (value == null)
+            if(value == null)
             {
                 Debug.WriteLine("Network: Attempted to WriteLittleUniNull() with null value");
                 value = String.Empty;
             }
 
-            int length = value.Length;
+            var length = value.Length;
 
             _stream.SetLength(_stream.Length + ((length + 1) * 2));
 
@@ -275,7 +277,7 @@ namespace OpenUO.Ultima.Network
 
         public void WriteLittleUniFixed(string value, int size)
         {
-            if (value == null)
+            if(value == null)
             {
                 Debug.WriteLine("Network: Attempted to WriteLittleUniFixed() with null value");
                 value = String.Empty;
@@ -283,12 +285,14 @@ namespace OpenUO.Ultima.Network
 
             size *= 2;
 
-            int length = value.Length;
+            var length = value.Length;
 
             _stream.SetLength(_stream.Length + size);
 
-            if ((length * 2) >= size)
+            if((length * 2) >= size)
+            {
                 _stream.Position += Encoding.Unicode.GetBytes(value, 0, length, _stream.GetBuffer(), (int)_stream.Position);
+            }
             else
             {
                 Encoding.Unicode.GetBytes(value, 0, length, _stream.GetBuffer(), (int)_stream.Position);
@@ -298,13 +302,13 @@ namespace OpenUO.Ultima.Network
 
         public void WriteBigUniNull(string value)
         {
-            if (value == null)
+            if(value == null)
             {
                 Debug.WriteLine("Network: Attempted to WriteBigUniNull() with null value");
                 value = String.Empty;
             }
 
-            int length = value.Length;
+            var length = value.Length;
 
             _stream.SetLength(_stream.Length + ((length + 1) * 2));
 
@@ -314,7 +318,7 @@ namespace OpenUO.Ultima.Network
 
         public void WriteBigUniFixed(string value, int size)
         {
-            if (value == null)
+            if(value == null)
             {
                 Debug.WriteLine("Network: Attempted to WriteBigUniFixed() with null value");
                 value = String.Empty;
@@ -322,12 +326,14 @@ namespace OpenUO.Ultima.Network
 
             size *= 2;
 
-            int length = value.Length;
+            var length = value.Length;
 
             _stream.SetLength(_stream.Length + size);
 
-            if ((length * 2) >= size)
+            if((length * 2) >= size)
+            {
                 _stream.Position += Encoding.BigEndianUnicode.GetBytes(value, 0, length, _stream.GetBuffer(), (int)_stream.Position);
+            }
             else
             {
                 Encoding.BigEndianUnicode.GetBytes(value, 0, length, _stream.GetBuffer(), (int)_stream.Position);
@@ -342,7 +348,7 @@ namespace OpenUO.Ultima.Network
 
         public void Fill(int length)
         {
-            if (_stream.Position == _stream.Length)
+            if(_stream.Position == _stream.Length)
             {
                 _stream.SetLength(_stream.Length + length);
                 _stream.Seek(0, SeekOrigin.End);

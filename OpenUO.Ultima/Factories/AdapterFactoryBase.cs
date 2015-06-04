@@ -42,7 +42,7 @@ namespace OpenUO.Ultima
 
         public void Dispose()
         {
-            if (_adapter != null)
+            if(_adapter != null)
             {
                 _adapter.Dispose();
                 _adapter = null;
@@ -54,7 +54,7 @@ namespace OpenUO.Ultima
         protected TStorageAdapter GetAdapter<TStorageAdapter>()
             where TStorageAdapter : class, IStorageAdapter
         {
-            if (_adapter == null)
+            if(_adapter == null)
             {
                 _adapter = _container.Resolve<TStorageAdapter>();
                 _adapter.Install = _install;

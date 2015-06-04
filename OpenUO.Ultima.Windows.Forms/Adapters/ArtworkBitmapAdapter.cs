@@ -33,7 +33,7 @@ namespace OpenUO.Ultima.Windows.Forms.Adapters
         {
             get
             {
-                if (!IsInitialized)
+                if(!IsInitialized)
                 {
                     Initialize();
                 }
@@ -46,7 +46,7 @@ namespace OpenUO.Ultima.Windows.Forms.Adapters
         {
             base.Initialize();
 
-            InstallLocation install = Install;
+            var install = Install;
 
             _fileIndex =
                 install.IsUOPFormat
@@ -59,29 +59,29 @@ namespace OpenUO.Ultima.Windows.Forms.Adapters
             index &= 0x3FFF;
 
             int length, extra;
-            Stream stream = _fileIndex.Seek(index, out length, out extra);
+            var stream = _fileIndex.Seek(index, out length, out extra);
 
-            if (stream == null)
+            if(stream == null)
             {
                 return null;
             }
 
-            Bitmap bmp = new Bitmap(44, 44, PixelFormat.Format16bppArgb1555);
-            BitmapData bd = bmp.LockBits(new Rectangle(0, 0, 44, 44), ImageLockMode.WriteOnly, PixelFormat.Format16bppArgb1555);
-            BinaryReader bin = new BinaryReader(stream);
+            var bmp = new Bitmap(44, 44, PixelFormat.Format16bppArgb1555);
+            var bd = bmp.LockBits(new Rectangle(0, 0, 44, 44), ImageLockMode.WriteOnly, PixelFormat.Format16bppArgb1555);
+            var bin = new BinaryReader(stream);
 
-            int xOffset = 21;
-            int xRun = 2;
+            var xOffset = 21;
+            var xRun = 2;
 
-            ushort* line = (ushort*)bd.Scan0;
-            int delta = bd.Stride >> 1;
+            var line = (ushort*)bd.Scan0;
+            var delta = bd.Stride >> 1;
 
-            for (int y = 0; y < 22; ++y, --xOffset, xRun += 2, line += delta)
+            for(var y = 0; y < 22; ++y, --xOffset, xRun += 2, line += delta)
             {
-                ushort* cur = line + xOffset;
-                ushort* end = cur + xRun;
+                var cur = line + xOffset;
+                var end = cur + xRun;
 
-                while (cur < end)
+                while(cur < end)
                 {
                     *cur++ = (ushort)(bin.ReadUInt16() | 0x8000);
                 }
@@ -90,12 +90,12 @@ namespace OpenUO.Ultima.Windows.Forms.Adapters
             xOffset = 0;
             xRun = 44;
 
-            for (int y = 0; y < 22; ++y, ++xOffset, xRun -= 2, line += delta)
+            for(var y = 0; y < 22; ++y, ++xOffset, xRun -= 2, line += delta)
             {
-                ushort* cur = line + xOffset;
-                ushort* end = cur + xRun;
+                var cur = line + xOffset;
+                var end = cur + xRun;
 
-                while (cur < end)
+                while(cur < end)
                 {
                     *cur++ = (ushort)(bin.ReadUInt16() | 0x8000);
                 }
@@ -111,55 +111,55 @@ namespace OpenUO.Ultima.Windows.Forms.Adapters
             index += 0x4000;
 
             int length, extra;
-            Stream stream = _fileIndex.Seek(index, out length, out extra);
+            var stream = _fileIndex.Seek(index, out length, out extra);
 
-            if (stream == null)
+            if(stream == null)
             {
                 return null;
             }
 
-            BinaryReader bin = new BinaryReader(stream);
+            var bin = new BinaryReader(stream);
 
             bin.ReadInt32(); // Unknown
 
             int width = bin.ReadInt16();
             int height = bin.ReadInt16();
 
-            if (width <= 0 || height <= 0)
+            if(width <= 0 || height <= 0)
             {
                 return null;
             }
 
-            int[] lookups = new int[height];
+            var lookups = new int[height];
 
-            int start = (int)bin.BaseStream.Position + (height * 2);
+            var start = (int)bin.BaseStream.Position + (height * 2);
 
-            for (int i = 0; i < height; ++i)
+            for(var i = 0; i < height; ++i)
             {
                 lookups[i] = (start + (bin.ReadUInt16() * 2));
             }
 
-            Bitmap bmp = new Bitmap(width, height, PixelFormat.Format16bppArgb1555);
-            BitmapData bd = bmp.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.WriteOnly, PixelFormat.Format16bppArgb1555);
+            var bmp = new Bitmap(width, height, PixelFormat.Format16bppArgb1555);
+            var bd = bmp.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.WriteOnly, PixelFormat.Format16bppArgb1555);
 
-            ushort* line = (ushort*)bd.Scan0;
-            int delta = bd.Stride >> 1;
+            var line = (ushort*)bd.Scan0;
+            var delta = bd.Stride >> 1;
 
-            for (int y = 0; y < height; ++y, line += delta)
+            for(var y = 0; y < height; ++y, line += delta)
             {
                 bin.BaseStream.Seek(lookups[y], SeekOrigin.Begin);
 
-                ushort* cur = line;
+                var cur = line;
                 ushort* end;
 
                 int xOffset, xRun;
 
-                while (((xOffset = bin.ReadUInt16()) + (xRun = bin.ReadUInt16())) != 0)
+                while(((xOffset = bin.ReadUInt16()) + (xRun = bin.ReadUInt16())) != 0)
                 {
                     cur += xOffset;
                     end = cur + xRun;
 
-                    while (cur < end)
+                    while(cur < end)
                     {
                         *cur++ = (ushort)(bin.ReadUInt16() ^ 0x8000);
                     }

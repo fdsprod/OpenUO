@@ -29,8 +29,8 @@ namespace OpenUO.Core.Reflection
 
         public FieldAccessor(string Field)
         {
-            getMethodHandler = BaseFieldAccessor.GetFieldInvoker<TargetType, FieldType>(typeof (TargetType).GetField(Field));
-            setMethodHandler = BaseFieldAccessor.SetFieldInvoker<TargetType, FieldType>(typeof (TargetType).GetField(Field));
+            getMethodHandler = BaseFieldAccessor.GetFieldInvoker<TargetType, FieldType>(typeof(TargetType).GetField(Field));
+            setMethodHandler = BaseFieldAccessor.SetFieldInvoker<TargetType, FieldType>(typeof(TargetType).GetField(Field));
         }
 
         public FieldAccessor(FieldInfo Field)

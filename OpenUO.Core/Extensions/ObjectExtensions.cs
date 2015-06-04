@@ -26,9 +26,9 @@ namespace OpenUO.Core
     {
         public static object ConvertTo(this object obj, Type convertTo)
         {
-            if (obj == null || obj == DBNull.Value)
+            if(obj == null || obj == DBNull.Value)
             {
-                if (convertTo.IsNullableType() || convertTo.IsClass)
+                if(convertTo.IsNullableType() || convertTo.IsClass)
                 {
                     return null;
                 }
@@ -38,7 +38,7 @@ namespace OpenUO.Core
 
             object converted = null;
 
-            if (!ObjectConverterter.TryConvert(obj.GetType(), obj, convertTo, out converted))
+            if(!ObjectConverterter.TryConvert(obj.GetType(), obj, convertTo, out converted))
             {
                 throw new InvalidCastException(string.Format("Unable to cast '{0}' to {1}'.", obj.GetType(), convertTo));
             }
@@ -50,14 +50,14 @@ namespace OpenUO.Core
         {
             outValue = null;
 
-            if (obj == null)
+            if(obj == null)
             {
                 return convertTo.IsNullableType();
             }
 
             object converted;
 
-            if (!ObjectConverterter.TryConvert(obj.GetType(), obj, convertTo, out converted))
+            if(!ObjectConverterter.TryConvert(obj.GetType(), obj, convertTo, out converted))
             {
                 return false;
             }
@@ -68,13 +68,13 @@ namespace OpenUO.Core
 
         public static T ConvertTo<T>(this object obj)
         {
-            return (T)ConvertTo(obj, typeof (T));
+            return (T)ConvertTo(obj, typeof(T));
         }
 
         public static bool TryConvertTo<T>(this object obj, out T outValue)
         {
             object o;
-            bool success = TryConvertTo(obj, typeof (T), out o);
+            var success = TryConvertTo(obj, typeof(T), out o);
             outValue = (T)o;
 
             return success;

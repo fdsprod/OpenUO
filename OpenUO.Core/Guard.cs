@@ -30,7 +30,7 @@ namespace OpenUO.Core
 
         public static void Assert(bool logicalExpression, string message)
         {
-            if (!logicalExpression)
+            if(!logicalExpression)
             {
                 throw new ArgumentException(message);
             }
@@ -38,9 +38,9 @@ namespace OpenUO.Core
 
         public static void Assert(string parameterName, bool logicalExpression, object actualValue, string message)
         {
-            if (!logicalExpression)
+            if(!logicalExpression)
             {
-                if (actualValue == null)
+                if(actualValue == null)
                 {
                     throw (new ArgumentNullException(parameterName, message));
                 }
@@ -51,7 +51,7 @@ namespace OpenUO.Core
 
         public static void AssertIsNotNull(object obj, string message)
         {
-            if (obj == null)
+            if(obj == null)
             {
                 throw new ArgumentNullException(message);
             }
@@ -62,7 +62,7 @@ namespace OpenUO.Core
 #if Framework_4_0
             if (string.IsNullOrWhiteSpace(value))
 #else
-            if (string.IsNullOrEmpty(value))
+            if(string.IsNullOrEmpty(value))
             {
 #endif
                 throw new ArgumentException(string.Format("'{0}' cannot be a not be null or empty string.", paramName));
@@ -71,7 +71,7 @@ namespace OpenUO.Core
 
         public static void AssertIsNotLessThan(string parameterName, int minimumValue, int actualValue)
         {
-            if (actualValue < minimumValue)
+            if(actualValue < minimumValue)
             {
                 throw new ArgumentOutOfRangeException(parameterName);
             }
@@ -79,7 +79,7 @@ namespace OpenUO.Core
 
         public static void AssertIsNotLessThan(string parameterName, long minimumValue, long actualValue)
         {
-            if (actualValue < minimumValue)
+            if(actualValue < minimumValue)
             {
                 throw new ArgumentOutOfRangeException(parameterName);
             }
@@ -87,7 +87,7 @@ namespace OpenUO.Core
 
         public static void AssertIsNotLessThan(string parameterName, decimal minimumValue, decimal actualValue)
         {
-            if (actualValue < minimumValue)
+            if(actualValue < minimumValue)
             {
                 throw new ArgumentOutOfRangeException(parameterName);
             }
@@ -95,7 +95,7 @@ namespace OpenUO.Core
 
         public static void AssertIsNotLessThan(string parameterName, float minimumValue, float actualValue)
         {
-            if (actualValue < minimumValue)
+            if(actualValue < minimumValue)
             {
                 throw new ArgumentOutOfRangeException(parameterName);
             }
@@ -103,7 +103,7 @@ namespace OpenUO.Core
 
         public static void AssertIsNotLessThan(string parameterName, TimeSpan minimumValue, TimeSpan actualValue)
         {
-            if (actualValue < minimumValue)
+            if(actualValue < minimumValue)
             {
                 throw new ArgumentOutOfRangeException(parameterName);
             }
@@ -111,7 +111,7 @@ namespace OpenUO.Core
 
         public static void AssertIsNotLessThan(string parameterName, double minimumValue, double actualValue)
         {
-            if (actualValue < minimumValue)
+            if(actualValue < minimumValue)
             {
                 throw new ArgumentOutOfRangeException(parameterName);
             }
@@ -119,7 +119,7 @@ namespace OpenUO.Core
 
         public static void AssertIsNotGreaterThan(string parameterName, int maximumValue, int actualValue)
         {
-            if (actualValue > maximumValue)
+            if(actualValue > maximumValue)
             {
                 throw new ArgumentOutOfRangeException(parameterName);
             }
@@ -127,7 +127,7 @@ namespace OpenUO.Core
 
         public static void AssertIsNotGreaterThan(string parameterName, long maximumValue, long actualValue)
         {
-            if (actualValue > maximumValue)
+            if(actualValue > maximumValue)
             {
                 throw new ArgumentOutOfRangeException(parameterName);
             }
@@ -135,7 +135,7 @@ namespace OpenUO.Core
 
         public static void AssertIsNotGreaterThan(string parameterName, decimal maximumValue, decimal actualValue)
         {
-            if (actualValue > maximumValue)
+            if(actualValue > maximumValue)
             {
                 throw new ArgumentOutOfRangeException(parameterName);
             }
@@ -143,7 +143,7 @@ namespace OpenUO.Core
 
         public static void AssertIsNotGreaterThan(string parameterName, float maximumValue, float actualValue)
         {
-            if (actualValue > maximumValue)
+            if(actualValue > maximumValue)
             {
                 throw new ArgumentOutOfRangeException(parameterName);
             }
@@ -151,7 +151,7 @@ namespace OpenUO.Core
 
         public static void AssertIsNotGreaterThan(string parameterName, double maximumValue, double actualValue)
         {
-            if (actualValue > maximumValue)
+            if(actualValue > maximumValue)
             {
                 throw new ArgumentOutOfRangeException(parameterName);
             }
@@ -159,7 +159,7 @@ namespace OpenUO.Core
 
         public static void AssertInRange(string parameterName, int minimumValue, int actualValue)
         {
-            if (actualValue < minimumValue)
+            if(actualValue < minimumValue)
             {
                 throw new ArgumentOutOfRangeException(parameterName);
             }
@@ -167,7 +167,7 @@ namespace OpenUO.Core
 
         public static void AssertInRange(string parameterName, decimal minimumValue, decimal actualValue)
         {
-            if (actualValue < minimumValue)
+            if(actualValue < minimumValue)
             {
                 throw new ArgumentOutOfRangeException(parameterName);
             }
@@ -175,13 +175,13 @@ namespace OpenUO.Core
 
         public static void AssertInRange(string parameterName, byte minimumValue, byte maximumValue, byte actualValue)
         {
-            if (minimumValue > maximumValue)
+            if(minimumValue > maximumValue)
             {
-                string message = String.Format(ErrorInvalidRange, parameterName, minimumValue, maximumValue);
+                var message = String.Format(ErrorInvalidRange, parameterName, minimumValue, maximumValue);
                 throw new InvalidOperationException(message);
             }
 
-            if (actualValue < minimumValue || actualValue > maximumValue)
+            if(actualValue < minimumValue || actualValue > maximumValue)
             {
                 throw new ArgumentOutOfRangeException(parameterName);
             }
@@ -189,13 +189,13 @@ namespace OpenUO.Core
 
         public static void AssertInRange(string parameterName, short minimumValue, short maximumValue, short actualValue)
         {
-            if (minimumValue > maximumValue)
+            if(minimumValue > maximumValue)
             {
-                string message = String.Format(ErrorInvalidRange, parameterName, minimumValue, maximumValue);
+                var message = String.Format(ErrorInvalidRange, parameterName, minimumValue, maximumValue);
                 throw new InvalidOperationException(message);
             }
 
-            if (actualValue < minimumValue || actualValue > maximumValue)
+            if(actualValue < minimumValue || actualValue > maximumValue)
             {
                 throw new ArgumentOutOfRangeException(parameterName);
             }
@@ -203,18 +203,18 @@ namespace OpenUO.Core
 
         public static void AssertInRange(string parameterName, int minimumValue, int? maximumValue, int actualValue)
         {
-            if (minimumValue > maximumValue)
+            if(minimumValue > maximumValue)
             {
-                string message = String.Format(ErrorInvalidRange, parameterName, minimumValue, maximumValue);
+                var message = String.Format(ErrorInvalidRange, parameterName, minimumValue, maximumValue);
                 throw new InvalidOperationException(message);
             }
 
-            if (maximumValue.HasValue && (actualValue < minimumValue || actualValue > maximumValue))
+            if(maximumValue.HasValue && (actualValue < minimumValue || actualValue > maximumValue))
             {
                 throw new ArgumentOutOfRangeException(parameterName);
             }
 
-            if (actualValue < minimumValue)
+            if(actualValue < minimumValue)
             {
                 throw new ArgumentOutOfRangeException(parameterName);
             }
@@ -222,13 +222,13 @@ namespace OpenUO.Core
 
         public static void AssertInRange(string parameterName, long minimumValue, long maximumValue, long actualValue)
         {
-            if (minimumValue > maximumValue)
+            if(minimumValue > maximumValue)
             {
-                string message = String.Format(ErrorInvalidRange, parameterName, minimumValue, maximumValue);
+                var message = String.Format(ErrorInvalidRange, parameterName, minimumValue, maximumValue);
                 throw new InvalidOperationException(message);
             }
 
-            if (actualValue < minimumValue || actualValue > maximumValue)
+            if(actualValue < minimumValue || actualValue > maximumValue)
             {
                 throw new ArgumentOutOfRangeException(parameterName);
             }
@@ -236,13 +236,13 @@ namespace OpenUO.Core
 
         public static void AssertInRange(string parameterName, decimal minimumValue, decimal maximumValue, decimal actualValue)
         {
-            if (minimumValue > maximumValue)
+            if(minimumValue > maximumValue)
             {
-                string message = String.Format(ErrorInvalidRange, parameterName, minimumValue, maximumValue);
+                var message = String.Format(ErrorInvalidRange, parameterName, minimumValue, maximumValue);
                 throw new InvalidOperationException(message);
             }
 
-            if (actualValue < minimumValue || actualValue > maximumValue)
+            if(actualValue < minimumValue || actualValue > maximumValue)
             {
                 throw new ArgumentOutOfRangeException(parameterName);
             }
@@ -250,13 +250,13 @@ namespace OpenUO.Core
 
         public static void AssertInRange(string parameterName, double minimumValue, double maximumValue, double actualValue)
         {
-            if (minimumValue > maximumValue)
+            if(minimumValue > maximumValue)
             {
-                string message = String.Format(ErrorInvalidRange, parameterName, minimumValue, maximumValue);
+                var message = String.Format(ErrorInvalidRange, parameterName, minimumValue, maximumValue);
                 throw new InvalidOperationException(message);
             }
 
-            if (actualValue < minimumValue || actualValue > maximumValue)
+            if(actualValue < minimumValue || actualValue > maximumValue)
             {
                 throw new ArgumentOutOfRangeException(parameterName);
             }
@@ -264,13 +264,13 @@ namespace OpenUO.Core
 
         public static void AssertInRange(string parameterName, float minimumValue, float maximumValue, float actualValue)
         {
-            if (minimumValue > maximumValue)
+            if(minimumValue > maximumValue)
             {
-                string message = String.Format(ErrorInvalidRange, parameterName, minimumValue, maximumValue);
+                var message = String.Format(ErrorInvalidRange, parameterName, minimumValue, maximumValue);
                 throw new InvalidOperationException(message);
             }
 
-            if (actualValue < minimumValue || actualValue > maximumValue)
+            if(actualValue < minimumValue || actualValue > maximumValue)
             {
                 throw new ArgumentOutOfRangeException(parameterName);
             }
@@ -278,13 +278,13 @@ namespace OpenUO.Core
 
         public static void AssertInRange(string parameterName, DateTime minimumValue, DateTime maximumValue, DateTime actualValue)
         {
-            if (minimumValue > maximumValue)
+            if(minimumValue > maximumValue)
             {
-                string message = String.Format(ErrorInvalidRange, parameterName, minimumValue, maximumValue);
+                var message = String.Format(ErrorInvalidRange, parameterName, minimumValue, maximumValue);
                 throw new InvalidOperationException(message);
             }
 
-            if (actualValue < minimumValue || actualValue > maximumValue)
+            if(actualValue < minimumValue || actualValue > maximumValue)
             {
                 throw new ArgumentOutOfRangeException(parameterName);
             }
@@ -292,7 +292,7 @@ namespace OpenUO.Core
 
         public static void AssertIsNull(object obj, string message)
         {
-            if (obj != null)
+            if(obj != null)
             {
                 throw new Exception(message);
             }
@@ -300,7 +300,7 @@ namespace OpenUO.Core
 
         public static void AssertAreEqual(object a, object b, string message)
         {
-            if (a != b)
+            if(a != b)
             {
                 throw new Exception(message);
             }
@@ -308,7 +308,7 @@ namespace OpenUO.Core
 
         public static void AssertFileExists(string path)
         {
-            if (!File.Exists(path))
+            if(!File.Exists(path))
             {
                 throw new FileNotFoundException(path);
             }
@@ -316,7 +316,7 @@ namespace OpenUO.Core
 
         public static void AssertDirectoryExists(string directory)
         {
-            if (!Directory.Exists(directory))
+            if(!Directory.Exists(directory))
             {
                 throw new DirectoryNotFoundException(directory);
             }

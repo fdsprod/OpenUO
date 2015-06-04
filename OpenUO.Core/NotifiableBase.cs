@@ -18,7 +18,6 @@
 
 using System;
 using System.ComponentModel;
-using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 
 #endregion
@@ -27,6 +26,8 @@ namespace OpenUO.Core
 {
     public abstract class NotifiableBase : IDisposable, INotifyPropertyChanged
     {
+        public event PropertyChangedEventHandler PropertyChanged;
+
         public void Dispose()
         {
             Dispose(true);
@@ -38,7 +39,7 @@ namespace OpenUO.Core
         protected virtual bool SetProperty<T>(ref T storage, T value, string propertyName = null)
 #endif
         {
-            if (Equals(storage, value))
+            if(Equals(storage, value))
             {
                 return false;
             }
@@ -57,7 +58,7 @@ namespace OpenUO.Core
         {
             var handler = PropertyChanged;
 
-            if (handler != null)
+            if(handler != null)
             {
                 handler(this, new PropertyChangedEventArgs(propertyName));
             }
@@ -66,7 +67,5 @@ namespace OpenUO.Core
         protected virtual void Dispose(bool disposing)
         {
         }
-
-        public event PropertyChangedEventHandler PropertyChanged;
     }
 }

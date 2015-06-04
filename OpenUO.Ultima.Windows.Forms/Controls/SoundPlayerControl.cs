@@ -35,6 +35,21 @@ namespace OpenUO.Ultima.Windows.Forms.Controls
             InitializeComponent();
         }
 
+        public class ListItem<T>
+        {
+            public T Value
+            {
+                get;
+                set;
+            }
+
+            public string DisplayName
+            {
+                get;
+                set;
+            }
+        }
+
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public SoundFactory Factory
@@ -42,7 +57,7 @@ namespace OpenUO.Ultima.Windows.Forms.Controls
             get { return _soundFactory; }
             set
             {
-                if (_soundFactory != value)
+                if(_soundFactory != value)
                 {
                     _soundFactory = value;
 
@@ -54,29 +69,30 @@ namespace OpenUO.Ultima.Windows.Forms.Controls
 
         private void BindSounds()
         {
-            if (_soundFactory == null)
+            if(_soundFactory == null)
             {
                 comboBox1.DataSource = null;
                 return;
             }
 
-            int length = _soundFactory.GetLength<Sound>();
+            var length = _soundFactory.GetLength<Sound>();
 
-            List<ListItem<Sound>> sounds = new List<ListItem<Sound>>();
+            var sounds = new List<ListItem<Sound>>();
 
-            for (int i = 0; i < length; i++)
+            for(var i = 0; i < length; i++)
             {
-                Sound sound = _soundFactory.GetSound<Sound>(i);
+                var sound = _soundFactory.GetSound<Sound>(i);
 
-                if (sound == null)
+                if(sound == null)
                 {
                     continue;
                 }
 
-                ListItem<Sound> listItem = new ListItem<Sound> {
-                    Value = sound,
-                    DisplayName = sound.Name
-                };
+                var listItem = new ListItem<Sound>
+                               {
+                                   Value = sound,
+                                   DisplayName = sound.Name
+                               };
 
                 sounds.Add(listItem);
             }
@@ -88,7 +104,7 @@ namespace OpenUO.Ultima.Windows.Forms.Controls
 
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (comboBox1.SelectedIndex == -1)
+            if(comboBox1.SelectedIndex == -1)
             {
                 tableLayoutPanel1.Enabled = false;
                 return;
@@ -116,21 +132,6 @@ namespace OpenUO.Ultima.Windows.Forms.Controls
         private void nextButton_Click(object sender, EventArgs e)
         {
             comboBox1.SelectedIndex += 1;
-        }
-
-        public class ListItem<T>
-        {
-            public T Value
-            {
-                get;
-                set;
-            }
-
-            public string DisplayName
-            {
-                get;
-                set;
-            }
         }
     }
 }
