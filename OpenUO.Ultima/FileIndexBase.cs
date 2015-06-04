@@ -16,6 +16,7 @@
 
 #region Usings
 
+using System;
 using System.IO;
 
 #endregion
@@ -24,7 +25,9 @@ namespace OpenUO.Ultima
 {
     public abstract class FileIndexBase
     {
+        private readonly byte[] _copyBuffer = new byte[2 * 1024 * 1024];
         private readonly string _dataPath;
+        private readonly object _syncRoot = new object();
 
         protected FileIndexBase(string dataPath)
         {
@@ -45,7 +48,13 @@ namespace OpenUO.Ultima
 
         public bool IsOpen
         {
-            get { return Stream != null && Stream.CanRead; }
+            get
+            {
+                lock(_syncRoot)
+                {
+                    return Stream != null && Stream.CanRead;
+                }
+            }
         }
 
         public FileIndexEntry[] Entries
@@ -89,48 +98,67 @@ namespace OpenUO.Ultima
             length = e.Length & 0x7FFFFFFF;
             extra = e.Extra;
 
-            if(Stream != null && (!Stream.CanRead || !Stream.CanSeek))
+            lock(_syncRoot)
             {
-                Stream.Dispose();
-                Stream = null;
+                if(Stream != null && (!Stream.CanRead || !Stream.CanSeek))
+                {
+                    Stream.Dispose();
+                    Stream = null;
+                }
+
+                if(Stream == null)
+                {
+                    Stream = new FileStream(_dataPath, FileMode.Open, FileAccess.Read, FileShare.Read);
+                }
+
+                Stream.Seek(e.Lookup, SeekOrigin.Begin);
+
+                var resultStream = new MemoryStream();
+
+                for(var offset = 0; offset < length; offset += _copyBuffer.Length)
+                {
+                    var count = Math.Min(_copyBuffer.Length, length);
+                    var numBytesRead = Stream.Read(_copyBuffer, offset, count);
+
+                    resultStream.Write(_copyBuffer, offset, numBytesRead);
+                }
+
+                return resultStream;
             }
-
-            if(Stream == null)
-            {
-                Stream = new FileStream(_dataPath, FileMode.Open, FileAccess.Read, FileShare.Read);
-            }
-
-            Stream.Seek(e.Lookup, SeekOrigin.Begin);
-
-            return Stream;
         }
 
         public void Close()
         {
-            if(Stream == null)
+            lock(_syncRoot)
             {
-                return;
-            }
+                if(Stream == null)
+                {
+                    return;
+                }
 
-            Stream.Close();
-            Stream = null;
+                Stream.Close();
+                Stream = null;
+            }
         }
 
         public void Open()
         {
-            if(Stream != null)
+            lock(_syncRoot)
             {
-                return;
+                if(Stream != null)
+                {
+                    return;
+                }
+
+                if(!FilesExist)
+                {
+                    return;
+                }
+
+                Entries = ReadEntries();
+
+                Length = Entries.Length;
             }
-
-            if(!FilesExist)
-            {
-                return;
-            }
-
-            Entries = ReadEntries();
-
-            Length = Entries.Length;
         }
 
         protected abstract FileIndexEntry[] ReadEntries();

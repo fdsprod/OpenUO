@@ -50,6 +50,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Adapters\ArtworkTextureAdapter.cs" />
     <Compile Include="Adapters\TexmapTextureAdapter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="OpenUOParadox3dModule.cs" />

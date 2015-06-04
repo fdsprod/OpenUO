@@ -54,36 +54,40 @@ namespace OpenUO.Ultima.Windows.Forms.Adapters
         public unsafe Bitmap GetTexmap(int index)
         {
             int length, extra;
-            var stream = _fileIndex.Seek(index, out length, out extra);
 
-            if(stream == null)
+            using(var stream = _fileIndex.Seek(index, out length, out extra))
             {
-                return null;
-            }
-
-            var size = extra == 0 ? 64 : 128;
-
-            var bmp = new Bitmap(size, size, PixelFormat.Format16bppArgb1555);
-            var bd = bmp.LockBits(new Rectangle(0, 0, size, size), ImageLockMode.WriteOnly, PixelFormat.Format16bppArgb1555);
-            var bin = new BinaryReader(stream);
-
-            var line = (ushort*)bd.Scan0;
-            var delta = bd.Stride >> 1;
-
-            for(var y = 0; y < size; ++y, line += delta)
-            {
-                var cur = line;
-                var end = cur + size;
-
-                while(cur < end)
+                if(stream == null)
                 {
-                    *cur++ = (ushort)(bin.ReadUInt16() ^ 0x8000);
+                    return null;
+                }
+
+                var size = extra == 0 ? 64 : 128;
+
+                var bmp = new Bitmap(size, size, PixelFormat.Format16bppArgb1555);
+                var bd = bmp.LockBits(new Rectangle(0, 0, size, size), ImageLockMode.WriteOnly, PixelFormat.Format16bppArgb1555);
+
+                using(var bin = new BinaryReader(stream))
+                {
+                    var line = (ushort*)bd.Scan0;
+                    var delta = bd.Stride >> 1;
+
+                    for(var y = 0; y < size; ++y, line += delta)
+                    {
+                        var cur = line;
+                        var end = cur + size;
+
+                        while(cur < end)
+                        {
+                            *cur++ = (ushort)(bin.ReadUInt16() ^ 0x8000);
+                        }
+                    }
+
+                    bmp.UnlockBits(bd);
+
+                    return bmp;
                 }
             }
-
-            bmp.UnlockBits(bd);
-
-            return bmp;
         }
 
         protected override void Dispose(bool disposing)

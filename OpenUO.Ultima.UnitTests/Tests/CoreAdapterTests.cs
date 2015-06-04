@@ -37,7 +37,7 @@ namespace OpenUO.Ultima.UnitTests
                 if(!_configuredKernelForTest)
                 {
                     _container = new Container();
-                    _container.RegisterModule<UltimaSDKCoreModule>();
+                    _container.RegisterModule<OpenUOCoreModule>();
                     _configuredKernelForTest = true;
                 }
 

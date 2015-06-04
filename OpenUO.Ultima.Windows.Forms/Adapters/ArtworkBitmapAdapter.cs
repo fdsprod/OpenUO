@@ -49,7 +49,7 @@ namespace OpenUO.Ultima.Windows.Forms.Adapters
             var install = Install;
 
             _fileIndex =
-                install.IsUOPFormat
+                install.IsUopFormat
                     ? install.CreateFileIndex("artLegacyMUL.uop", 0x10000, false, ".tga")
                     : install.CreateFileIndex("artidx.mul", "art.mul");
         }
@@ -59,51 +59,54 @@ namespace OpenUO.Ultima.Windows.Forms.Adapters
             index &= 0x3FFF;
 
             int length, extra;
-            var stream = _fileIndex.Seek(index, out length, out extra);
-
-            if(stream == null)
+            using(var stream = _fileIndex.Seek(index, out length, out extra))
             {
-                return null;
-            }
-
-            var bmp = new Bitmap(44, 44, PixelFormat.Format16bppArgb1555);
-            var bd = bmp.LockBits(new Rectangle(0, 0, 44, 44), ImageLockMode.WriteOnly, PixelFormat.Format16bppArgb1555);
-            var bin = new BinaryReader(stream);
-
-            var xOffset = 21;
-            var xRun = 2;
-
-            var line = (ushort*)bd.Scan0;
-            var delta = bd.Stride >> 1;
-
-            for(var y = 0; y < 22; ++y, --xOffset, xRun += 2, line += delta)
-            {
-                var cur = line + xOffset;
-                var end = cur + xRun;
-
-                while(cur < end)
+                if(stream == null)
                 {
-                    *cur++ = (ushort)(bin.ReadUInt16() | 0x8000);
+                    return null;
+                }
+
+                using(var bmp = new Bitmap(44, 44, PixelFormat.Format16bppArgb1555))
+                {
+                    var bd = bmp.LockBits(new Rectangle(0, 0, 44, 44), ImageLockMode.WriteOnly, PixelFormat.Format16bppArgb1555);
+                    var bin = new BinaryReader(stream);
+
+                    var xOffset = 21;
+                    var xRun = 2;
+
+                    var line = (ushort*)bd.Scan0;
+                    var delta = bd.Stride >> 1;
+
+                    for(var y = 0; y < 22; ++y, --xOffset, xRun += 2, line += delta)
+                    {
+                        var cur = line + xOffset;
+                        var end = cur + xRun;
+
+                        while(cur < end)
+                        {
+                            *cur++ = (ushort)(bin.ReadUInt16() | 0x8000);
+                        }
+                    }
+
+                    xOffset = 0;
+                    xRun = 44;
+
+                    for(var y = 0; y < 22; ++y, ++xOffset, xRun -= 2, line += delta)
+                    {
+                        var cur = line + xOffset;
+                        var end = cur + xRun;
+
+                        while(cur < end)
+                        {
+                            *cur++ = (ushort)(bin.ReadUInt16() | 0x8000);
+                        }
+                    }
+
+                    bmp.UnlockBits(bd);
+
+                    return bmp;
                 }
             }
-
-            xOffset = 0;
-            xRun = 44;
-
-            for(var y = 0; y < 22; ++y, ++xOffset, xRun -= 2, line += delta)
-            {
-                var cur = line + xOffset;
-                var end = cur + xRun;
-
-                while(cur < end)
-                {
-                    *cur++ = (ushort)(bin.ReadUInt16() | 0x8000);
-                }
-            }
-
-            bmp.UnlockBits(bd);
-
-            return bmp;
         }
 
         public unsafe Bitmap GetStatic(int index)
@@ -111,64 +114,66 @@ namespace OpenUO.Ultima.Windows.Forms.Adapters
             index += 0x4000;
 
             int length, extra;
-            var stream = _fileIndex.Seek(index, out length, out extra);
-
-            if(stream == null)
+            using(var stream = _fileIndex.Seek(index, out length, out extra))
             {
-                return null;
-            }
-
-            var bin = new BinaryReader(stream);
-
-            bin.ReadInt32(); // Unknown
-
-            int width = bin.ReadInt16();
-            int height = bin.ReadInt16();
-
-            if(width <= 0 || height <= 0)
-            {
-                return null;
-            }
-
-            var lookups = new int[height];
-
-            var start = (int)bin.BaseStream.Position + (height * 2);
-
-            for(var i = 0; i < height; ++i)
-            {
-                lookups[i] = (start + (bin.ReadUInt16() * 2));
-            }
-
-            var bmp = new Bitmap(width, height, PixelFormat.Format16bppArgb1555);
-            var bd = bmp.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.WriteOnly, PixelFormat.Format16bppArgb1555);
-
-            var line = (ushort*)bd.Scan0;
-            var delta = bd.Stride >> 1;
-
-            for(var y = 0; y < height; ++y, line += delta)
-            {
-                bin.BaseStream.Seek(lookups[y], SeekOrigin.Begin);
-
-                var cur = line;
-                ushort* end;
-
-                int xOffset, xRun;
-
-                while(((xOffset = bin.ReadUInt16()) + (xRun = bin.ReadUInt16())) != 0)
+                if(stream == null)
                 {
-                    cur += xOffset;
-                    end = cur + xRun;
+                    return null;
+                }
 
-                    while(cur < end)
+                using(var bin = new BinaryReader(stream))
+                {
+                    bin.ReadInt32(); // Unknown
+
+                    int width = bin.ReadInt16();
+                    int height = bin.ReadInt16();
+
+                    if(width <= 0 || height <= 0)
                     {
-                        *cur++ = (ushort)(bin.ReadUInt16() ^ 0x8000);
+                        return null;
                     }
+
+                    var lookups = new int[height];
+
+                    var start = (int)bin.BaseStream.Position + (height * 2);
+
+                    for(var i = 0; i < height; ++i)
+                    {
+                        lookups[i] = (start + (bin.ReadUInt16() * 2));
+                    }
+
+                    var bmp = new Bitmap(width, height, PixelFormat.Format16bppArgb1555);
+                    var bd = bmp.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.WriteOnly, PixelFormat.Format16bppArgb1555);
+
+                    var line = (ushort*)bd.Scan0;
+                    var delta = bd.Stride >> 1;
+
+                    for(var y = 0; y < height; ++y, line += delta)
+                    {
+                        bin.BaseStream.Seek(lookups[y], SeekOrigin.Begin);
+
+                        var cur = line;
+                        ushort* end;
+
+                        int xOffset, xRun;
+
+                        while(((xOffset = bin.ReadUInt16()) + (xRun = bin.ReadUInt16())) != 0)
+                        {
+                            cur += xOffset;
+                            end = cur + xRun;
+
+                            while(cur < end)
+                            {
+                                *cur++ = (ushort)(bin.ReadUInt16() ^ 0x8000);
+                            }
+                        }
+                    }
+
+                    bmp.UnlockBits(bd);
+
+                    return bmp;
                 }
             }
-
-            bmp.UnlockBits(bd);
-
-            return bmp;
         }
 
         protected override void Dispose(bool disposing)

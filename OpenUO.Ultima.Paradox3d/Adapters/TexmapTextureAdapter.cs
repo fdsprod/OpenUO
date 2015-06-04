@@ -28,7 +28,6 @@ namespace OpenUO.Ultima.Paradox3d.Adapters
     internal class TexmapTextureAdapter : StorageAdapterBase, ITexmapStorageAdapter<Texture>
     {
         private readonly GraphicsDevice _graphicsDevice;
-        private readonly object _syncRoot = new object();
         private FileIndexBase _fileIndex;
 
         public TexmapTextureAdapter(IContainer container)
@@ -60,43 +59,44 @@ namespace OpenUO.Ultima.Paradox3d.Adapters
 
         public unsafe Texture GetTexmap(int index)
         {
-            lock(_syncRoot)
+            int extra;
+            int length;
+
+            using(var stream = _fileIndex.Seek(index, out length, out extra))
             {
-                int extra;
-                int length;
-
-                var stream = _fileIndex.Seek(index, out length, out extra);
-
                 if(stream == null)
                 {
                     return null;
                 }
 
                 var size = extra == 0 ? 64 : 128;
-                var bin = new BinaryReader(stream);
-                var texture = Texture.New2D(_graphicsDevice, size, size, PixelFormat.B5G5R5A1_UNorm);
-                var buffer = new ushort[size * size];
 
-                fixed(ushort* start = buffer)
+                using(var bin = new BinaryReader(stream))
                 {
-                    var ptr = start;
-                    var delta = texture.Width;
+                    var texture = Texture.New2D(_graphicsDevice, size, size, PixelFormat.B5G5R5A1_UNorm);
+                    var buffer = new ushort[size * size];
 
-                    for(var y = 0; y < size; ++y, ptr += delta)
+                    fixed(ushort* start = buffer)
                     {
-                        var cur = ptr;
-                        var end = cur + size;
+                        var ptr = start;
+                        var delta = texture.Width;
 
-                        while(cur < end)
+                        for(var y = 0; y < size; ++y, ptr += delta)
                         {
-                            *cur++ = (ushort)(bin.ReadUInt16() ^ 0x8000);
+                            var cur = ptr;
+                            var end = cur + size;
+
+                            while(cur < end)
+                            {
+                                *cur++ = (ushort)(bin.ReadUInt16() ^ 0x8000);
+                            }
                         }
                     }
+
+                    texture.SetData(buffer);
+
+                    return texture;
                 }
-
-                texture.SetData(buffer);
-
-                return texture;
             }
         }
 
@@ -104,16 +104,13 @@ namespace OpenUO.Ultima.Paradox3d.Adapters
         {
             base.Dispose(disposing);
 
-            lock(_syncRoot)
+            if(_fileIndex == null)
             {
-                if(_fileIndex == null)
-                {
-                    return;
-                }
-
-                _fileIndex.Close();
-                _fileIndex = null;
+                return;
             }
+
+            _fileIndex.Close();
+            _fileIndex = null;
         }
     }
 }

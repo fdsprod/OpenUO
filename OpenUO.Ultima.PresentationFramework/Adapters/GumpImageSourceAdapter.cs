@@ -50,7 +50,7 @@ namespace OpenUO.Ultima.PresentationFramework.Adapters
             var install = Install;
 
             _fileIndex =
-                install.IsUOPFormat
+                install.IsUopFormat
                     ? install.CreateFileIndex("gumpartLegacyMUL.uop", 0xFFFF, true, ".tga")
                     : install.CreateFileIndex("gumpidx.mul", "gumpart.mul");
         }
@@ -58,64 +58,66 @@ namespace OpenUO.Ultima.PresentationFramework.Adapters
         public unsafe ImageSource GetGump(int index)
         {
             int length, extra;
-            var stream = _fileIndex.Seek(index, out length, out extra);
-
-            if(stream == null)
+            using(var stream = _fileIndex.Seek(index, out length, out extra))
             {
-                return null;
-            }
-
-            var bin = new BinaryReader(stream);
-
-            var width = (extra >> 16) & 0xFFFF;
-            var height = extra & 0xFFFF;
-
-            var bmp = new WriteableBitmap(width, height, 96, 96, PixelFormats.Bgr555, null);
-            bmp.Lock();
-
-            var lookups = new int[height];
-            var start = (int)bin.BaseStream.Position;
-
-            for(var i = 0; i < height; ++i)
-            {
-                lookups[i] = start + (bin.ReadInt32() * 4);
-            }
-
-            var line = (ushort*)bmp.BackBuffer;
-            var delta = (ushort)(bmp.BackBufferStride >> 1);
-
-            for(var y = 0; y < height; ++y, line += delta)
-            {
-                bin.BaseStream.Seek(lookups[y], SeekOrigin.Begin);
-
-                var cur = line;
-                var end = line + bmp.PixelWidth;
-
-                while(cur < end)
+                if(stream == null)
                 {
-                    var color = bin.ReadUInt16();
-                    var next = cur + bin.ReadUInt16();
+                    return null;
+                }
 
-                    if(color == 0)
+                using(var bin = new BinaryReader(stream))
+                {
+                    var width = (extra >> 16) & 0xFFFF;
+                    var height = extra & 0xFFFF;
+
+                    var bmp = new WriteableBitmap(width, height, 96, 96, PixelFormats.Bgr555, null);
+                    bmp.Lock();
+
+                    var lookups = new int[height];
+                    var start = (int)bin.BaseStream.Position;
+
+                    for(var i = 0; i < height; ++i)
                     {
-                        cur = next;
+                        lookups[i] = start + (bin.ReadInt32() * 4);
                     }
-                    else
-                    {
-                        color ^= 0x8000;
 
-                        while(cur < next)
+                    var line = (ushort*)bmp.BackBuffer;
+                    var delta = (ushort)(bmp.BackBufferStride >> 1);
+
+                    for(var y = 0; y < height; ++y, line += delta)
+                    {
+                        bin.BaseStream.Seek(lookups[y], SeekOrigin.Begin);
+
+                        var cur = line;
+                        var end = line + bmp.PixelWidth;
+
+                        while(cur < end)
                         {
-                            *cur++ = color;
+                            var color = bin.ReadUInt16();
+                            var next = cur + bin.ReadUInt16();
+
+                            if(color == 0)
+                            {
+                                cur = next;
+                            }
+                            else
+                            {
+                                color ^= 0x8000;
+
+                                while(cur < next)
+                                {
+                                    *cur++ = color;
+                                }
+                            }
                         }
                     }
+
+                    bmp.AddDirtyRect(new Int32Rect(0, 0, width, height));
+                    bmp.Unlock();
+
+                    return bmp;
                 }
             }
-
-            bmp.AddDirtyRect(new Int32Rect(0, 0, width, height));
-            bmp.Unlock();
-
-            return bmp;
         }
 
         protected override void Dispose(bool disposing)

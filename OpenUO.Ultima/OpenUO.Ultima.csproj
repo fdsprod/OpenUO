@@ -117,13 +117,13 @@
     <Compile Include="Factories\UnicodeFontFactory.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="UltimaSDKCoreModule.cs" />
+    <Compile Include="OpenUOCoreModule.cs" />
     <Compile Include="Fonts\ASCIIChar.cs" />
     <Compile Include="Fonts\ASCIIFont.cs" />
     <Compile Include="Animations\BodyConverter.cs" />
     <Compile Include="Animations\BodyTable.cs" />
     <Compile Include="Animations\BodyTableEntry.cs" />
-    <Compile Include="ClientUtility.cs" />
+    <Compile Include="LoginKeyFactory.cs" />
     <Compile Include="ColorConverter.cs" />
     <Compile Include="Factories\ArtworkFactory.cs" />
     <Compile Include="Factories\AdapterFactoryBase.cs" />

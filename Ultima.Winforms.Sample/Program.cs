@@ -43,7 +43,7 @@ namespace Ultima.Winforms.Sample
 #endif
             var container = new Container();
 
-            container.RegisterModule<UltimaSDKCoreModule>();
+            container.RegisterModule<OpenUOCoreModule>();
             container.RegisterModule<OpenUOBitmapModule>();
             container.Register<SampleForm>();
 

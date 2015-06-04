@@ -132,38 +132,41 @@ namespace OpenUO.Ultima.Adapters
         private Skill ReadSkill(FileIndexBase fileIndex, int index)
         {
             int length, extra;
-            var stream = fileIndex.Seek(index, out length, out extra);
-
-            if(stream == null)
+            using(var stream = _fileIndex.Seek(index, out length, out extra))
             {
-                return null;
+                if(stream == null)
+                {
+                    return null;
+                }
+
+                using(var bin = new BinaryReader(stream))
+                {
+                    var nameLength = length - 2;
+
+                    var useBtn = bin.ReadByte();
+                    var nameBuffer = new byte[nameLength];
+                    bin.Read(nameBuffer, 0, nameLength);
+                    var unk = bin.ReadByte();
+
+                    var sb = new StringBuilder(nameBuffer.Length);
+
+                    for(var i = 0; i < nameBuffer.Length; i++)
+                    {
+                        sb.Append((char)nameBuffer[i]);
+                    }
+
+                    var category = _categories[0];
+
+                    if(index < _categoryLookup.Length)
+                    {
+                        category = _categories[_categoryLookup[index]];
+                    }
+
+                    var skill = new Skill(new SkillData(index, sb.ToString(), useBtn > 0, extra, unk, category));
+
+                    return skill;
+                }
             }
-
-            var bin = new BinaryReader(stream);
-            var nameLength = length - 2;
-
-            var useBtn = bin.ReadByte();
-            var nameBuffer = new byte[nameLength];
-            bin.Read(nameBuffer, 0, nameLength);
-            var unk = bin.ReadByte();
-
-            var sb = new StringBuilder(nameBuffer.Length);
-
-            for(var i = 0; i < nameBuffer.Length; i++)
-            {
-                sb.Append((char)nameBuffer[i]);
-            }
-
-            var category = _categories[0];
-
-            if(index < _categoryLookup.Length)
-            {
-                category = _categories[_categoryLookup[index]];
-            }
-
-            var skill = new Skill(new SkillData(index, sb.ToString(), useBtn > 0, extra, unk, category));
-
-            return skill;
         }
     }
 }

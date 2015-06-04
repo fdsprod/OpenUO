@@ -48,7 +48,7 @@ namespace OpenUO.Ultima.Adapters
             var install = Install;
 
             _fileIndex =
-                install.IsUOPFormat
+                install.IsUopFormat
                     ? install.CreateFileIndex("soundLegacyMUL.uop", 0xFFF, false, ".dat")
                     : install.CreateFileIndex("soundidx.mul", "sound..mul");
         }
@@ -56,32 +56,34 @@ namespace OpenUO.Ultima.Adapters
         public Sound GetSound(int index)
         {
             int length, extra;
-            var stream = _fileIndex.Seek(index, out length, out extra);
 
-            if(stream == null)
+            using(var stream = _fileIndex.Seek(index, out length, out extra))
             {
-                return null;
+                if(stream == null)
+                {
+                    return null;
+                }
+
+                var waveHeader = CreateWaveHeader(length);
+
+                length -= 40;
+
+                var headerLength = (waveHeader.Length << 2);
+
+                var stringBuffer = new byte[40];
+                var buffer = new byte[length + headerLength];
+
+                Buffer.BlockCopy(waveHeader, 0, buffer, 0, headerLength);
+
+                stream.Read(stringBuffer, 0, 40);
+                stream.Read(buffer, headerLength, length);
+
+                var name = Encoding.ASCII.GetString(stringBuffer).Trim();
+                var end = name.IndexOf("\0");
+                name = name.Substring(0, end);
+
+                return new Sound(name, new MemoryStream(buffer));
             }
-
-            var waveHeader = CreateWaveHeader(length);
-
-            length -= 40;
-
-            var headerLength = (waveHeader.Length << 2);
-
-            var stringBuffer = new byte[40];
-            var buffer = new byte[length + headerLength];
-
-            Buffer.BlockCopy(waveHeader, 0, buffer, 0, headerLength);
-
-            stream.Read(stringBuffer, 0, 40);
-            stream.Read(buffer, headerLength, length);
-
-            var name = Encoding.ASCII.GetString(stringBuffer).Trim();
-            var end = name.IndexOf("\0");
-            name = name.Substring(0, end);
-
-            return new Sound(name, new MemoryStream(buffer));
         }
 
         private static int[] CreateWaveHeader(int length)

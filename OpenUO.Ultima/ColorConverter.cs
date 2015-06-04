@@ -18,7 +18,7 @@ namespace OpenUO.Ultima
 {
     public class ColorConverter
     {
-        public static uint ARGB1555toARGB8888(ushort color16)
+        public static uint Argb1555ToArgb8888(ushort color16)
         {
             var a = color16 & (uint)0x8000;
             var r = color16 & (uint)0x7C00;

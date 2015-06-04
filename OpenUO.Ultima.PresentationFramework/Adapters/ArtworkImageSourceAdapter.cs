@@ -50,7 +50,7 @@ namespace OpenUO.Ultima.PresentationFramework.Adapters
             var install = Install;
 
             _fileIndex =
-                install.IsUOPFormat
+                install.IsUopFormat
                     ? install.CreateFileIndex("artLegacyMUL.uop", 0x10000, false, ".tga")
                     : install.CreateFileIndex("artidx.mul", "art.mul");
         }
@@ -60,48 +60,51 @@ namespace OpenUO.Ultima.PresentationFramework.Adapters
             index &= 0x3FFF;
 
             int length, extra;
-            var stream = _fileIndex.Seek(index, out length, out extra);
-
-            var bin = new BinaryReader(stream);
-            var bmp = new WriteableBitmap(44, 44, 96, 96, PixelFormats.Bgr555, null);
-
-            bmp.Lock();
-
-            var xOffset = 21;
-            var xRun = 2;
-
-            var line = (ushort*)bmp.BackBuffer;
-            var delta = bmp.BackBufferStride >> 1;
-
-            for(var y = 0; y < 22; ++y, --xOffset, xRun += 2, line += delta)
+            using(var stream = _fileIndex.Seek(index, out length, out extra))
             {
-                var cur = line + xOffset;
-                var end = cur + xRun;
-
-                while(cur < end)
+                using(var bin = new BinaryReader(stream))
                 {
-                    *cur++ = (ushort)(bin.ReadUInt16() | 0x8000);
+                    var bmp = new WriteableBitmap(44, 44, 96, 96, PixelFormats.Bgr555, null);
+
+                    bmp.Lock();
+
+                    var xOffset = 21;
+                    var xRun = 2;
+
+                    var line = (ushort*)bmp.BackBuffer;
+                    var delta = bmp.BackBufferStride >> 1;
+
+                    for(var y = 0; y < 22; ++y, --xOffset, xRun += 2, line += delta)
+                    {
+                        var cur = line + xOffset;
+                        var end = cur + xRun;
+
+                        while(cur < end)
+                        {
+                            *cur++ = (ushort)(bin.ReadUInt16() | 0x8000);
+                        }
+                    }
+
+                    xOffset = 0;
+                    xRun = 44;
+
+                    for(var y = 0; y < 22; ++y, ++xOffset, xRun -= 2, line += delta)
+                    {
+                        var cur = line + xOffset;
+                        var end = cur + xRun;
+
+                        while(cur < end)
+                        {
+                            *cur++ = (ushort)(bin.ReadUInt16() | 0x8000);
+                        }
+                    }
+
+                    bmp.AddDirtyRect(new Int32Rect(0, 0, 44, 44));
+                    bmp.Unlock();
+
+                    return bmp;
                 }
             }
-
-            xOffset = 0;
-            xRun = 44;
-
-            for(var y = 0; y < 22; ++y, ++xOffset, xRun -= 2, line += delta)
-            {
-                var cur = line + xOffset;
-                var end = cur + xRun;
-
-                while(cur < end)
-                {
-                    *cur++ = (ushort)(bin.ReadUInt16() | 0x8000);
-                }
-            }
-
-            bmp.AddDirtyRect(new Int32Rect(0, 0, 44, 44));
-            bmp.Unlock();
-
-            return bmp;
         }
 
         public unsafe ImageSource GetStatic(int index)
@@ -110,60 +113,63 @@ namespace OpenUO.Ultima.PresentationFramework.Adapters
             index &= 0xFFFF;
 
             int length, extra;
-            var stream = _fileIndex.Seek(index, out length, out extra);
-            var bin = new BinaryReader(stream);
-
-            bin.ReadInt32(); // Unknown
-
-            int width = bin.ReadInt16();
-            int height = bin.ReadInt16();
-
-            if(width <= 0 || height <= 0)
+            using(var stream = _fileIndex.Seek(index, out length, out extra))
             {
-                return null;
-            }
-
-            var lookups = new int[height];
-
-            var start = (int)bin.BaseStream.Position + (height * 2);
-
-            for(var i = 0; i < height; ++i)
-            {
-                lookups[i] = (start + (bin.ReadUInt16() * 2));
-            }
-
-            var bmp = new WriteableBitmap(width, height, 96, 96, PixelFormats.Bgr555, null);
-
-            bmp.Lock();
-
-            var line = (ushort*)bmp.BackBuffer;
-            var delta = bmp.BackBufferStride >> 1;
-
-            for(var y = 0; y < height; ++y, line += delta)
-            {
-                bin.BaseStream.Seek(lookups[y], SeekOrigin.Begin);
-
-                var cur = line;
-                ushort* end;
-
-                int xOffset, xRun;
-
-                while(((xOffset = bin.ReadUInt16()) + (xRun = bin.ReadUInt16())) != 0)
+                using(var bin = new BinaryReader(stream))
                 {
-                    cur += xOffset;
-                    end = cur + xRun;
+                    bin.ReadInt32(); // Unknown
 
-                    while(cur < end)
+                    int width = bin.ReadInt16();
+                    int height = bin.ReadInt16();
+
+                    if(width <= 0 || height <= 0)
                     {
-                        *cur++ = (ushort)(bin.ReadUInt16() ^ 0x8000);
+                        return null;
                     }
+
+                    var lookups = new int[height];
+
+                    var start = (int)bin.BaseStream.Position + (height * 2);
+
+                    for(var i = 0; i < height; ++i)
+                    {
+                        lookups[i] = (start + (bin.ReadUInt16() * 2));
+                    }
+
+                    var bmp = new WriteableBitmap(width, height, 96, 96, PixelFormats.Bgr555, null);
+
+                    bmp.Lock();
+
+                    var line = (ushort*)bmp.BackBuffer;
+                    var delta = bmp.BackBufferStride >> 1;
+
+                    for(var y = 0; y < height; ++y, line += delta)
+                    {
+                        bin.BaseStream.Seek(lookups[y], SeekOrigin.Begin);
+
+                        var cur = line;
+                        ushort* end;
+
+                        int xOffset, xRun;
+
+                        while(((xOffset = bin.ReadUInt16()) + (xRun = bin.ReadUInt16())) != 0)
+                        {
+                            cur += xOffset;
+                            end = cur + xRun;
+
+                            while(cur < end)
+                            {
+                                *cur++ = (ushort)(bin.ReadUInt16() ^ 0x8000);
+                            }
+                        }
+                    }
+
+                    bmp.AddDirtyRect(new Int32Rect(0, 0, width, height));
+                    bmp.Unlock();
+
+                    return bmp;
                 }
             }
-
-            bmp.AddDirtyRect(new Int32Rect(0, 0, width, height));
-            bmp.Unlock();
-
-            return bmp;
         }
 
         protected override void Dispose(bool disposing)

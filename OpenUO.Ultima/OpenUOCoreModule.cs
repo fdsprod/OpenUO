@@ -23,7 +23,7 @@ using OpenUO.Ultima.Adapters;
 
 namespace OpenUO.Ultima
 {
-    public class UltimaSDKCoreModule : IModule
+    public class OpenUOCoreModule : IModule
     {
         public string Name
         {

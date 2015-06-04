@@ -16,9 +16,9 @@
 
 namespace OpenUO.Ultima
 {
-    public static class ClientUtility
+    public static class LoginKeyFactory
     {
-        public static void CalculateLoginKeys(uint major, uint minor, uint revision, uint build, out uint key1, out uint key2)
+        public static void Create(uint major, uint minor, uint revision, uint build, out uint key1, out uint key2)
         {
             key1 = (major << 23) | (minor << 14) | (revision << 4);
             key1 ^= (revision * revision) << 9;

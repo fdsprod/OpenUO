@@ -55,37 +55,41 @@ namespace OpenUO.Ultima.PresentationFramework.Adapters
         public unsafe ImageSource GetTexmap(int index)
         {
             int length, extra;
-            var stream = _fileIndex.Seek(index, out length, out extra);
-
-            if(stream == null)
+            using(var stream = _fileIndex.Seek(index, out length, out extra))
             {
-                return null;
-            }
-
-            var size = extra == 0 ? 64 : 128;
-
-            var bin = new BinaryReader(stream);
-            var bmp = new WriteableBitmap(size, size, 96, 96, PixelFormats.Bgr555, null);
-            bmp.Lock();
-
-            var line = (ushort*)bmp.BackBuffer;
-            var delta = bmp.BackBufferStride >> 1;
-
-            for(var y = 0; y < size; ++y, line += delta)
-            {
-                var cur = line;
-                var end = cur + size;
-
-                while(cur < end)
+                if(stream == null)
                 {
-                    *cur++ = (ushort)(bin.ReadUInt16() ^ 0x8000);
+                    return null;
+                }
+
+                var size = extra == 0 ? 64 : 128;
+
+                using(var bin = new BinaryReader(stream))
+                {
+                    var bmp = new WriteableBitmap(size, size, 96, 96, PixelFormats.Bgr555, null);
+
+                    bmp.Lock();
+
+                    var line = (ushort*)bmp.BackBuffer;
+                    var delta = bmp.BackBufferStride >> 1;
+
+                    for(var y = 0; y < size; ++y, line += delta)
+                    {
+                        var cur = line;
+                        var end = cur + size;
+
+                        while(cur < end)
+                        {
+                            *cur++ = (ushort)(bin.ReadUInt16() ^ 0x8000);
+                        }
+                    }
+
+                    bmp.AddDirtyRect(new Int32Rect(0, 0, size, size));
+                    bmp.Unlock();
+
+                    return bmp;
                 }
             }
-
-            bmp.AddDirtyRect(new Int32Rect(0, 0, size, size));
-            bmp.Unlock();
-
-            return bmp;
         }
 
         protected override void Dispose(bool disposing)

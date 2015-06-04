@@ -76,7 +76,7 @@ namespace OpenUO.Ultima
             private set;
         }
 
-        public bool IsUOPFormat
+        public bool IsUopFormat
         {
             get { return Version >= _convertedToUOPVersion; }
         }

@@ -182,118 +182,121 @@ namespace OpenUO.Ultima.Windows.Forms.Adapters
             }
 
             int length, extra;
-            var stream = fileIndex.Seek(index, out length, out extra);
 
-            if(stream == null)
+            using(var stream = fileIndex.Seek(index, out length, out extra))
             {
-                return null;
-            }
-
-            var flip = (direction > 4);
-
-            var bin = new BinaryReader(stream);
-
-            var palette = new ushort[0x100];
-
-            for(var i = 0; i < 0x100; ++i)
-            {
-                palette[i] = (ushort)(bin.ReadUInt16() ^ 0x8000);
-            }
-
-            var start = (int)bin.BaseStream.Position;
-            var frameCount = bin.ReadInt32();
-
-            var lookups = new int[frameCount];
-
-            for(var i = 0; i < frameCount; ++i)
-            {
-                lookups[i] = start + bin.ReadInt32();
-            }
-
-            var onlyHueGrayPixels = ((hue & 0x8000) == 0);
-
-            hue = (hue & 0x3FFF) - 1;
-
-            Hue hueObject = null;
-
-            if(hue >= 0 && hue < _hues.Table.Length)
-            {
-                hueObject = _hues.Table[hue];
-            }
-
-            var frames = new Frame<Bitmap>[frameCount];
-
-            for(var i = 0; i < frameCount; ++i)
-            {
-                bin.BaseStream.Seek(lookups[i], SeekOrigin.Begin);
-
-                int xCenter = bin.ReadInt16();
-                int yCenter = bin.ReadInt16();
-
-                int width = bin.ReadUInt16();
-                int height = bin.ReadUInt16();
-
-                var bmp = new Bitmap(width, height, PixelFormat.Format16bppArgb1555);
-                var bd = bmp.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.WriteOnly, PixelFormat.Format16bppArgb1555);
-
-                var line = (ushort*)bd.Scan0;
-                var delta = bd.Stride >> 1;
-
-                int header;
-
-                var xBase = xCenter - 0x200;
-                var yBase = (yCenter + height) - 0x200;
-
-                if(!flip)
+                if(stream == null)
                 {
-                    line += xBase;
-                    line += (yBase * delta);
-
-                    while((header = bin.ReadInt32()) != 0x7FFF7FFF)
-                    {
-                        header ^= DoubleXor;
-
-                        var cur = line + ((((header >> 12) & 0x3FF) * delta) + ((header >> 22) & 0x3FF));
-                        var end = cur + (header & 0xFFF);
-
-                        while(cur < end)
-                        {
-                            *cur++ = palette[bin.ReadByte()];
-                        }
-                    }
+                    return null;
                 }
-                else
+
+                var flip = (direction > 4);
+
+                using(var bin = new BinaryReader(stream))
                 {
-                    line -= xBase - width + 1;
-                    line += (yBase * delta);
+                    var palette = new ushort[0x100];
 
-                    while((header = bin.ReadInt32()) != 0x7FFF7FFF)
+                    for(var i = 0; i < 0x100; ++i)
                     {
-                        header ^= DoubleXor;
-
-                        var cur = line + ((((header >> 12) & 0x3FF) * delta) - ((header >> 22) & 0x3FF));
-                        var end = cur - (header & 0xFFF);
-
-                        while(cur > end)
-                        {
-                            *cur-- = palette[bin.ReadByte()];
-                        }
+                        palette[i] = (ushort)(bin.ReadUInt16() ^ 0x8000);
                     }
 
-                    xCenter = width - xCenter;
+                    var start = (int)bin.BaseStream.Position;
+                    var frameCount = bin.ReadInt32();
+
+                    var lookups = new int[frameCount];
+
+                    for(var i = 0; i < frameCount; ++i)
+                    {
+                        lookups[i] = start + bin.ReadInt32();
+                    }
+
+                    var onlyHueGrayPixels = ((hue & 0x8000) == 0);
+
+                    hue = (hue & 0x3FFF) - 1;
+
+                    Hue hueObject = null;
+
+                    if(hue >= 0 && hue < _hues.Table.Length)
+                    {
+                        hueObject = _hues.Table[hue];
+                    }
+
+                    var frames = new Frame<Bitmap>[frameCount];
+
+                    for(var i = 0; i < frameCount; ++i)
+                    {
+                        bin.BaseStream.Seek(lookups[i], SeekOrigin.Begin);
+
+                        int xCenter = bin.ReadInt16();
+                        int yCenter = bin.ReadInt16();
+
+                        int width = bin.ReadUInt16();
+                        int height = bin.ReadUInt16();
+
+                        var bmp = new Bitmap(width, height, PixelFormat.Format16bppArgb1555);
+                        var bd = bmp.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.WriteOnly, PixelFormat.Format16bppArgb1555);
+
+                        var line = (ushort*)bd.Scan0;
+                        var delta = bd.Stride >> 1;
+
+                        int header;
+
+                        var xBase = xCenter - 0x200;
+                        var yBase = (yCenter + height) - 0x200;
+
+                        if(!flip)
+                        {
+                            line += xBase;
+                            line += (yBase * delta);
+
+                            while((header = bin.ReadInt32()) != 0x7FFF7FFF)
+                            {
+                                header ^= DoubleXor;
+
+                                var cur = line + ((((header >> 12) & 0x3FF) * delta) + ((header >> 22) & 0x3FF));
+                                var end = cur + (header & 0xFFF);
+
+                                while(cur < end)
+                                {
+                                    *cur++ = palette[bin.ReadByte()];
+                                }
+                            }
+                        }
+                        else
+                        {
+                            line -= xBase - width + 1;
+                            line += (yBase * delta);
+
+                            while((header = bin.ReadInt32()) != 0x7FFF7FFF)
+                            {
+                                header ^= DoubleXor;
+
+                                var cur = line + ((((header >> 12) & 0x3FF) * delta) - ((header >> 22) & 0x3FF));
+                                var end = cur - (header & 0xFFF);
+
+                                while(cur > end)
+                                {
+                                    *cur-- = palette[bin.ReadByte()];
+                                }
+                            }
+
+                            xCenter = width - xCenter;
+                        }
+
+                        bmp.UnlockBits(bd);
+
+                        if(hueObject != null)
+                        {
+                            ApplyHue(bmp, hueObject, onlyHueGrayPixels);
+                        }
+
+                        frames[i] = new Frame<Bitmap>(xCenter, yCenter, bmp);
+                    }
+
+                    return frames;
                 }
-
-                bmp.UnlockBits(bd);
-
-                if(hueObject != null)
-                {
-                    ApplyHue(bmp, hueObject, onlyHueGrayPixels);
-                }
-
-                frames[i] = new Frame<Bitmap>(xCenter, yCenter, bmp);
             }
-
-            return frames;
         }
 
         protected override void Dispose(bool disposing)
