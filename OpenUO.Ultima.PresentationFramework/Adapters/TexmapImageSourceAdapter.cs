@@ -17,6 +17,7 @@
 #region Usings
 
 using System.IO;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -24,7 +25,7 @@ using OpenUO.Ultima.Adapters;
 
 #endregion
 
-namespace OpenUO.Ultima.PresentationFramework.Adapters
+namespace OpenUO.Ultima.PresentationOpenUO.Core.Adapters
 {
     internal class TexmapImageSourceAdapter : StorageAdapterBase, ITexmapStorageAdapter<ImageSource>
     {
@@ -90,6 +91,11 @@ namespace OpenUO.Ultima.PresentationFramework.Adapters
                     return bmp;
                 }
             }
+        }
+
+        public Task<ImageSource> GetTexmapAsync(int index)
+        {
+            return Task.FromResult(GetTexmap(index));
         }
 
         protected override void Dispose(bool disposing)

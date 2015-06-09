@@ -16,9 +16,11 @@
 
 #region Usings
 
-using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
+
+using static System.String;
 
 #endregion
 
@@ -69,7 +71,7 @@ namespace OpenUO.Ultima.Adapters
             var tables = new List<ClientLocalizations>(_tables.Values);
             var loaded = tables.TrueForAll(t => t.Loaded);
 
-            if(loaded || (Install == null || String.IsNullOrWhiteSpace(Install.Directory)))
+            if(loaded || IsNullOrWhiteSpace(Install?.Directory))
             {
                 return;
             }
@@ -100,6 +102,11 @@ namespace OpenUO.Ultima.Adapters
             return null;
         }
 
+        public Task<ClilocInfo> GetClilocAsync(ClientLocalizationLanguage lng, int index)
+        {
+            return Task.FromResult(GetCliloc(lng, index));
+        }
+
         public Dictionary<ClientLocalizationLanguage, ClientLocalizations> Tables
         {
             get { return _tables; }
@@ -112,7 +119,7 @@ namespace OpenUO.Ultima.Adapters
                 return _tables[lng][index].Text;
             }
 
-            return String.Empty;
+            return Empty;
         }
 
         public string GetString(ClientLocalizationLanguage lng, int index, string args)
@@ -121,7 +128,7 @@ namespace OpenUO.Ultima.Adapters
 
             if(info == null)
             {
-                return String.Empty;
+                return Empty;
             }
 
             return info.ToString(args);
@@ -133,7 +140,7 @@ namespace OpenUO.Ultima.Adapters
 
             if(info == null)
             {
-                return String.Empty;
+                return Empty;
             }
 
             return info.ToString(args);

@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>OpenUO.Ultima</RootNamespace>
     <AssemblyName>OpenUO.Ultima</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -84,6 +84,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Animations\AnimationData.cs" />
+    <Compile Include="ConsoleManager.cs" />
     <Compile Include="TileData\TileComparer.cs" />
     <Compile Include="UopFileIndex.cs" />
     <Compile Include="MulFileIndex.cs" />
@@ -164,12 +165,11 @@
     <Content Include="TODO.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\OpenUO.Core\OpenUO.Core.Net40.csproj">
-      <Project>{25B50E34-555E-497E-901E-628494B0C954}</Project>
-      <Name>OpenUO.Core.Net40</Name>
+    <ProjectReference Include="..\OpenUO.Core.Net45\OpenUO.Core %28.Net 4.5%29.csproj">
+      <Project>{921d6c7a-5b62-4f99-a6a7-710c6920d494}</Project>
+      <Name>OpenUO.Core %28.Net 4.5%29</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

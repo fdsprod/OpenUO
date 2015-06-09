@@ -18,6 +18,7 @@
 
 using OpenUO.Core;
 using OpenUO.Core.Diagnostics;
+using OpenUO.Core.Diagnostics.Tracing.Listeners;
 
 #endregion
 
@@ -42,10 +43,10 @@ namespace OpenUO.Ultima.UnitTests
                     }
 
                     //Outputs Trace warnings and errors to the Visual Studio Output Console.
-                    new DebugTraceListener();
+                    new DebugOutputEventListener();
                 }
 
-                Guard.AssertIsNotNull(_install, "Ultima Online is not installed");
+                Guard.RequireIsNotNull(_install, "Ultima Online is not installed");
 
                 return _install;
             }

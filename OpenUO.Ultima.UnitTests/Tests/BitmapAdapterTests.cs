@@ -16,8 +16,10 @@
 
 #region Usings
 
+using System;
 using System.Drawing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+
 using OpenUO.Core;
 using OpenUO.Core.Patterns;
 using OpenUO.Ultima.Windows.Forms;
@@ -53,17 +55,17 @@ namespace OpenUO.Ultima.UnitTests
             var factory = new AnimationFactory(Install, Container);
             var frames = factory.GetAnimation<Bitmap>(1, 0, 0, 0, true);
 
-            Guard.AssertIsNotNull(frames, "Animation 1 was not found.");
-            Guard.AssertIsNotLessThan("Frames for animation 1, direction 0 were not found.", 1, frames.Length);
+            Guard.RequireIsNotNull(frames, "Animation 1 was not found.");
+            Guard.RequireIsNotLessThan("Frames for animation 1, direction 0 were not found.", 1, frames.Length);
         }
-
+        
         [TestMethod]
         public void TestTexmapsBitmapAdapter()
         {
             var factory = new TexmapFactory(Install, Container);
             var texmap = factory.GetTexmap<Bitmap>(1);
 
-            Guard.AssertIsNotNull(texmap, "Texmap 0 was not found.");
+            Guard.RequireIsNotNull(texmap, "Texmap 0 was not found.");
         }
 
         [TestMethod]
@@ -72,7 +74,7 @@ namespace OpenUO.Ultima.UnitTests
             var factory = new GumpFactory(Install, Container);
             var gump = factory.GetGump<Bitmap>(0);
 
-            Guard.AssertIsNotNull(gump, "Gump 0 was not found.");
+            Guard.RequireIsNotNull(gump, "Gump 0 was not found.");
         }
 
         [TestMethod]
@@ -83,8 +85,8 @@ namespace OpenUO.Ultima.UnitTests
             var land = factory.GetLand<Bitmap>(0);
             var @static = factory.GetStatic<Bitmap>(0);
 
-            Guard.AssertIsNotNull(land, "Land tile 0 was not found.");
-            Guard.AssertIsNotNull(@static, "Static 0 was not found.");
+            Guard.RequireIsNotNull(land, "Land tile 0 was not found.");
+            Guard.RequireIsNotNull(@static, "Static 0 was not found.");
         }
 
         [TestMethod]
@@ -92,7 +94,7 @@ namespace OpenUO.Ultima.UnitTests
         {
             var factory = new ASCIIFontFactory(Install, Container);
             var text = factory.GetText<Bitmap>(0, "This is a test", 0);
-            Guard.AssertIsNotNull(text, "ASCII Font was not created.");
+            Guard.RequireIsNotNull(text, "ASCII Font was not created.");
         }
 
         [TestMethod]
@@ -100,7 +102,7 @@ namespace OpenUO.Ultima.UnitTests
         {
             var factory = new UnicodeFontFactory(Install, Container);
             var text = factory.GetText<Bitmap>(0, "This is a test", 0);
-            Guard.AssertIsNotNull(text, "Unicode Font was not created.");
+            Guard.RequireIsNotNull(text, "Unicode Font was not created.");
         }
     }
 }

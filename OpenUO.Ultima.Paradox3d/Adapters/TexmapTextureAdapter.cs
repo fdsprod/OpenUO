@@ -16,7 +16,10 @@
 
 #region Usings
 
+using System.Diagnostics;
 using System.IO;
+using System.Threading.Tasks;
+
 using OpenUO.Core.Patterns;
 using OpenUO.Ultima.Adapters;
 using SiliconStudio.Paradox.Graphics;
@@ -32,7 +35,9 @@ namespace OpenUO.Ultima.Paradox3d.Adapters
 
         public TexmapTextureAdapter(IContainer container)
         {
-            _graphicsDevice = container.Resolve<GraphicsDevice>();
+            var graphicsDeviceService = container.Resolve<IGraphicsDeviceService>();
+
+            _graphicsDevice = graphicsDeviceService.GraphicsDevice;
         }
 
         public override int Length
@@ -88,7 +93,52 @@ namespace OpenUO.Ultima.Paradox3d.Adapters
 
                             while(cur < end)
                             {
-                                *cur++ = (ushort)(bin.ReadUInt16() ^ 0x8000);
+                                *cur++ = (bin.ReadUInt16());
+                            }
+                        }
+                    }
+
+                    texture.SetData(buffer);
+
+                    return texture;
+                }
+            }
+        }
+
+        public async Task<Texture> GetTexmapAsync(int index)
+        {
+            using (var result = await _fileIndex.SeekAsync(index).ConfigureAwait(false))
+            {
+                var stream = result.Stream;
+
+                if (stream == null)
+                {
+                    return null;
+                }
+
+                var size = result.Extra == 0 ? 64 : 128;
+
+                using (var bin = new BinaryReader(stream))
+                {
+                    var texture = Texture.New2D(_graphicsDevice, size, size, PixelFormat.B5G5R5A1_UNorm);
+                    var buffer = new ushort[size * size];
+
+                    unsafe
+                    {
+                        fixed (ushort* start = buffer)
+                        {
+                            var ptr = start;
+                            var delta = texture.Width;
+
+                            for (var y = 0; y < size; ++y, ptr += delta)
+                            {
+                                var cur = ptr;
+                                var end = cur + size;
+
+                                while (cur < end)
+                                {
+                                    *cur++ = (ushort)(bin.ReadUInt16() ^ 0x8000);
+                                }
                             }
                         }
                     }

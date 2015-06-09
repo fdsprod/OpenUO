@@ -1,46 +1,114 @@
-#region License Header
+﻿#region License Header
 
-/***************************************************************************
- *
- *   This program is free software; you can redistribute it and/or modify
- *   it under the terms of the GNU General Public License as published by
- *   the Free Software Foundation; either version 2 of the License, or
- *   (at your option) any later version.
- *
- ***************************************************************************/
+// Copyright (c) 2015 OpenUO Software Team.
+// All Right Reserved.
+// 
+// PacketHandler.cs
+// 
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 3 of the License, or
+// (at your option) any later version.
 
 #endregion
 
-namespace OpenUO.Ultima.Network
+#region Usings
+
+using System;
+
+#endregion
+
+namespace OpenUO.Core.Net
 {
-    public delegate void OnPacketReceive(NetState state, PacketReader reader);
+    public delegate void PacketReceiveHandler(PacketReader reader);
+
+    public delegate void PacketReceiveHandler<in TPacket>(TPacket packet);
 
     public class PacketHandler
     {
-        private readonly int _length;
-        private readonly OnPacketReceive _onReceive;
-        private readonly int _packetId;
+        private readonly PacketReceiveHandler m_Handler;
 
-        public PacketHandler(int packetId, int length, OnPacketReceive onReceive)
+        public PacketHandler(int id, string name, int length, PacketReceiveHandler handler)
         {
-            _packetId = packetId;
-            _length = length;
-            _onReceive = onReceive;
+            Id = id;
+            Name = name;
+            Length = length;
+
+            m_Handler = handler;
         }
 
-        public int PacketID
+        public int Id
         {
-            get { return _packetId; }
+            get;
+            private set;
         }
 
         public int Length
         {
-            get { return _length; }
+            get;
+            private set;
         }
 
-        public OnPacketReceive OnReceive
+        public string Name
         {
-            get { return _onReceive; }
+            get;
+            private set;
+        }
+
+        protected virtual Type PacketType
+        {
+            get { return null; }
+        }
+
+        public bool CanCreatePacket
+        {
+            get { return PacketType != null; }
+        }
+
+        public IRecvPacket CreatePacket(PacketReader reader)
+        {
+            return (IRecvPacket) Activator.CreateInstance(PacketType, reader);
+        }
+
+        public virtual void Invoke(IRecvPacket recvPacket)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Invoke(PacketReader reader)
+        {
+            m_Handler.Invoke(reader);
+        }
+
+        public virtual Delegate GetHandler()
+        {
+            return m_Handler;
+        }
+    }
+
+    public class PacketHandler<TPacket> : PacketHandler
+    {
+        private readonly PacketReceiveHandler<TPacket> m_Handler;
+
+        public PacketHandler(int id, string name, int length, PacketReceiveHandler<TPacket> handler)
+            : base(id, name, length, null)
+        {
+            m_Handler = handler;
+        }
+
+        protected override Type PacketType
+        {
+            get { return typeof (TPacket); }
+        }
+
+        public override Delegate GetHandler()
+        {
+            return m_Handler;
+        }
+
+        public override void Invoke(IRecvPacket recvPacket)
+        {
+            m_Handler.Invoke((TPacket) recvPacket);
         }
     }
 }

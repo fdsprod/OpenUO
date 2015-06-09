@@ -1,0 +1,213 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{957F8375-0AA9-4F4D-ADCB-F3A083F92914}</ProjectGuid>
+    <OutputType>library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>OpenUO.Core.PresentationFramework.Net45</RootNamespace>
+    <AssemblyName>OpenUO.Core.PresentationFramework.Net45</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Xaml">
+      <RequiredTargetFramework>4.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="WindowsBase" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ComponentModel\Design\DataModelBase.cs" />
+    <Compile Include="ComponentModel\Design\PropertyChangedNotifierBase.cs" />
+    <Compile Include="ComponentModel\Design\PropertySupport.cs" />
+    <Compile Include="ComponentModel\Design\RaisePropertyChangedAttribute.cs" />
+    <Compile Include="ComponentModel\Design\ViewModelBase.cs" />
+    <Compile Include="Controls\Converters\BoolToOppositeConverter.cs" />
+    <Compile Include="Controls\Converters\DoubleTypeConverter.cs" />
+    <Compile Include="Controls\Converters\EnumTypeConverter.cs" />
+    <Compile Include="Controls\Data\CompositeItem.cs" />
+    <Compile Include="Controls\Data\ExpandableProperty.cs" />
+    <Compile Include="Controls\Data\Item.cs" />
+    <Compile Include="Controls\Data\Property.cs" />
+    <Compile Include="Controls\Data\PropertyCategory.cs" />
+    <Compile Include="Controls\Data\PropertyCollection.cs" />
+    <Compile Include="Controls\FlatAttribute.cs" />
+    <Compile Include="Controls\PropertyGrid.cs" />
+    <Compile Include="Controls\PropertyTemplateSelector.cs" />
+    <Compile Include="Controls\TypeEditors\CollectionEditorWindow.xaml.cs">
+      <DependentUpon>CollectionEditorWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\TypeEditors\IntegerTypeEditor.cs" />
+    <Compile Include="Controls\TypeEditors\NumberTypeEditor.cs" />
+    <Compile Include="Controls\VirtualizingWrapPanel.cs" />
+    <Compile Include="Converters\BinaryToImageConverter.cs" />
+    <Compile Include="Converters\BoolToNotBoolConverter.cs" />
+    <Compile Include="Converters\BoolToOpacityConverter.cs" />
+    <Compile Include="Converters\BoolToVisibilityConverter.cs" />
+    <Compile Include="Converters\CountToVisibilityConverter.cs" />
+    <Compile Include="Converters\DivideByTwoConverter.cs" />
+    <Compile Include="Converters\EnumToDescriptionConverter.cs" />
+    <Compile Include="Converters\HasValueConverter.cs" />
+    <Compile Include="Converters\MultiplyByConverter.cs" />
+    <Compile Include="Converters\NotBoolToVisibilityConverter.cs" />
+    <Compile Include="Converters\NotNullToBoolConverter.cs" />
+    <Compile Include="Converters\NullToBoolConverter.cs" />
+    <Compile Include="Converters\StringLengthConverter.cs" />
+    <Compile Include="Converters\StringLengthToBoolConverter.cs" />
+    <Compile Include="Converters\StringLengthToVisibilityConverter.cs" />
+    <Compile Include="Converters\StringToLowerCaseConverter.cs" />
+    <Compile Include="Converters\StringToUpperCaseConverter.cs" />
+    <Compile Include="Converters\VisibilityIfEmptyStringConverter.cs" />
+    <Compile Include="Converters\VisibilityIfNotEmptyStringConverter.cs" />
+    <Compile Include="Converters\VisibilityIfNotNullConverter.cs" />
+    <Compile Include="Converters\VisibilityIfNullConverter.cs" />
+    <Compile Include="Input\CommandBase.cs" />
+    <Compile Include="Input\IRaiseCanExecuteChanged.cs" />
+    <Compile Include="Input\RelayCommand.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="Themes\TypeEditors\CollectionEditorControl.xaml.cs">
+      <DependentUpon>CollectionEditorControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Threading\DispatcherProxy.cs" />
+    <Compile Include="WeakAction.cs" />
+    <Compile Include="WeakReferenceManager.cs" />
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <AppDesigner Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\OpenUO.Core.Net45\OpenUO.Core %28.Net 4.5%29.csproj">
+      <Project>{921d6c7a-5b62-4f99-a6a7-710c6920d494}</Project>
+      <Name>OpenUO.Core %28.Net 4.5%29</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="Controls\TypeEditors\CollectionEditorWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Themes\ExpressionBlend.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Themes\ExpressionBlend\Brushes.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Themes\ExpressionBlend\CheckBox.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Themes\ExpressionBlend\ComboBox.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Themes\ExpressionBlend\Expander.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Themes\ExpressionBlend\ListBox.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Themes\ExpressionBlend\PropertyGrid.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Themes\ExpressionBlend\ScrollViewer.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Themes\ExpressionBlend\TextBlock.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Themes\ExpressionBlend\TextBox.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Themes\ExpressionBlend\WPGTemplates.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Themes\Generic.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Themes\TypeEditors\CollectionEditorControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Themes\TypeEditors\IntegerTypeEditor.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Themes\Icons\abc.png" />
+    <Resource Include="Themes\Icons\grouped.png" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties ProjectLinkReference="84b7dd45-fb07-4d91-aa9a-2c11edefd38e" ProjectLinkerExcludeFilter="\\?desktop(\\.*)?$;\\?silverlight(\\.*)?$;\.desktop;\.silverlight;\.xaml;^service references(\\.*)?$;\.clientconfig;^web references(\\.*)?$" />
+    </VisualStudio>
+  </ProjectExtensions>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

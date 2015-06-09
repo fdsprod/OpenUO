@@ -19,6 +19,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -26,7 +27,7 @@ using OpenUO.Ultima.Adapters;
 
 #endregion
 
-namespace OpenUO.Ultima.PresentationFramework.Adapters
+namespace OpenUO.Ultima.PresentationOpenUO.Core.Adapters
 {
     internal class UnicodeFontImageSourceAdapter : StorageAdapterBase, IUnicodeFontStorageAdapter<ImageSource>
     {
@@ -183,9 +184,19 @@ namespace OpenUO.Ultima.PresentationFramework.Adapters
             return bmp;
         }
 
+        public Task<ImageSource> GetTextAsync(int fontId, string text, short hueId)
+        {
+            return Task.FromResult(GetText(fontId, text, hueId));
+        }
+
         public int GetFontHeight(int fontId)
         {
             return _fonts[fontId].Height;
+        }
+
+        public Task<int> GetFontHeightAsync(int fontId)
+        {
+            return Task.FromResult(GetFontHeight(fontId));
         }
 
         protected override void Dispose(bool disposing)

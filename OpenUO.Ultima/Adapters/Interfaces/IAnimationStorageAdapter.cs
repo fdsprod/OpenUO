@@ -14,10 +14,13 @@
 
 #endregion
 
+using System.Threading.Tasks;
+
 namespace OpenUO.Ultima.Adapters
 {
     public interface IAnimationStorageAdapter<T> : IStorageAdapter
     {
         Frame<T>[] GetAnimation(int body, int action, int direction, int hue, bool preserveHue);
+        Task<Frame<T>[]> GetAnimationAsync(int body, int action, int direction, int hue, bool preserveHue);
     }
 }

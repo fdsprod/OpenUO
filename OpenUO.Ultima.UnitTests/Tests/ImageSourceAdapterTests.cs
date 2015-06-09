@@ -53,8 +53,8 @@ namespace OpenUO.Ultima.UnitTests
             var factory = new AnimationFactory(Install, Container);
             var frames = factory.GetAnimation<ImageSource>(1, 0, 0, 0, true);
 
-            Guard.AssertIsNotNull(frames, "Animation 1 was not found.");
-            Guard.AssertIsNotLessThan("Frames for animation 1, direction 0 were not found.", 1, frames.Length);
+            Guard.RequireIsNotNull(frames, "Animation 1 was not found.");
+            Guard.RequireIsNotLessThan("Frames for animation 1, direction 0 were not found.", 1, frames.Length);
         }
 
         [TestMethod]
@@ -63,7 +63,7 @@ namespace OpenUO.Ultima.UnitTests
             var factory = new TexmapFactory(Install, Container);
             var texmap = factory.GetTexmap<ImageSource>(1);
 
-            Guard.AssertIsNotNull(texmap, "Texmap 0 was not found.");
+            Guard.RequireIsNotNull(texmap, "Texmap 0 was not found.");
         }
 
         [TestMethod]
@@ -72,7 +72,7 @@ namespace OpenUO.Ultima.UnitTests
             var factory = new GumpFactory(Install, Container);
             var gump = factory.GetGump<ImageSource>(0);
 
-            Guard.AssertIsNotNull(gump, "Gump 0 was not found.");
+            Guard.RequireIsNotNull(gump, "Gump 0 was not found.");
         }
 
         [TestMethod]
@@ -83,8 +83,8 @@ namespace OpenUO.Ultima.UnitTests
             var land = factory.GetLand<ImageSource>(0);
             var @static = factory.GetStatic<ImageSource>(0);
 
-            Guard.AssertIsNotNull(land, "Land tile 0 was not found.");
-            Guard.AssertIsNotNull(@static, "Static 0 was not found.");
+            Guard.RequireIsNotNull(land, "Land tile 0 was not found.");
+            Guard.RequireIsNotNull(@static, "Static 0 was not found.");
         }
 
         [TestMethod]
@@ -93,7 +93,7 @@ namespace OpenUO.Ultima.UnitTests
             var factory = new ASCIIFontFactory(Install, Container);
             var text = factory.GetText<ImageSource>(0, "This is a test", 0);
 
-            Guard.AssertIsNotNull(text, "ASCII Font was not created.");
+            Guard.RequireIsNotNull(text, "ASCII Font was not created.");
         }
 
         [TestMethod]
@@ -102,7 +102,7 @@ namespace OpenUO.Ultima.UnitTests
             var factory = new UnicodeFontFactory(Install, Container);
             var text = factory.GetText<ImageSource>(0, "This is a test", 0);
 
-            Guard.AssertIsNotNull(text, "Unicode Font was not created.");
+            Guard.RequireIsNotNull(text, "Unicode Font was not created.");
         }
     }
 }

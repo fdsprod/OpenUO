@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace OpenUO.Core.PresentationFramework.Net45.Properties {
+namespace OpenUO.Core.PresentationOpenUO.Core.Net45.Properties {
     
     
     /// <summary>
@@ -38,7 +38,7 @@ namespace OpenUO.Core.PresentationFramework.Net45.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if ((resourceMan == null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("OpenUO.Core.PresentationFramework.Net45.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("OpenUO.Core.PresentationOpenUO.Core.Net45.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;

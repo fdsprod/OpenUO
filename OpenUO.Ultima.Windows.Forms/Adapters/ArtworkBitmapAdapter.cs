@@ -19,6 +19,8 @@
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Threading.Tasks;
+
 using OpenUO.Ultima.Adapters;
 
 #endregion
@@ -109,6 +111,11 @@ namespace OpenUO.Ultima.Windows.Forms.Adapters
             }
         }
 
+        public Task<Bitmap> GetLandAsync(int index)
+        {
+            return Task.FromResult(GetLand(index));
+        }
+
         public unsafe Bitmap GetStatic(int index)
         {
             index += 0x4000;
@@ -174,6 +181,11 @@ namespace OpenUO.Ultima.Windows.Forms.Adapters
                     return bmp;
                 }
             }
+        }
+
+        public Task<Bitmap> GetStaticAsync(int index)
+        {
+            return Task.FromResult(GetStatic(index));
         }
 
         protected override void Dispose(bool disposing)

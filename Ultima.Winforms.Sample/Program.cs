@@ -19,6 +19,7 @@
 using System;
 using System.Windows.Forms;
 using OpenUO.Core.Diagnostics;
+using OpenUO.Core.Diagnostics.Tracing.Listeners;
 using OpenUO.Core.Patterns;
 using OpenUO.Ultima;
 using OpenUO.Ultima.Windows.Forms;
@@ -36,10 +37,7 @@ namespace Ultima.Winforms.Sample
         private static void Main()
         {
 #if DEBUG
-            new DebugTraceListener
-            {
-                TraceLevel = TraceLevels.Verbose
-            };
+            new DebugOutputEventListener();
 #endif
             var container = new Container();
 

@@ -17,6 +17,7 @@
 #region Usings
 
 using System.IO;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -24,7 +25,7 @@ using OpenUO.Ultima.Adapters;
 
 #endregion
 
-namespace OpenUO.Ultima.PresentationFramework.Adapters
+namespace OpenUO.Ultima.PresentationOpenUO.Core.Adapters
 {
     internal class ASCIIFontImageSourceAdapter : StorageAdapterBase, IASCIIFontStorageAdapter<ImageSource>
     {
@@ -142,6 +143,11 @@ namespace OpenUO.Ultima.PresentationFramework.Adapters
             bmp.Unlock();
 
             return bmp;
+        }
+
+        public Task<ImageSource> GetTextAsync(int fontId, string text, short hueId)
+        {
+            return Task.FromResult(GetText(fontId, text, hueId));
         }
 
         protected override void Dispose(bool disposing)

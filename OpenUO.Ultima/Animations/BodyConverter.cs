@@ -20,6 +20,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
 using OpenUO.Core.Diagnostics;
+using OpenUO.Core.Diagnostics.Tracing;
 
 #endregion
 

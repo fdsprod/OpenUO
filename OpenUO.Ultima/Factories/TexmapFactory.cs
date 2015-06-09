@@ -16,6 +16,8 @@
 
 #region Usings
 
+using System.Threading.Tasks;
+
 using OpenUO.Core.Patterns;
 using OpenUO.Ultima.Adapters;
 
@@ -33,6 +35,16 @@ namespace OpenUO.Ultima
         public T GetTexmap<T>(int index)
         {
             return GetAdapter<ITexmapStorageAdapter<T>>().GetTexmap(index);
+        }
+
+        public Task<T> GetTexmapAsync<T>(int index)
+        {
+            return Task.Run(async () =>
+            {
+                var adapter = await GetAdapterAsync<ITexmapStorageAdapter<T>>().ConfigureAwait(false);
+
+                return await adapter.GetTexmapAsync(index).ConfigureAwait(false);
+            });
         }
     }
 }

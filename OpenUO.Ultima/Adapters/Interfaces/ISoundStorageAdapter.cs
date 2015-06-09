@@ -14,10 +14,13 @@
 
 #endregion
 
+using System.Threading.Tasks;
+
 namespace OpenUO.Ultima.Adapters
 {
     public interface ISoundStorageAdapter<T> : IStorageAdapter
     {
         T GetSound(int index);
+        Task<T> GetSoundAsync(int index);
     }
 }

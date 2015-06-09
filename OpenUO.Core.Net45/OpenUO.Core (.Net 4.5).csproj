@@ -1,0 +1,133 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{921D6C7A-5B62-4F99-A6A7-710C6920D494}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>OpenUO.Core</RootNamespace>
+    <AssemblyName>OpenUO.Core</AssemblyName>
+    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;NET_45</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE;NET_45</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.6.0.8\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="-\Annotations.cs" />
+    <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="Collections\Cache.cs" />
+    <Compile Include="Collections\SafeDictionary.cs" />
+    <Compile Include="Collections\WorkingQueue.cs" />
+    <Compile Include="ComponentModel\EqualityHelper.cs" />
+    <Compile Include="ComponentModel\NotifiableBase.cs" />
+    <Compile Include="Configuration\SettingsFile.cs" />
+    <Compile Include="Configuration\SettingsSectionBase.cs" />
+    <Compile Include="ConsoleManager.cs" />
+    <Compile Include="Data\ColumnAttribute.cs" />
+    <Compile Include="Diagnostics\GeneralExceptionHandler.cs" />
+    <Compile Include="Diagnostics\Guard.cs" />
+    <Compile Include="Diagnostics\Listeners\ConsoleOutputEventListener.cs" />
+    <Compile Include="Diagnostics\Listeners\DebugOutputEventListener.cs" />
+    <Compile Include="Diagnostics\Listeners\FileLogEventListener.cs" />
+    <Compile Include="Diagnostics\Listeners\StreamOuputEventListener.cs" />
+    <Compile Include="Diagnostics\Performance\PerformanceCounter.cs" />
+    <Compile Include="Diagnostics\Tracing\ConcreteTracer.cs" />
+    <Compile Include="Diagnostics\Tracing\ITracer.cs" />
+    <Compile Include="Diagnostics\Tracing\TraceEventId.cs" />
+    <Compile Include="Diagnostics\Tracing\Tracer.cs" />
+    <Compile Include="Diagnostics\Tracing\TracerEventSource.cs" />
+    <Compile Include="Extensions\ArrayExtensions.cs" />
+    <Compile Include="Extensions\AssemblyExtensions.cs" />
+    <Compile Include="Extensions\ByteArrayExtensions.cs" />
+    <Compile Include="Extensions\CollectionExtensions.cs" />
+    <Compile Include="Extensions\EnumExtensions.cs" />
+    <Compile Include="Extensions\IDataReaderExtensions.cs" />
+    <Compile Include="Extensions\IDataRecordExtensions.cs" />
+    <Compile Include="Extensions\IPAddressExtensions.cs" />
+    <Compile Include="Extensions\MethodInfoExtensions.cs" />
+    <Compile Include="Extensions\ObjectExtensions.cs" />
+    <Compile Include="Extensions\SecureStringExtensions.cs" />
+    <Compile Include="Extensions\SingleExtensions.cs" />
+    <Compile Include="Extensions\StreamExtensions.cs" />
+    <Compile Include="Extensions\StringBuilderExtensions.cs" />
+    <Compile Include="Extensions\StringExtensions.cs" />
+    <Compile Include="Extensions\TypeExtensions.cs" />
+    <Compile Include="Guard.cs" />
+    <Compile Include="IO\BufferPool.cs" />
+    <Compile Include="IO\FileSystemHelper.cs" />
+    <Compile Include="IO\HuffmanCompression.cs" />
+    <Compile Include="IO\ZlibCompression.cs" />
+    <Compile Include="NativeMethods.cs" />
+    <Compile Include="ObjectConverterter.cs" />
+    <Compile Include="Patterns\Chaining\ExecutionChainBase.cs" />
+    <Compile Include="Patterns\Chaining\ExecutionChainStepBase.cs" />
+    <Compile Include="Patterns\Chaining\Interfaces\IChain.cs" />
+    <Compile Include="Patterns\Chaining\Interfaces\IChainStep.cs" />
+    <Compile Include="Patterns\Graphs\DirectedAcyclicGraph.cs" />
+    <Compile Include="Patterns\Graphs\GraphNode.cs" />
+    <Compile Include="Patterns\IoC\Container.cs" />
+    <Compile Include="Patterns\IoC\IContainer.cs" />
+    <Compile Include="ProgressEventArgs.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Reflection\BaseFieldAccessor.cs" />
+    <Compile Include="Reflection\BaseMethodInvoker.cs" />
+    <Compile Include="Reflection\BasePropertyAccessor.cs" />
+    <Compile Include="Reflection\Delegates.cs" />
+    <Compile Include="Reflection\FieldAccessor.cs" />
+    <Compile Include="Reflection\MethodInvoker.cs" />
+    <Compile Include="Reflection\PropertyAccesor.cs" />
+    <Compile Include="Threading\Tasks\AsyncLock.cs" />
+    <Compile Include="Threading\Tasks\AsyncSemaphore.cs" />
+    <Compile Include="Threading\Tasks\TaskResult.cs" />
+    <Compile Include="ValueEventArgs.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties ProjectLinkReference="25b50e34-555e-497e-901e-628494b0c954" ProjectLinkerExcludeFilter="\\?desktop(\\.*)?$;\\?silverlight(\\.*)?$;\.desktop;\.silverlight;\.xaml;^service references(\\.*)?$;\.clientconfig;^web references(\\.*)?$" />
+    </VisualStudio>
+  </ProjectExtensions>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

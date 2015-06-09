@@ -20,6 +20,8 @@ using System;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Threading.Tasks;
+
 using OpenUO.Ultima.Adapters;
 
 #endregion
@@ -297,6 +299,11 @@ namespace OpenUO.Ultima.Windows.Forms.Adapters
                     return frames;
                 }
             }
+        }
+
+        public Task<Frame<Bitmap>[]> GetAnimationAsync(int body, int action, int direction, int hue, bool preserveHue)
+        {
+            return Task.FromResult(GetAnimation(body, action, direction, hue, preserveHue));
         }
 
         protected override void Dispose(bool disposing)

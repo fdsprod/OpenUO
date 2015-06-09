@@ -19,6 +19,7 @@
 using System;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 
 #endregion
 
@@ -84,6 +85,11 @@ namespace OpenUO.Ultima.Adapters
 
                 return new Sound(name, new MemoryStream(buffer));
             }
+        }
+
+        public Task<Sound> GetSoundAsync(int index)
+        {
+            return Task.FromResult(GetSound(index));
         }
 
         private static int[] CreateWaveHeader(int length)

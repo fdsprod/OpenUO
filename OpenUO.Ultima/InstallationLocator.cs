@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using System.IO;
 using Microsoft.Win32;
 using OpenUO.Core.Diagnostics;
+using OpenUO.Core.Diagnostics.Tracing;
 
 #endregion
 

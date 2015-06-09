@@ -16,6 +16,8 @@
 
 #region Usings
 
+using System.Threading.Tasks;
+
 using OpenUO.Core.Patterns;
 using OpenUO.Ultima.Adapters;
 
@@ -33,6 +35,16 @@ namespace OpenUO.Ultima
         public T GetText<T>(int fontId, string text, short hueId)
         {
             return GetAdapter<IASCIIFontStorageAdapter<T>>().GetText(fontId, text, hueId);
+        }
+
+        public Task<T> GetTextAsync<T>(int fontId, string text, short hueId)
+        {
+            return Task.Run(async () =>
+            {
+                var adapter = await GetAdapterAsync<IASCIIFontStorageAdapter<T>>().ConfigureAwait(false);
+
+                return await adapter.GetTextAsync(fontId, text, hueId).ConfigureAwait(false);
+            });
         }
     }
 }

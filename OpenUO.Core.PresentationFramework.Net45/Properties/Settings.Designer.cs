@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace OpenUO.Core.PresentationFramework.Net45.Properties {
+namespace OpenUO.Core.PresentationOpenUO.Core.Net45.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]

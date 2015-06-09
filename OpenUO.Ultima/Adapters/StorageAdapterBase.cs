@@ -14,6 +14,10 @@
 
 #endregion
 
+using System.Threading.Tasks;
+
+using OpenUO.Core.Threading.Tasks;
+
 namespace OpenUO.Ultima.Adapters
 {
     public abstract class StorageAdapterBase : IStorageAdapter
@@ -32,6 +36,12 @@ namespace OpenUO.Ultima.Adapters
         public virtual void Initialize()
         {
             IsInitialized = true;
+        }
+
+        public Task InitializeAsync()
+        {
+            Initialize();
+            return TaskResult.Complete;
         }
 
         public void Dispose()

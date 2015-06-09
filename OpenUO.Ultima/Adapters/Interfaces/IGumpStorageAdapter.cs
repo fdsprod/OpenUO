@@ -14,10 +14,13 @@
 
 #endregion
 
+using System.Threading.Tasks;
+
 namespace OpenUO.Ultima.Adapters
 {
     public interface IGumpStorageAdapter<T> : IStorageAdapter
     {
         T GetGump(int index);
+        Task<T> GetGumpAsync(int index);
     }
 }

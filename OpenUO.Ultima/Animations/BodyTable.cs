@@ -20,6 +20,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using OpenUO.Core.Diagnostics;
+using OpenUO.Core.Diagnostics.Tracing;
 
 #endregion
 

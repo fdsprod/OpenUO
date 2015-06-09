@@ -16,6 +16,8 @@
 
 #region Usings
 
+using System.Threading.Tasks;
+
 using OpenUO.Core.Patterns;
 using OpenUO.Ultima.Adapters;
 
@@ -38,6 +40,26 @@ namespace OpenUO.Ultima
         public int GetLength<T>()
         {
             return GetAdapter<ISoundStorageAdapter<T>>().Length;
+        }
+
+        public Task<T> GetSoundAsync<T>(int index)
+        {
+            return Task.Run(async () =>
+            {
+                var adapter = await GetAdapterAsync<ISoundStorageAdapter<T>>().ConfigureAwait(false);
+
+                return await adapter.GetSoundAsync(index).ConfigureAwait(false);
+            });
+        }
+
+        public Task<int> GetLengthAsync<T>()
+        {
+            return Task.Run(async () =>
+            {
+                var adapter = await GetAdapterAsync<ISoundStorageAdapter<T>>().ConfigureAwait(false);
+
+                return adapter.Length;
+            });
         }
     }
 }

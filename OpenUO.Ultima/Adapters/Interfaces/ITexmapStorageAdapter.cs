@@ -14,10 +14,13 @@
 
 #endregion
 
+using System.Threading.Tasks;
+
 namespace OpenUO.Ultima.Adapters
 {
     public interface ITexmapStorageAdapter<T> : IStorageAdapter
     {
         T GetTexmap(int index);
+        Task<T> GetTexmapAsync(int index);
     }
 }

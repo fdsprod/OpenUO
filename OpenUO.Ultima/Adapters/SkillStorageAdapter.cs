@@ -19,6 +19,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 
 #endregion
 
@@ -61,6 +62,11 @@ namespace OpenUO.Ultima.Adapters
             }
 
             return null;
+        }
+
+        public Task<Skill> GetSkillAsync(int index)
+        {
+            return Task.FromResult(GetSkill(index));
         }
 
         private void ReadCategories(InstallLocation install)
@@ -132,7 +138,7 @@ namespace OpenUO.Ultima.Adapters
         private Skill ReadSkill(FileIndexBase fileIndex, int index)
         {
             int length, extra;
-            using(var stream = _fileIndex.Seek(index, out length, out extra))
+            using(var stream = fileIndex.Seek(index, out length, out extra))
             {
                 if(stream == null)
                 {

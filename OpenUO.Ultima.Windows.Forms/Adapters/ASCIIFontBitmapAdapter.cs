@@ -19,6 +19,8 @@
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Threading.Tasks;
+
 using OpenUO.Ultima.Adapters;
 
 #endregion
@@ -139,6 +141,11 @@ namespace OpenUO.Ultima.Windows.Forms.Adapters
             bmp.UnlockBits(bd);
 
             return bmp;
+        }
+
+        public Task<Bitmap> GetTextAsync(int fontId, string text, short hueId)
+        {
+            return Task.FromResult(GetText(fontId, text, hueId));
         }
 
         protected override void Dispose(bool disposing)

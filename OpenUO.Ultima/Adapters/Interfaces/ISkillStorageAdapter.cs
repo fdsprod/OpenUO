@@ -14,10 +14,13 @@
 
 #endregion
 
+using System.Threading.Tasks;
+
 namespace OpenUO.Ultima.Adapters
 {
     public interface ISkillStorageAdapter<T> : IStorageAdapter
     {
         T GetSkill(int index);
+        Task<T> GetSkillAsync(int index);
     }
 }

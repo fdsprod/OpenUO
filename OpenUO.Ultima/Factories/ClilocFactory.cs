@@ -16,6 +16,8 @@
 
 #region Usings
 
+using System.Threading.Tasks;
+
 using OpenUO.Core.Patterns;
 using OpenUO.Ultima.Adapters;
 
@@ -33,6 +35,16 @@ namespace OpenUO.Ultima
         public T GetCliloc<T>(ClientLocalizationLanguage lng, int index)
         {
             return GetAdapter<IClilocStorageAdapter<T>>().GetCliloc(lng, index);
+        }
+
+        public Task<T> GetClilocAsync<T>(ClientLocalizationLanguage lng, int index)
+        {
+            return Task.Run(async () =>
+            {
+                var adapter = await GetAdapterAsync<IClilocStorageAdapter<T>>().ConfigureAwait(false);
+
+                return await adapter.GetClilocAsync(lng, index).ConfigureAwait(false);
+            });
         }
     }
 }

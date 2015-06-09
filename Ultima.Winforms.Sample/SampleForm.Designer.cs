@@ -1,6 +1,8 @@
-﻿namespace Ultima.Winforms.Sample
+﻿using System.Windows.Forms;
+
+namespace Ultima.Winforms.Sample
 {
-    partial class SampleForm
+    partial class SampleForm : Form
     {
         /// <summary>
         /// Required designer variable.

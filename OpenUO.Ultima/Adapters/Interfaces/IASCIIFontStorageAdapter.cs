@@ -14,10 +14,13 @@
 
 #endregion
 
+using System.Threading.Tasks;
+
 namespace OpenUO.Ultima.Adapters
 {
     public interface IASCIIFontStorageAdapter<T> : IStorageAdapter
     {
         T GetText(int fontId, string text, short hueId);
+        Task<T> GetTextAsync(int fontId, string text, short hueId);
     }
 }

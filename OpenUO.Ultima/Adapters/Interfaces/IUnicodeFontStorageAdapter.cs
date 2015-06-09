@@ -14,11 +14,15 @@
 
 #endregion
 
+using System.Threading.Tasks;
+
 namespace OpenUO.Ultima.Adapters
 {
     public interface IUnicodeFontStorageAdapter<T> : IStorageAdapter
     {
         T GetText(int fontId, string text, short hueId);
+        Task<T> GetTextAsync(int fontId, string text, short hueId);
         int GetFontHeight(int fontId);
+        Task<int> GetFontHeightAsync(int fontId);
     }
 }

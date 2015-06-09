@@ -16,6 +16,8 @@
 
 #region Usings
 
+using System.Threading.Tasks;
+
 using OpenUO.Core.Patterns;
 using OpenUO.Ultima.Adapters;
 
@@ -33,6 +35,16 @@ namespace OpenUO.Ultima
         public T GetAnimationData<T>(int index)
         {
             return GetAdapter<IAnimationDataStorageAdapter<T>>().GetAnimationData(index);
+        }
+
+        public Task<T> GetAnimationDataAsync<T>(int index)
+        {
+            return Task.Run(async () =>
+            {
+                var adapter = await GetAdapterAsync<IAnimationDataStorageAdapter<T>>().ConfigureAwait(false);
+
+                return await adapter.GetAnimationDataAsync(index).ConfigureAwait(false);
+            });
         }
     }
 }

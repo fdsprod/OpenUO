@@ -17,6 +17,8 @@
 #region Usings
 
 using System.IO;
+using System.Threading.Tasks;
+
 using OpenUO.Core.Patterns;
 using OpenUO.Ultima.Adapters;
 using SiliconStudio.Paradox.Graphics;
@@ -25,14 +27,16 @@ using SiliconStudio.Paradox.Graphics;
 
 namespace OpenUO.Ultima.Paradox3d.Adapters
 {
-    internal class ArtworkImageSourceAdapter : StorageAdapterBase, IArtworkStorageAdapter<Texture>
+    internal class ArtworkTextureAdapter : StorageAdapterBase, IArtworkStorageAdapter<Texture>
     {
         private readonly GraphicsDevice _graphicsDevice;
         private FileIndexBase _fileIndex;
 
-        public ArtworkImageSourceAdapter(IContainer container)
+        public ArtworkTextureAdapter(IContainer container)
         {
-            _graphicsDevice = container.Resolve<GraphicsDevice>();
+            var graphicsDeviceService = container.Resolve<IGraphicsDeviceService>();
+
+            _graphicsDevice = graphicsDeviceService.GraphicsDevice;
         }
 
         public override int Length
@@ -107,9 +111,16 @@ namespace OpenUO.Ultima.Paradox3d.Adapters
                         }
                     }
 
+                    texture.SetData(buffer);
+
                     return texture;
                 }
             }
+        }
+
+        public Task<Texture> GetLandAsync(int index)
+        {
+            return Task.FromResult(GetLand(index));
         }
 
         public unsafe Texture GetStatic(int index)
@@ -141,7 +152,7 @@ namespace OpenUO.Ultima.Paradox3d.Adapters
                     }
 
                     var texture = Texture.New2D(_graphicsDevice, width, height, PixelFormat.B5G5R5A1_UNorm);
-                    var buffer = new ushort[44 * 44];
+                    var buffer = new ushort[width * height];
 
                     fixed(ushort* start = buffer)
                     {
@@ -169,9 +180,16 @@ namespace OpenUO.Ultima.Paradox3d.Adapters
                         }
                     }
 
+                    texture.SetData(buffer);
+
                     return texture;
                 }
             }
+        }
+
+        public Task<Texture> GetStaticAsync(int index)
+        {
+            return Task.FromResult(GetStatic(index));
         }
 
         protected override void Dispose(bool disposing)

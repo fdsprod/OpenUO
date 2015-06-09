@@ -23,6 +23,7 @@ using System.Globalization;
 using System.IO;
 using System.Xml.Serialization;
 using OpenUO.Core.Diagnostics;
+using OpenUO.Core.Diagnostics.Tracing;
 
 #endregion
 
@@ -201,7 +202,7 @@ namespace OpenUO.Ultima
             var minor = (uint)info.ProductMinorPart;
             var build = (uint)info.ProductBuildPart;
 
-            ClientUtility.CalculateLoginKeys(major, minor, 0, build, out key1, out key2);
+            LoginKeyFactory.Create(major, minor, 0, build, out key1, out key2);
         }
 
         public static implicit operator string(InstallLocation a)

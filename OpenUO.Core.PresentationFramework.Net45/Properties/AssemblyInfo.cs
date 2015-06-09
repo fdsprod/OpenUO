@@ -6,11 +6,11 @@ using System.Windows;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 
-[assembly:AssemblyTitle("OpenUO.Core.PresentationFramework.Net45")]
+[assembly:AssemblyTitle("OpenUO.Core.PresentationOpenUO.Core.Net45")]
 [assembly:AssemblyDescription("")]
 [assembly:AssemblyConfiguration("")]
 [assembly:AssemblyCompany("")]
-[assembly:AssemblyProduct("OpenUO.Core.PresentationFramework.Net45")]
+[assembly:AssemblyProduct("OpenUO.Core.PresentationOpenUO.Core.Net45")]
 [assembly:AssemblyCopyright("Copyright ©  2013")]
 [assembly:AssemblyTrademark("")]
 [assembly:AssemblyCulture("")]

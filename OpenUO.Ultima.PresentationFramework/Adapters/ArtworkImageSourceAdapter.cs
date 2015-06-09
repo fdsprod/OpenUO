@@ -17,6 +17,7 @@
 #region Usings
 
 using System.IO;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -24,7 +25,7 @@ using OpenUO.Ultima.Adapters;
 
 #endregion
 
-namespace OpenUO.Ultima.PresentationFramework.Adapters
+namespace OpenUO.Ultima.PresentationOpenUO.Core.Adapters
 {
     internal class ArtworkImageSourceAdapter : StorageAdapterBase, IArtworkStorageAdapter<ImageSource>
     {
@@ -107,6 +108,11 @@ namespace OpenUO.Ultima.PresentationFramework.Adapters
             }
         }
 
+        public Task<ImageSource> GetLandAsync(int index)
+        {
+            return Task.FromResult(GetLand(index));
+        }
+
         public unsafe ImageSource GetStatic(int index)
         {
             index += 0x4000;
@@ -170,6 +176,11 @@ namespace OpenUO.Ultima.PresentationFramework.Adapters
                     return bmp;
                 }
             }
+        }
+
+        public Task<ImageSource> GetStaticAsync(int index)
+        {
+            return Task.FromResult(GetStatic(index));
         }
 
         protected override void Dispose(bool disposing)

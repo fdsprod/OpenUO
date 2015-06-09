@@ -19,6 +19,8 @@
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Threading.Tasks;
+
 using OpenUO.Ultima.Adapters;
 
 #endregion
@@ -117,6 +119,11 @@ namespace OpenUO.Ultima.Windows.Forms.Adapters
                     return bmp;
                 }
             }
+        }
+
+        public Task<Bitmap> GetGumpAsync(int index)
+        {
+            return Task.FromResult(GetGump(index));
         }
 
         protected override void Dispose(bool disposing)

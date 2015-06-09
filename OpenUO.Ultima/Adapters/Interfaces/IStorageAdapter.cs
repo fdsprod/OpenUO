@@ -17,6 +17,7 @@
 #region Usings
 
 using System;
+using System.Threading.Tasks;
 
 #endregion
 
@@ -36,5 +37,7 @@ namespace OpenUO.Ultima.Adapters
         }
 
         void Initialize();
+
+        Task InitializeAsync();
     }
 }

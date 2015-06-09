@@ -16,6 +16,8 @@
 
 #region Usings
 
+using System.Threading.Tasks;
+
 using OpenUO.Core.Patterns;
 using OpenUO.Ultima.Adapters;
 
@@ -33,6 +35,16 @@ namespace OpenUO.Ultima
         public T GetSkill<T>(int index)
         {
             return GetAdapter<ISkillStorageAdapter<T>>().GetSkill(index);
+        }
+
+        public Task<T> GetSkillAsync<T>(int index)
+        {
+            return Task.Run(async () =>
+            {
+                var adapter = await GetAdapterAsync<ISkillStorageAdapter<T>>().ConfigureAwait(false);
+
+                return await adapter.GetSkillAsync(index).ConfigureAwait(false);
+            });
         }
     }
 }

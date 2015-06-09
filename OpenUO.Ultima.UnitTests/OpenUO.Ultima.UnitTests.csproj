@@ -78,9 +78,9 @@
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\OpenUO.Core\OpenUO.Core.Net40.csproj">
-      <Project>{25B50E34-555E-497E-901E-628494B0C954}</Project>
-      <Name>OpenUO.Core.Net40</Name>
+    <ProjectReference Include="..\OpenUO.Core.Net45\OpenUO.Core %28.Net 4.5%29.csproj">
+      <Project>{921d6c7a-5b62-4f99-a6a7-710c6920d494}</Project>
+      <Name>OpenUO.Core %28.Net 4.5%29</Name>
     </ProjectReference>
     <ProjectReference Include="..\OpenUO.Ultima.PresentationFramework\OpenUO.Ultima.PresentationFramework.csproj">
       <Project>{8C5BCAAD-5415-4FF7-B677-6BF398E5465D}</Project>

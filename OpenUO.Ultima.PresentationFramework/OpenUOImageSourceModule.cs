@@ -19,7 +19,7 @@
 using System.Windows.Media;
 using OpenUO.Core.Patterns;
 using OpenUO.Ultima.Adapters;
-using OpenUO.Ultima.PresentationFramework.Adapters;
+using OpenUO.Ultima.PresentationOpenUO.Core.Adapters;
 
 #endregion
 
@@ -32,7 +32,7 @@ namespace OpenUO.Ultima.PresentationFramework
             get { return "OpenUO Ultima SDK - ImageSource Module"; }
         }
 
-        public void OnLoad(Container container)
+        public void OnLoad(IContainer container)
         {
             container.Register<IArtworkStorageAdapter<ImageSource>, ArtworkImageSourceAdapter>();
             container.Register<IAnimationStorageAdapter<ImageSource>, AnimationImageSourceStorageAdapter>();
@@ -42,13 +42,8 @@ namespace OpenUO.Ultima.PresentationFramework
             container.Register<IUnicodeFontStorageAdapter<ImageSource>, UnicodeFontImageSourceAdapter>();
         }
 
-        public void OnUnload(Container container)
+        public void OnUnload(IContainer container)
         {
-        }
-
-        private T Get<T>()
-        {
-            return default(T);
         }
     }
 }

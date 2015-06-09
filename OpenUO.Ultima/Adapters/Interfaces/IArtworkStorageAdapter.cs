@@ -14,11 +14,15 @@
 
 #endregion
 
+using System.Threading.Tasks;
+
 namespace OpenUO.Ultima.Adapters
 {
     public interface IArtworkStorageAdapter<T> : IStorageAdapter
     {
         T GetLand(int index);
+        Task<T> GetLandAsync(int index);
         T GetStatic(int index);
+        Task<T> GetStaticAsync(int index);
     }
 }

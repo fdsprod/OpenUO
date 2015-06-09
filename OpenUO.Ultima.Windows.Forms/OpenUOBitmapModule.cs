@@ -17,6 +17,7 @@
 #region Usings
 
 using System.Drawing;
+
 using OpenUO.Core.Patterns;
 using OpenUO.Ultima.Adapters;
 using OpenUO.Ultima.Windows.Forms.Adapters;
@@ -32,7 +33,7 @@ namespace OpenUO.Ultima.Windows.Forms
             get { return "OpenUO Ultima SDK - Bitmap Module"; }
         }
 
-        public void OnLoad(Container container)
+        public void OnLoad(IContainer container)
         {
             container.Register<IArtworkStorageAdapter<Bitmap>, ArtworkBitmapAdapter>();
             container.Register<IAnimationStorageAdapter<Bitmap>, AnimationBitmapStorageAdapter>();
@@ -42,7 +43,7 @@ namespace OpenUO.Ultima.Windows.Forms
             container.Register<IUnicodeFontStorageAdapter<Bitmap>, UnicodeFontBitmapAdapter>();
         }
 
-        public void OnUnload(Container container)
+        public void OnUnload(IContainer container)
         {
         }
     }

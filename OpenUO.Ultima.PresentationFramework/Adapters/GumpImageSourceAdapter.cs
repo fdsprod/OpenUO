@@ -17,6 +17,7 @@
 #region Usings
 
 using System.IO;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -24,7 +25,7 @@ using OpenUO.Ultima.Adapters;
 
 #endregion
 
-namespace OpenUO.Ultima.PresentationFramework.Adapters
+namespace OpenUO.Ultima.PresentationOpenUO.Core.Adapters
 {
     internal class GumpImageSourceAdapter : StorageAdapterBase, IGumpStorageAdapter<ImageSource>
     {
@@ -118,6 +119,11 @@ namespace OpenUO.Ultima.PresentationFramework.Adapters
                     return bmp;
                 }
             }
+        }
+
+        public Task<ImageSource> GetGumpAsync(int index)
+        {
+            return Task.FromResult(GetGump(index));
         }
 
         protected override void Dispose(bool disposing)

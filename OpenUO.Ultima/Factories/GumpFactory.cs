@@ -16,6 +16,8 @@
 
 #region Usings
 
+using System.Threading.Tasks;
+
 using OpenUO.Core.Patterns;
 using OpenUO.Ultima.Adapters;
 
@@ -38,6 +40,26 @@ namespace OpenUO.Ultima
         public int GetLength<T>()
         {
             return GetAdapter<IGumpStorageAdapter<T>>().Length;
+        }
+
+        public Task<T> GetGumpAsync<T>(int index)
+        {
+            return Task.Run(async () =>
+            {
+                var adapter = await GetAdapterAsync<IGumpStorageAdapter<T>>().ConfigureAwait(false);
+
+                return await adapter.GetGumpAsync(index).ConfigureAwait(false);
+            });
+        }
+
+        public Task<int> GetLengthAsync<T>()
+        {
+            return Task.Run(async () =>
+            {
+                var adapter = await GetAdapterAsync<IGumpStorageAdapter<T>>().ConfigureAwait(false);
+
+                return adapter.Length;
+            });
         }
     }
 }

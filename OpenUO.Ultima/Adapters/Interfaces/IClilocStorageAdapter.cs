@@ -14,10 +14,13 @@
 
 #endregion
 
+using System.Threading.Tasks;
+
 namespace OpenUO.Ultima.Adapters
 {
     public interface IClilocStorageAdapter<T> : IStorageAdapter
     {
         T GetCliloc(ClientLocalizationLanguage lng, int index);
+        Task<T> GetClilocAsync(ClientLocalizationLanguage lng, int index);
     }
 }

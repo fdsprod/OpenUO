@@ -51,7 +51,7 @@ namespace OpenUO.Ultima.UnitTests
             var factory = new SoundFactory(Install, Container);
             var sound = factory.GetSound<Sound>(1);
 
-            Guard.AssertIsNotNull(sound, "Sound was not created.");
+            Guard.RequireIsNotNull(sound, "Sound was not created.");
 
             sound.Play();
         }
@@ -62,7 +62,7 @@ namespace OpenUO.Ultima.UnitTests
             var factory = new SkillsFactory(Install, Container);
             var skill = factory.GetSkill<Skill>(0);
 
-            Guard.AssertIsNotNull(skill, "Skill was not created.");
+            Guard.RequireIsNotNull(skill, "Skill was not created.");
         }
 
         [TestMethod]
@@ -71,7 +71,7 @@ namespace OpenUO.Ultima.UnitTests
             var factory = new AnimationDataFactory(Install, Container);
             var animData = factory.GetAnimationData<AnimationData>(0);
 
-            Guard.AssertIsNotNull(animData, "Animation Data was not created.");
+            Guard.RequireIsNotNull(animData, "Animation Data was not created.");
         }
 
         [TestMethod]
@@ -79,7 +79,7 @@ namespace OpenUO.Ultima.UnitTests
         {
             var colors = new RadarColors(Install);
 
-            Guard.Assert(colors.Length > 0, "Radarcol was not parsed correctly");
+            Guard.Require(colors.Length > 0, "Radarcol was not parsed correctly");
         }
     }
 }
