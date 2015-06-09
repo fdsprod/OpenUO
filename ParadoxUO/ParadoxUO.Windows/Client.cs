@@ -120,7 +120,12 @@ namespace ParadoxUO
             compositor.Master.Renderers.Add(new SceneDelegateRenderer(RenderQuad));
 
         }
-        
+
+        public override async Task Execute()
+        {
+            await Script.NextFrame();
+        }
+
         private void RenderQuad(RenderContext renderContext, RenderFrame frame)
         {
             GraphicsDevice.Clear(frame.DepthStencil, DepthStencilClearOptions.DepthBuffer);
