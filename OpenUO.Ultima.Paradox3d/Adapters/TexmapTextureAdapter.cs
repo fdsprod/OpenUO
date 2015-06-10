@@ -28,16 +28,13 @@ using SiliconStudio.Paradox.Graphics;
 
 namespace OpenUO.Ultima.Paradox3d.Adapters
 {
-    internal class TexmapTextureAdapter : StorageAdapterBase, ITexmapStorageAdapter<Texture>
+    internal class TexmapTextureAdapter : Paradox3dStorageAdapterBase, ITexmapStorageAdapter<Texture>
     {
-        private readonly GraphicsDevice _graphicsDevice;
         private FileIndexBase _fileIndex;
 
         public TexmapTextureAdapter(IContainer container)
+            : base(container)
         {
-            var graphicsDeviceService = container.Resolve<IGraphicsDeviceService>();
-
-            _graphicsDevice = graphicsDeviceService.GraphicsDevice;
         }
 
         public override int Length
@@ -78,7 +75,7 @@ namespace OpenUO.Ultima.Paradox3d.Adapters
 
                 using(var bin = new BinaryReader(stream))
                 {
-                    var texture = Texture.New2D(_graphicsDevice, size, size, PixelFormat.B5G5R5A1_UNorm);
+                    var texture = Texture.New2D(GraphicsDevice, size, size, PixelFormat.B5G5R5A1_UNorm);
                     var buffer = new ushort[size * size];
 
                     fixed(ushort* start = buffer)
@@ -120,7 +117,7 @@ namespace OpenUO.Ultima.Paradox3d.Adapters
 
                 using (var bin = new BinaryReader(stream))
                 {
-                    var texture = Texture.New2D(_graphicsDevice, size, size, PixelFormat.B5G5R5A1_UNorm);
+                    var texture = Texture.New2D(GraphicsDevice, size, size, PixelFormat.B5G5R5A1_UNorm);
                     var buffer = new ushort[size * size];
 
                     unsafe

@@ -91,6 +91,10 @@ namespace ParadoxUO
         private SpriteBatch _spriteBatch;
         private TexmapFactory _texmapFactory;
         private ArtworkFactory _artworkFactory;
+        private AnimationFactory _animationFactory;
+        private ASCIIFontFactory _asciiFontFactory;
+        private UnicodeFontFactory _unicodeFontFactory;
+        private GumpFactory _gumpFactory;
         private Texture _tile;
         private IContainer _container;
 
@@ -111,18 +115,26 @@ namespace ParadoxUO
 
             _artworkFactory = new ArtworkFactory(installs.First(), _container);
             _texmapFactory = new TexmapFactory(installs.First(), _container);
-            
+            _animationFactory = new AnimationFactory(installs.First(), _container);
+            _gumpFactory = new GumpFactory(installs.First(), _container);
+            _asciiFontFactory = new ASCIIFontFactory(installs.First(), _container);
+            _unicodeFontFactory = new UnicodeFontFactory(installs.First(), _container);
+
             // register the renderer in the pipeline
             var scene = SceneSystem.SceneInstance.Scene;
             var compositor = ((SceneGraphicsCompositorLayers)scene.Settings.GraphicsCompositor);
 
             compositor.Master.Renderers.Add(new ClearRenderFrameRenderer());
             compositor.Master.Renderers.Add(new SceneDelegateRenderer(RenderQuad));
-
         }
 
         public override async Task Execute()
         {
+            if (_tile == null)
+            {
+                _tile = await _unicodeFontFactory.GetTextAsync<Texture>(0, "This is a test of the emergency openuo system.", 1);
+            }
+
             await Script.NextFrame();
         }
 

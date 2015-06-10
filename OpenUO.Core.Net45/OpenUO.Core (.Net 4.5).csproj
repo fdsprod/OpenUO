@@ -58,7 +58,6 @@
     <Compile Include="ConsoleManager.cs" />
     <Compile Include="Data\ColumnAttribute.cs" />
     <Compile Include="Diagnostics\GeneralExceptionHandler.cs" />
-    <Compile Include="Diagnostics\Guard.cs" />
     <Compile Include="Diagnostics\Listeners\ConsoleOutputEventListener.cs" />
     <Compile Include="Diagnostics\Listeners\DebugOutputEventListener.cs" />
     <Compile Include="Diagnostics\Listeners\FileLogEventListener.cs" />

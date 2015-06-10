@@ -1,0 +1,49 @@
+!Package
+Id: f96b46f0-f70a-44c2-ab94-ca9c4d7d0c81
+Tags: []
+Meta:
+    Name: ParadoxUO
+    Version: 1.0.0.0
+    Authors: []
+    Owners: []
+    RootNamespace: ParadoxUO
+    Dependencies:
+        -   Name: Paradox
+            Version: 1.1.2-beta
+LocalDependencies: []
+Profiles:
+    -   Name: Shared
+        Platform: Shared
+        InheritProfiles: []
+        AssetFolders:
+            -   Path: Assets/Shared
+                RawImports: []
+            -   Path: ParadoxUO.Game/Effects
+                RawImports: []
+        OutputGroupDirectories: {}
+        Properties:
+            GameSettingsAsset.BackBufferHeight: 720
+            GameSettingsAsset.BackBufferWidth: 1280
+            GameSettingsAsset.DefaultGraphicsProfile: Level_10_0
+            GameSettingsAsset.DefaultScene: 4a02bf9f-c979-43d2-85ff-18c7df9f22ba:MainScene
+            Paradox.DisplayOrientation: LandscapeRight
+        ProjectReferences:
+            -   Id: A1C90275-1B59-436F-8327-78863E14D155
+                Location: ParadoxUO.Game/ParadoxUO.Game.csproj
+                Type: Library
+    -   Name: Windows
+        Platform: Windows
+        InheritProfiles: []
+        AssetFolders:
+            -   Path: Assets/Windows
+                RawImports: []
+        OutputGroupDirectories: {}
+        Properties:
+            Paradox.GraphicsPlatform: Direct3D11
+        ProjectReferences:
+            -   Id: 6ada11dc-4c94-4984-a555-005ee7d26483
+                Location: ParadoxUO.Windows/ParadoxUO.Windows.csproj
+                Type: Executable
+ExplicitFolders: []
+Bundles: []
+TemplateFolders: []
