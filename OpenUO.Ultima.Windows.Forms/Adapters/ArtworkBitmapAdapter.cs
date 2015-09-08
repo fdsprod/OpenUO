@@ -68,46 +68,44 @@ namespace OpenUO.Ultima.Windows.Forms.Adapters
                     return null;
                 }
 
-                using(var bmp = new Bitmap(44, 44, PixelFormat.Format16bppArgb1555))
+                var bmp = new Bitmap(44, 44, PixelFormat.Format16bppArgb1555);
+                var bd = bmp.LockBits(new Rectangle(0, 0, 44, 44), ImageLockMode.WriteOnly, PixelFormat.Format16bppArgb1555);
+                var bin = new BinaryReader(stream);
+
+                var xOffset = 21;
+                var xRun = 2;
+
+                var line = (ushort*)bd.Scan0;
+                var delta = bd.Stride >> 1;
+
+                for(var y = 0; y < 22; ++y, --xOffset, xRun += 2, line += delta)
                 {
-                    var bd = bmp.LockBits(new Rectangle(0, 0, 44, 44), ImageLockMode.WriteOnly, PixelFormat.Format16bppArgb1555);
-                    var bin = new BinaryReader(stream);
+                    var cur = line + xOffset;
+                    var end = cur + xRun;
 
-                    var xOffset = 21;
-                    var xRun = 2;
-
-                    var line = (ushort*)bd.Scan0;
-                    var delta = bd.Stride >> 1;
-
-                    for(var y = 0; y < 22; ++y, --xOffset, xRun += 2, line += delta)
+                    while(cur < end)
                     {
-                        var cur = line + xOffset;
-                        var end = cur + xRun;
-
-                        while(cur < end)
-                        {
-                            *cur++ = (ushort)(bin.ReadUInt16() | 0x8000);
-                        }
+                        *cur++ = (ushort)(bin.ReadUInt16() | 0x8000);
                     }
-
-                    xOffset = 0;
-                    xRun = 44;
-
-                    for(var y = 0; y < 22; ++y, ++xOffset, xRun -= 2, line += delta)
-                    {
-                        var cur = line + xOffset;
-                        var end = cur + xRun;
-
-                        while(cur < end)
-                        {
-                            *cur++ = (ushort)(bin.ReadUInt16() | 0x8000);
-                        }
-                    }
-
-                    bmp.UnlockBits(bd);
-
-                    return bmp;
                 }
+
+                xOffset = 0;
+                xRun = 44;
+
+                for(var y = 0; y < 22; ++y, ++xOffset, xRun -= 2, line += delta)
+                {
+                    var cur = line + xOffset;
+                    var end = cur + xRun;
+
+                    while(cur < end)
+                    {
+                        *cur++ = (ushort)(bin.ReadUInt16() | 0x8000);
+                    }
+                }
+
+                bmp.UnlockBits(bd);
+
+                return bmp;
             }
         }
 

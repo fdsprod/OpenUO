@@ -107,7 +107,7 @@ namespace OpenUO.Ultima.Windows.Forms.Controls
             {
                 foreach(var value in _cache.Values)
                 {
-                    value.Dispose();
+                    value?.Dispose();
                 }
             }
         }

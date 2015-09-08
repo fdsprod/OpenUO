@@ -14,15 +14,14 @@
 
 #region Usings
 
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
-
+using System.Windows.Forms;
+using OpenUO.Core.Configuration;
 using OpenUO.Core.Net;
 using OpenUO.Core.Patterns;
 using OpenUO.Ultima;
-
+using ParadoxUO.Windows.Forms;
 using SiliconStudio.Core;
 using SiliconStudio.Core.Mathematics;
 using SiliconStudio.Paradox.Engine;
@@ -37,13 +36,10 @@ namespace ParadoxUO
 {
     public interface IClient
     {
-        IContainer Container
-        {
-            get;
-        }
+        IContainer Container { get; }
     }
-    
-    internal class Client : Game
+
+    internal class Client : Game, IClient
     {
         private INetworkClient _network;
 
@@ -51,6 +47,7 @@ namespace ParadoxUO
         {
             Container = new Container();
 
+            Container.Register<IClient>(this);
             Container.Register<IGame>(this);
             Container.Register(Services.GetServiceAs<IGamePlatform>());
             Container.Register<IGraphicsDeviceService>(GraphicsDeviceManager);
@@ -59,14 +56,13 @@ namespace ParadoxUO
             IsFixedTimeStep = false;
         }
 
-        public IContainer Container
-        {
-            get;
-        }
+        public IContainer Container { get; }
 
         protected override void Initialize()
         {
             base.Initialize();
+
+            Container.Register(Window);
 
             _network = Container.Resolve<INetworkClient>();
         }
@@ -88,41 +84,58 @@ namespace ParadoxUO
 
     public class RenderScript : AsyncScript
     {
+        private readonly IContainer _container;
+        private readonly Vector2 _virtualResolution = new Vector2(1280, 720);
+        private AnimationFactory _animationFactory;
+        private ArtworkFactory _artworkFactory;
+        private ASCIIFontFactory _asciiFontFactory;
+        private GumpFactory _gumpFactory;
         private SpriteBatch _spriteBatch;
         private TexmapFactory _texmapFactory;
-        private ArtworkFactory _artworkFactory;
-        private AnimationFactory _animationFactory;
-        private ASCIIFontFactory _asciiFontFactory;
-        private UnicodeFontFactory _unicodeFontFactory;
-        private GumpFactory _gumpFactory;
         private Texture _tile;
-        private IContainer _container;
+        private UnicodeFontFactory _unicodeFontFactory;
 
         public RenderScript(IContainer container)
         {
             _container = container;
         }
 
-        private readonly Vector2 _virtualResolution = new Vector2(1280, 720);
-
         public override void Start()
         {
             base.Start();
 
-            var installs = InstallationLocator.Locate();
+            var dataDirectory = Settings.UltimaOnline.DataDirectory;
 
-            _spriteBatch = new SpriteBatch(GraphicsDevice) { VirtualResolution = new Vector3(_virtualResolution, 1) };
+            if (string.IsNullOrEmpty(dataDirectory) || !Directory.Exists(dataDirectory))
+            {
+                using (var form = new SelectInstallForm("CoreAdapterTests"))
+                {
+                    if (form.ShowDialog() == DialogResult.Cancel)
+                    {
+                        //TODO: End game
+                    }
 
-            _artworkFactory = new ArtworkFactory(installs.First(), _container);
-            _texmapFactory = new TexmapFactory(installs.First(), _container);
-            _animationFactory = new AnimationFactory(installs.First(), _container);
-            _gumpFactory = new GumpFactory(installs.First(), _container);
-            _asciiFontFactory = new ASCIIFontFactory(installs.First(), _container);
-            _unicodeFontFactory = new UnicodeFontFactory(installs.First(), _container);
+                    var version = form.SelectedInstall.Version;
+
+                    Settings.UltimaOnline.DataDirectory = dataDirectory = form.SelectedInstall.Directory;
+                    Settings.UltimaOnline.ClientVersion = version.ToString();
+                }
+            }
+
+            var install = new InstallLocation(dataDirectory);
+
+            _spriteBatch = new SpriteBatch(GraphicsDevice) {VirtualResolution = new Vector3(_virtualResolution, 1)};
+
+            _artworkFactory = new ArtworkFactory(install, _container);
+            _texmapFactory = new TexmapFactory(install, _container);
+            _animationFactory = new AnimationFactory(install, _container);
+            _gumpFactory = new GumpFactory(install, _container);
+            _asciiFontFactory = new ASCIIFontFactory(install, _container);
+            _unicodeFontFactory = new UnicodeFontFactory(install, _container);
 
             // register the renderer in the pipeline
             var scene = SceneSystem.SceneInstance.Scene;
-            var compositor = ((SceneGraphicsCompositorLayers)scene.Settings.GraphicsCompositor);
+            var compositor = ((SceneGraphicsCompositorLayers) scene.Settings.GraphicsCompositor);
 
             compositor.Master.Renderers.Add(new ClearRenderFrameRenderer());
             compositor.Master.Renderers.Add(new SceneDelegateRenderer(RenderQuad));
@@ -130,11 +143,6 @@ namespace ParadoxUO
 
         public override async Task Execute()
         {
-            if (_tile == null)
-            {
-                _tile = await _unicodeFontFactory.GetTextAsync<Texture>(0, "This is a test of the emergency openuo system.", 1);
-            }
-
             await Script.NextFrame();
         }
 

@@ -1,4 +1,5 @@
-﻿namespace OpenUO.Ultima.UnitTests
+﻿
+namespace OpenUO.Ultima.UnitTests
 {
     partial class SelectInstallForm
     {
@@ -35,7 +36,7 @@
             // 
             // installsComboBox
             // 
-            this.installsComboBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.installsComboBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.installsComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.installsComboBox.FormattingEnabled = true;

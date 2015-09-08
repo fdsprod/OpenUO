@@ -17,24 +17,24 @@ namespace OpenUO.Core.Configuration
     public sealed class UltimaOnlineSettings : SettingsSectionBase
     {
         public const string SectionName = "UltimaOnline";
-        private byte[] m_ClientVersion;
-        private string m_DataDirectory;
+        private string _clientVersion;
+        private string _dataDirectory;
 
         public UltimaOnlineSettings()
         {
-            ClientVersion = new byte[] {6, 0, 6, 2};
+            ClientVersion = "6.0.6.2";
         }
 
-        public byte[] ClientVersion
+        public string ClientVersion
         {
-            get { return m_ClientVersion; }
-            set { SetProperty(ref m_ClientVersion, value); }
+            get { return _clientVersion; }
+            set { SetProperty(ref _clientVersion, value); }
         }
 
         public string DataDirectory
         {
-            get { return m_DataDirectory; }
-            set { SetProperty(ref m_DataDirectory, value); }
+            get { return _dataDirectory; }
+            set { SetProperty(ref _dataDirectory, value); }
         }
 
         protected override void UpdateVersionValues()
@@ -43,7 +43,7 @@ namespace OpenUO.Core.Configuration
 
             if (ClientVersion == null)
             {
-                ClientVersion = new byte[] {6, 0, 6, 2};
+                ClientVersion = "6.0.6.2";
             }
         }
     }

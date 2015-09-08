@@ -29,6 +29,7 @@ using OpenUO.Ultima;
 using ParadoxUO.Extensibility;
 
 using SiliconStudio.Core;
+using SiliconStudio.Core.Diagnostics;
 using SiliconStudio.Paradox.Engine;
 
 #endregion
@@ -68,9 +69,7 @@ namespace ParadoxUO
                 {
                     ConsoleManager.Show();
                 }
-
-                //Profiler.EnableAll();
-
+                
                 using (var client = new Client())
                 {
                     client.Container.RegisterModule<ParadoxUOCoreModule>();

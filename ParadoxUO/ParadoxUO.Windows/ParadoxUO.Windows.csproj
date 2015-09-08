@@ -73,6 +73,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
@@ -87,6 +88,10 @@
     <ProjectReference Include="..\..\OpenUO.Ultima.Paradox3d\OpenUO.Ultima.Paradox3d.csproj">
       <Project>{1eef802e-08ce-4405-b5ab-daa2756d43df}</Project>
       <Name>OpenUO.Ultima.Paradox3d</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\OpenUO.Ultima.Windows.Forms\OpenUO.Ultima.Windows.Forms.csproj">
+      <Project>{5050b1a5-4683-4935-81de-1b7a4403831b}</Project>
+      <Name>OpenUO.Ultima.Windows.Forms</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\OpenUO.Ultima\OpenUO.Ultima.csproj">
       <Project>{911c0a0f-1a08-4da0-b103-eb24d9e19402}</Project>
@@ -113,6 +118,12 @@
     <Compile Include="Configuration\UltimaOnlineSettings.cs" />
     <Compile Include="Extensibility\IExtension.cs" />
     <Compile Include="Extensibility\ExtensionManager.cs" />
+    <Compile Include="Forms\SelectInstallForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\SelectInstallForm.Designer.cs">
+      <DependentUpon>SelectInstallForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Net\ClientSystemBase.cs" />
     <Compile Include="Net\NetworkClient.cs" />
     <Compile Include="Net\QueuedPacket.cs" />
@@ -125,6 +136,11 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Extensions\" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Forms\SelectInstallForm.resx">
+      <DependentUpon>SelectInstallForm.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SiliconStudioPackageProps)" Condition="Exists('$(SiliconStudioPackageProps)')" />
