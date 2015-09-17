@@ -48,6 +48,9 @@ namespace OpenUO.Ultima.Adapters
                 },
                 {
                     ClientLocalizationLanguage.KOR, new ClientLocalizations()
+                },
+                {
+                    ClientLocalizationLanguage.CHT, new ClientLocalizations()
                 }
             };
 
