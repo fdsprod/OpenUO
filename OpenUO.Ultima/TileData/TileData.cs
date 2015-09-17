@@ -38,6 +38,7 @@ namespace OpenUO.Ultima
             {
                 using(var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read))
                 {
+                    var x64 = fs.Length >= 3188736;
                     var bin = new BinaryReader(fs);
 
                     m_LandData = new LandData[0x4000];
@@ -49,7 +50,7 @@ namespace OpenUO.Ultima
                             bin.ReadInt32(); // header
                         }
 
-                        var flags = (TileFlag)bin.ReadInt32();
+                        var flags = x64 ? (TileFlag)bin.ReadInt64() : (TileFlag)bin.ReadInt32();
                         bin.ReadInt16(); // skip 2 bytes -- textureID
 
                         m_LandData[i] = new LandData(ReadNameString(bin), flags);
@@ -65,7 +66,7 @@ namespace OpenUO.Ultima
                             bin.ReadInt32(); // header
                         }
 
-                        var flags = (TileFlag)bin.ReadInt32();
+                        var flags = x64 ? (TileFlag)bin.ReadInt64() : (TileFlag)bin.ReadInt32();
                         int weight = bin.ReadByte();
                         int quality = bin.ReadByte();
                         bin.ReadInt16();
