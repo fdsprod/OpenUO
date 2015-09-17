@@ -24,6 +24,7 @@ namespace OpenUO.Ultima
         ESP,
         FRA,
         JPN,
-        KOR
+        KOR,
+        CHT
     }
 }
