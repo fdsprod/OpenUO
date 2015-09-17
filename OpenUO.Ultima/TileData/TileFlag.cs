@@ -23,7 +23,7 @@ using System;
 namespace OpenUO.Ultima
 {
     [Flags]
-    public enum TileFlag
+    public enum TileFlag : long
     {
         /// <summary>
         ///     Nothing is flagged.
@@ -188,6 +188,6 @@ namespace OpenUO.Ultima
         /// <summary>
         ///     Not yet documented.
         /// </summary>
-        StairRight = unchecked((int)0x80000000)
+        StairRight = 0x80000000
     }
 }
